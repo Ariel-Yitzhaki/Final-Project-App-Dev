@@ -71,6 +71,13 @@ class MainActivity : AppCompatActivity() {
                 .replace(R.id.fragment_container, ProfileFragment())
                 .commit()
         }
+
+        // Friends button - opens friends list
+        findViewById<ImageButton>(R.id.nav_friends).setOnClickListener {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, FriendsFragment())
+                .commit()
+        }
     }
 
     private fun checkCameraPermissionAndOpen() {
