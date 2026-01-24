@@ -1,4 +1,4 @@
-package com.example.travel
+package com.example.travel.models
 
 // User profile data stored in Firestore
 data class User(

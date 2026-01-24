@@ -9,10 +9,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.launch
+import com.example.travel.data.PhotoRepository
 
 class ProfileFragment : Fragment() {
 
-    private lateinit var repository: FirebaseRepository
+    private lateinit var photoRepository: PhotoRepository
     private lateinit var recyclerView: RecyclerView
 
     override fun onCreateView(
@@ -26,7 +27,7 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        repository = FirebaseRepository()
+        photoRepository = PhotoRepository()
         recyclerView = view.findViewById(R.id.photos_recycler_view)
         recyclerView.layoutManager = GridLayoutManager(requireContext(), 3)  // 3 columns
 
@@ -36,7 +37,7 @@ class ProfileFragment : Fragment() {
     // Fetches all photos from Firestore and displays them in the grid
     private fun loadPhotos() {
         lifecycleScope.launch {
-            val photos = repository.getAllPhotos()
+            val photos = photoRepository.getAllPhotos()
             recyclerView.adapter = PhotoAdapter(photos)
         }
     }

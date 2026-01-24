@@ -31,6 +31,8 @@ import android.graphics.RectF
 import androidx.core.graphics.createBitmap
 import com.google.android.gms.maps.model.Marker
 import androidx.core.graphics.scale
+import com.example.travel.models.Photo
+import com.example.travel.data.PhotoRepository
 
 
 // Fragment that displays a Google Map and centers it on user's location
@@ -41,7 +43,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     // Google's location service - gets device location using GPS, WiFi, cell towers
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private lateinit var repository: FirebaseRepository
+    private lateinit var photoRepository: PhotoRepository
     private val photoMarkers = mutableListOf<Pair<Marker, Photo>>()
 
     // Modern way to request permissions - launches system permission dialog and handles result
@@ -68,7 +70,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         // Initialize Google's location service
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
-        repository = FirebaseRepository()
+        photoRepository = PhotoRepository()
 
         // Find the map fragment and request the GoogleMap object asynchronously
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
@@ -128,7 +130,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private fun loadPhotosOnMap() {
         lifecycleScope.launch {
-            val photos = repository.getAllPhotos()
+            val photos = photoRepository.getAllPhotos()
             for (photo in photos) {
                 val position = LatLng(photo.latitude, photo.longitude)
                 val size = getMarkerSizeForZoom(map.cameraPosition.zoom)

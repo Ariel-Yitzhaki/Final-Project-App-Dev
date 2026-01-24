@@ -1,4 +1,4 @@
-package com.example.travel
+package com.example.travel.models
 
 data class Photo(
     val id: String = "",

@@ -18,11 +18,13 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 import android.widget.ImageButton
+import com.example.travel.models.Photo
+import com.example.travel.data.PhotoRepository
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private lateinit var repository: FirebaseRepository
+    private lateinit var photoRepository: PhotoRepository
     private var photoUri: Uri? = null
     private var currentPhotoPath: String = ""
 
@@ -49,7 +51,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-        repository = FirebaseRepository()
+        photoRepository = PhotoRepository()
 
         // Load map fragment
         if (savedInstanceState == null) {
@@ -116,7 +118,7 @@ class MainActivity : AppCompatActivity() {
                     )
 
                     lifecycleScope.launch {
-                        repository.savePhoto(photo)
+                        photoRepository.savePhoto(photo)
                     }
                 }
             }
