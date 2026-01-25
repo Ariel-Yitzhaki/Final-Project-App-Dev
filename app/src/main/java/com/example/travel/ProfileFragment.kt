@@ -46,10 +46,12 @@ class ProfileFragment : Fragment() {
         loadPhotos()
     }
 
-    // Fetches all photos from Firestore and displays them in the grid
+    // Fetches all photos from Firestore of the user and displays them in the grid
     private fun loadPhotos() {
+        val userId = authRepository.getCurrentUser()?.uid ?: return
+
         lifecycleScope.launch {
-            val photos = photoRepository.getAllPhotos()
+            val photos = photoRepository.getPhotosForUser(userId)
             recyclerView.adapter = PhotoAdapter(photos)
         }
     }

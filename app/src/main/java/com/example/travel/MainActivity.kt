@@ -20,6 +20,7 @@ import java.util.*
 import android.widget.ImageButton
 import com.example.travel.models.Photo
 import com.example.travel.data.PhotoRepository
+import com.example.travel.data.AuthRepository
 
 class MainActivity : AppCompatActivity() {
 
@@ -27,6 +28,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var photoRepository: PhotoRepository
     private var photoUri: Uri? = null
     private var currentPhotoPath: String = ""
+    private lateinit var authRepository: AuthRepository
 
     // Launches camera and handles result
     private val takePictureLauncher = registerForActivityResult(
@@ -52,6 +54,7 @@ class MainActivity : AppCompatActivity() {
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         photoRepository = PhotoRepository()
+        authRepository = AuthRepository()
 
         // Load map fragment
         if (savedInstanceState == null) {
@@ -116,6 +119,7 @@ class MainActivity : AppCompatActivity() {
                 location?.let {
                     val photo = Photo(
                         id = UUID.randomUUID().toString(),
+                        userId = authRepository.getCurrentUser()?.uid ?: "",
                         localPath = currentPhotoPath,
                         latitude = it.latitude,
                         longitude = it.longitude,
