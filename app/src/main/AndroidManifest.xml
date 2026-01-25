@@ -32,8 +32,12 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.Travel">
-        </activity>
+            android:theme="@style/Theme.Travel"/>
+
+        <activity
+            android:name=".PhotoPreviewActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Travel" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

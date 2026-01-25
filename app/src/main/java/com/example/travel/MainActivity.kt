@@ -3,22 +3,20 @@ package com.example.travel
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Environment
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import kotlinx.coroutines.launch
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 import android.widget.ImageButton
-import com.example.travel.models.Photo
 import com.example.travel.data.PhotoRepository
 import com.example.travel.data.AuthRepository
 
@@ -31,11 +29,31 @@ class MainActivity : AppCompatActivity() {
     private lateinit var authRepository: AuthRepository
 
     // Launches camera and handles result
+    // Launches camera and handles result
     private val takePictureLauncher = registerForActivityResult(
         ActivityResultContracts.TakePicture()
     ) { success ->
         if (success) {
-            savePhotoToFirestore()
+            openPhotoPreview()
+        }
+    }
+
+    // Launches preview screen and handles result
+    private val previewLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        when (result.resultCode) {
+            RESULT_OK -> {
+                // Photo uploaded, refresh map
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, MapFragment())
+                    .commit()
+            }
+            RESULT_FIRST_USER -> {
+                // Retake requested
+                openCamera()
+            }
+            // RESULT_CANCELED - do nothing, photo discarded
         }
     }
 
@@ -81,6 +99,13 @@ class MainActivity : AppCompatActivity() {
                 .replace(R.id.fragment_container, FriendsFragment())
                 .commit()
         }
+
+        // Home button - opens map
+        findViewById<ImageButton>(R.id.nav_home).setOnClickListener {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, MapFragment())
+                .commit()
+        }
     }
 
     private fun checkCameraPermissionAndOpen() {
@@ -111,27 +136,17 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun savePhotoToFirestore() {
+    private fun openPhotoPreview() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
             == PackageManager.PERMISSION_GRANTED
         ) {
             fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-                location?.let {
-                    val photo = Photo(
-                        id = UUID.randomUUID().toString(),
-                        userId = authRepository.getCurrentUser()?.uid ?: "",
-                        localPath = currentPhotoPath,
-                        latitude = it.latitude,
-                        longitude = it.longitude,
-                        date = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date()),
-                        timestamp = System.currentTimeMillis(),
-                        tripId = "default_trip"  // We'll add trip selection later
-                    )
-
-                    lifecycleScope.launch {
-                        photoRepository.savePhoto(photo)
-                    }
+                val intent = Intent(this, PhotoPreviewActivity::class.java).apply {
+                    putExtra("photoPath", currentPhotoPath)
+                    putExtra("latitude", location?.latitude ?: 0.0)
+                    putExtra("longitude", location?.longitude ?: 0.0)
                 }
+                previewLauncher.launch(intent)
             }
         }
     }
