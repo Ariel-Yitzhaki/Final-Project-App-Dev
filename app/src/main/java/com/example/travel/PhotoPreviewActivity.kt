@@ -1,6 +1,5 @@
 package com.example.travel
 
-import android.graphics.BitmapFactory
 import android.location.Geocoder
 import android.os.Bundle
 import android.view.View
@@ -20,6 +19,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.UUID
+import com.bumptech.glide.Glide
 
 class PhotoPreviewActivity : AppCompatActivity() {
 
@@ -56,8 +56,9 @@ class PhotoPreviewActivity : AppCompatActivity() {
         progressBar = findViewById(R.id.progressBar)
 
         // Display photo
-        val bitmap = BitmapFactory.decodeFile(photoPath)
-        photoPreview.setImageBitmap(bitmap)
+        Glide.with(this)
+            .load(photoPath)
+            .into(photoPreview)
 
         // Display location
         loadAddress()

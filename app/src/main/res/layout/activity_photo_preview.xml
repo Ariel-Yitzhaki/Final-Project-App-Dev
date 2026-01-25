@@ -14,7 +14,7 @@
         android:layout_marginTop="10dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="discard photo"
-        android:scaleType="centerCrop"
+        android:scaleType="fitCenter"
         android:src="@drawable/ic_trash"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

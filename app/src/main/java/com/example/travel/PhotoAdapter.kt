@@ -1,12 +1,12 @@
 package com.example.travel
 
-import android.graphics.BitmapFactory
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.travel.models.Photo
+import com.bumptech.glide.Glide
 
 // Adapter that binds photo data to RecyclerView grid items
 class PhotoAdapter(private val photos: List<Photo>) :
@@ -27,8 +27,10 @@ class PhotoAdapter(private val photos: List<Photo>) :
     // Binds photo data to view holder - loads image from local path
     override fun onBindViewHolder(holder: PhotoViewHolder, position: Int) {
         val photo = photos[position]
-        val bitmap = BitmapFactory.decodeFile(photo.localPath)
-        holder.imageView.setImageBitmap(bitmap)
+        Glide.with(holder.itemView.context)
+            .load(photo.localPath)
+            .centerCrop()
+            .into(holder.imageView)
     }
 
     // Returns total number of photos

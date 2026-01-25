@@ -20,8 +20,6 @@ import com.google.android.gms.maps.model.LatLng
 import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.maps.model.MarkerOptions
 import kotlinx.coroutines.launch
-import android.graphics.BitmapFactory
-import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import android.graphics.Canvas
 import android.graphics.Paint
@@ -30,9 +28,12 @@ import android.graphics.Path
 import android.graphics.RectF
 import androidx.core.graphics.createBitmap
 import com.google.android.gms.maps.model.Marker
-import androidx.core.graphics.scale
 import com.example.travel.models.Photo
 import com.example.travel.data.PhotoRepository
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
+import android.graphics.drawable.Drawable
 
 
 // Fragment that displays a Google Map and centers it on user's location
@@ -134,30 +135,45 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             for (photo in photos) {
                 val position = LatLng(photo.latitude, photo.longitude)
                 val size = getMarkerSizeForZoom(map.cameraPosition.zoom)
-                val markerOptions = MarkerOptions()
-                    .position(position)
-                    .title(photo.date)
 
-                createMarkerBitmapFromPath(photo.localPath, size)?.let {
-                    markerOptions.icon(it)
-                }
+                Glide.with(this@MapFragment)
+                    .asBitmap()
+                    .load(photo.localPath)
+                    .override(size, size)
+                    .centerCrop()
+                    .into(object : CustomTarget<Bitmap>() {
+                        override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                            val pinBitmap = createPinWithPhoto(resource, 8, Color.WHITE)
+                            val markerOptions = MarkerOptions()
+                                .position(position)
+                                .title(photo.date)
+                                .icon(BitmapDescriptorFactory.fromBitmap(pinBitmap))
 
-                map.addMarker(markerOptions)?.let { marker ->
-                    photoMarkers.add(Pair(marker, photo))
-                }
+                            map.addMarker(markerOptions)?.let { marker ->
+                                photoMarkers.add(Pair(marker, photo))
+                            }
+                        }
+
+                        override fun onLoadCleared(placeholder: Drawable?) {}
+                    })
             }
         }
     }
 
-    private fun createMarkerBitmapFromPath(path: String, size: Int): BitmapDescriptor? {
-        return try {
-            val bitmap = BitmapFactory.decodeFile(path)
-            val scaled = bitmap.scale(size, size, false)
-            val pinBitmap = createPinWithPhoto(scaled, 8, Color.WHITE)
-            BitmapDescriptorFactory.fromBitmap(pinBitmap)
-        } catch (_: Exception) {
-            null
-        }
+    private fun updateMarkerWithSize(marker: Marker, photo: Photo, size: Int) {
+        Glide.with(this@MapFragment)
+            .asBitmap()
+            .load(photo.localPath)
+            .override(size, size)
+            .centerCrop()
+            .into(object : CustomTarget<Bitmap>() {
+                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                    val pinBitmap = createPinWithPhoto(resource, 8, Color.WHITE)
+                    marker.setIcon(BitmapDescriptorFactory.fromBitmap(pinBitmap))
+                }
+
+                override fun onLoadCleared(placeholder: Drawable?) {}
+            })
     }
 
     private fun createPinWithPhoto(photo: Bitmap, borderWidth: Int, borderColor: Int): Bitmap {
@@ -202,9 +218,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private fun updateMarkerSizes() {
         val size = getMarkerSizeForZoom(map.cameraPosition.zoom)
         for ((marker, photo) in photoMarkers) {
-            createMarkerBitmapFromPath(photo.localPath, size)?.let {
-                marker.setIcon(it)
-            }
+            updateMarkerWithSize(marker, photo, size)
         }
     }
 }
