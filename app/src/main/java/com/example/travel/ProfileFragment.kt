@@ -10,10 +10,14 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.launch
 import com.example.travel.data.PhotoRepository
+import com.example.travel.data.AuthRepository
+import android.content.Intent
+import android.widget.Button
 
 class ProfileFragment : Fragment() {
 
     private lateinit var photoRepository: PhotoRepository
+    private lateinit var authRepository: AuthRepository
     private lateinit var recyclerView: RecyclerView
 
     override fun onCreateView(
@@ -28,6 +32,14 @@ class ProfileFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         photoRepository = PhotoRepository()
+        authRepository = AuthRepository()
+
+        view.findViewById<Button>(R.id.signOutButton).setOnClickListener {
+            authRepository.signOut()
+            startActivity(Intent(requireContext(), LoginActivity::class.java))
+            requireActivity().finish()
+        }
+
         recyclerView = view.findViewById(R.id.photos_recycler_view)
         recyclerView.layoutManager = GridLayoutManager(requireContext(), 3)  // 3 columns
 

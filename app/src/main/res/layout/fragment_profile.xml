@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     android:background="@color/white">
 
-    <!-- Page title -->
     <TextView
         android:id="@+id/profile_title"
         android:layout_width="wrap_content"
@@ -18,7 +17,14 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <!-- Grid of photos -->
+    <Button
+        android:id="@+id/signOutButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sign Out"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/photos_recycler_view"
         android:layout_width="0dp"
