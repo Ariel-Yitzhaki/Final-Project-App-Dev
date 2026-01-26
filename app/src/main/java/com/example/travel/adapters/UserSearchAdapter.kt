@@ -1,4 +1,4 @@
-package com.example.travel
+package com.example.travel.adapters
 
 import android.view.LayoutInflater
 import android.view.View
@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.travel.R
 import com.example.travel.models.User
 
 // Adapter for user search results with dynamic button states

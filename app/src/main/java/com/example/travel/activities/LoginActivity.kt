@@ -1,4 +1,4 @@
-package com.example.travel
+package com.example.travel.activities
 
 import android.content.Intent
 import android.os.Bundle
@@ -10,6 +10,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.example.travel.activities.MainActivity
+import com.example.travel.R
 import com.example.travel.data.AuthRepository
 import kotlinx.coroutines.launch
 

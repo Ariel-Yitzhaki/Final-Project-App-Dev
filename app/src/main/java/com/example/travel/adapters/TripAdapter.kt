@@ -1,9 +1,10 @@
-package com.example.travel
+package com.example.travel.adapters
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.travel.R
 import com.example.travel.models.Trip
 
 // Adapter for displaying trip cards

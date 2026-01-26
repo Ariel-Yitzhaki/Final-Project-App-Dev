@@ -1,43 +1,43 @@
-package com.example.travel
+package com.example.travel.fragments
 
 import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.RectF
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.createBitmap
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
+import com.example.travel.R
+import com.example.travel.data.AuthRepository
+import com.example.travel.data.PhotoRepository
+import com.example.travel.data.TripRepository
+import com.example.travel.models.Photo
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
-import androidx.lifecycle.lifecycleScope
-import com.google.android.gms.maps.model.MarkerOptions
-import kotlinx.coroutines.launch
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import android.graphics.Canvas
-import android.graphics.Paint
-import android.graphics.Color
-import android.graphics.Path
-import android.graphics.RectF
-import androidx.core.graphics.createBitmap
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
-import com.example.travel.models.Photo
-import com.example.travel.data.PhotoRepository
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
-import android.graphics.drawable.Drawable
-import com.example.travel.data.AuthRepository
-import com.example.travel.data.TripRepository
+import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
-
+import kotlinx.coroutines.launch
 
 // Fragment that displays a Google Map and centers it on user's location
 class MapFragment : Fragment(), OnMapReadyCallback {

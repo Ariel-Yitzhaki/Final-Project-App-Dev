@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="@color/white">
 
     <TextView
         android:id="@+id/displayNameText"
@@ -32,7 +33,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-
     <TextView
         android:id="@+id/tripsLabel"
         android:layout_width="wrap_content"
@@ -44,7 +44,6 @@
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="24dp" />
 
-    <!-- Trips list -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/tripsRecyclerView"
         android:layout_width="0dp"
@@ -55,7 +54,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="8dp" />
 
-    <!-- Empty state -->
     <TextView
         android:id="@+id/emptyText"
         android:layout_width="wrap_content"

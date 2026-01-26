@@ -1,30 +1,34 @@
-package com.example.travel
+package com.example.travel.activities
 
-import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import android.Manifest
+import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Bundle
 import android.os.Environment
+import android.widget.Button
+import android.widget.ImageButton
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.lifecycle.lifecycleScope
+import com.example.travel.fragments.FriendsFragment
+import com.example.travel.fragments.MapFragment
+import com.example.travel.activities.PhotoPreviewActivity
+import com.example.travel.fragments.ProfileFragment
+import com.example.travel.R
+import com.example.travel.data.AuthRepository
+import com.example.travel.data.PhotoRepository
+import com.example.travel.data.TripRepository
+import com.example.travel.models.Trip
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import kotlinx.coroutines.launch
 import java.io.File
 import java.text.SimpleDateFormat
-import java.util.*
-import android.widget.ImageButton
-import com.example.travel.data.PhotoRepository
-import com.example.travel.data.AuthRepository
-import com.example.travel.data.TripRepository
-import com.example.travel.models.Trip
-import android.app.AlertDialog
-import android.widget.Button
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.launch
 import java.util.Date
 import java.util.Locale
 import java.util.UUID
@@ -238,4 +242,3 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 }
-

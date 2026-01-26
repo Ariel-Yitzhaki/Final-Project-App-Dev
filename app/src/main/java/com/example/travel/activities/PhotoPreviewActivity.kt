@@ -1,4 +1,4 @@
-package com.example.travel
+package com.example.travel.activities
 
 import android.location.Geocoder
 import android.os.Bundle
@@ -11,16 +11,18 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.bumptech.glide.Glide
+import com.example.travel.R
 import com.example.travel.data.AuthRepository
 import com.example.travel.data.PhotoRepository
+import com.example.travel.data.TripRepository
 import com.example.travel.models.Photo
 import kotlinx.coroutines.launch
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.UUID
-import com.bumptech.glide.Glide
-import com.example.travel.data.TripRepository
 
 class PhotoPreviewActivity : AppCompatActivity() {
 
@@ -144,7 +146,7 @@ class PhotoPreviewActivity : AppCompatActivity() {
     private fun discardAndFinish() {
         // Delete the temp photo file
         try {
-            java.io.File(photoPath).delete()
+            File(photoPath).delete()
         } catch (_: Exception) {}
         setResult(RESULT_CANCELED)
         finish()

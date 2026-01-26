@@ -20,7 +20,7 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="${MAPS_API_KEY}" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".activities.LoginActivity"
             android:exported="true"
             android:theme="@style/Theme.Travel">
             <intent-filter>
@@ -30,12 +30,12 @@
         </activity>
 
         <activity
-            android:name=".MainActivity"
+            android:name=".activities.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.Travel"/>
 
         <activity
-            android:name=".PhotoPreviewActivity"
+            android:name=".activities.PhotoPreviewActivity"
             android:exported="false"
             android:theme="@style/Theme.Travel" />
 

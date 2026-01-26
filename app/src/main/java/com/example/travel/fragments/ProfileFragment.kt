@@ -1,4 +1,4 @@
-package com.example.travel
+package com.example.travel.fragments
 
 import android.content.Intent
 import android.os.Bundle
@@ -12,6 +12,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.travel.R
+import com.example.travel.activities.LoginActivity
+import com.example.travel.adapters.TripAdapter
 import com.example.travel.data.AuthRepository
 import com.example.travel.data.PhotoRepository
 import com.example.travel.data.TripRepository
