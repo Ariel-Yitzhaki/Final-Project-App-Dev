@@ -17,7 +17,7 @@ class TripRepository {
     suspend fun getActiveTrip(userId: String): Trip? {
         val snapshot = tripsCollection
             .whereEqualTo("userId", userId)
-            .whereEqualTo("isActive", true)
+            .whereEqualTo("active", true)
             .get()
             .await()
         return snapshot.toObjects(Trip::class.java).firstOrNull()
@@ -27,17 +27,17 @@ class TripRepository {
     suspend fun getCompletedTrips(userId: String): List<Trip> {
         val snapshot = tripsCollection
             .whereEqualTo("userId", userId)
-            .whereEqualTo("isActive", false)
+            .whereEqualTo("active", false)
             .get()
             .await()
         return snapshot.toObjects(Trip::class.java).filter { it.photoCount > 0 }
     }
 
-    // End a trip - set isActive to false and set end date
+    // End a trip - set active to false and set end date
     suspend fun endTrip(tripId: String, endDate: String) {
         tripsCollection.document(tripId).update(
             mapOf(
-                "isActive" to false,
+                "active" to false,
                 "endDate" to endDate
             )
         ).await()

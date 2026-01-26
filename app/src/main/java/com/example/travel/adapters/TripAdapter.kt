@@ -33,14 +33,14 @@ class TripAdapter(
         holder.tripName.text = trip.name
 
         // Show date range for completed trips, just start date for active card
-        holder.tripDate.text = if(trip.isActive) {
+        holder.tripDate.text = if(trip.active) {
             "Started: ${trip.startDate}"
         } else {
             "${trip.startDate} - ${trip.endDate}"
         }
 
         // Show End Trip button only for active trips
-        if (trip.isActive) {
+        if (trip.active) {
             holder.endTripButton.visibility = View.VISIBLE
             holder.endTripButton.setOnClickListener {
                 onTripClick.invoke(trip)

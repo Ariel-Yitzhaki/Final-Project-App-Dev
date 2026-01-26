@@ -33,6 +33,7 @@ import java.util.Date
 import java.util.Locale
 import java.util.UUID
 import androidx.fragment.app.Fragment
+import com.example.travel.fragments.ProfileFragment
 import com.example.travel.fragments.Refresh
 
 class MainActivity : AppCompatActivity() {
@@ -128,7 +129,7 @@ class MainActivity : AppCompatActivity() {
 
         // Profile button - opens gallery view
         findViewById<ImageButton>(R.id.nav_profile).setOnClickListener {
-            switchToFragment(FriendsFragment(), "profile")
+            switchToFragment(ProfileFragment(), "profile")
             fab.hide()
         }
 
@@ -141,7 +142,7 @@ class MainActivity : AppCompatActivity() {
         // Home button - opens map
         findViewById<ImageButton>(R.id.nav_home).setOnClickListener {
             switchToFragment(MapFragment(), "map")
-            fab.hide()
+            fab.show()
         }
     }
 
@@ -194,6 +195,7 @@ class MainActivity : AppCompatActivity() {
     private suspend fun checkActiveTrip() {
         val userId = authRepository.getCurrentUser()?.uid ?: return
         activeTrip = tripRepository.getActiveTrip(userId)
+
         updateTripButtonUI()
     }
 
@@ -224,7 +226,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // Start a new trip
-    private fun startNewTrip(name: String) {
+    private suspend fun startNewTrip(name: String) {
         val userId = authRepository.getCurrentUser()?.uid ?: return
         val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
         val today = dateFormat.format(Date())
@@ -234,15 +236,13 @@ class MainActivity : AppCompatActivity() {
             userId = userId,
             name = name,
             startDate = today,
-            isActive = true,
+            active = true,
             photoCount = 0
         )
 
-        lifecycleScope.launch {
-            tripRepository.saveTrip(trip)
-            activeTrip = trip
-            updateTripButtonUI()
-        }
+        tripRepository.saveTrip(trip)
+        activeTrip = trip
+        updateTripButtonUI()
     }
 
     private fun showTripNameDialog() {
@@ -258,7 +258,9 @@ class MainActivity : AppCompatActivity() {
             .setPositiveButton("Start") { _, _ ->
                 val name = input.text.toString().trim()
                 if (name.isNotEmpty()) {
-                    startNewTrip(name)
+                    lifecycleScope.launch {
+                        startNewTrip(name)
+                    }
                 } else {
                     Toast.makeText(this, "Please enter trip name", Toast.LENGTH_SHORT).show()
                 }
