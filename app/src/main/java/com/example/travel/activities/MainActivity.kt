@@ -18,7 +18,6 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.travel.fragments.FriendsFragment
 import com.example.travel.fragments.MapFragment
-import com.example.travel.fragments.ProfileFragment
 import com.example.travel.R
 import com.example.travel.data.AuthRepository
 import com.example.travel.data.PhotoRepository
@@ -33,6 +32,8 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.UUID
+import androidx.fragment.app.Fragment
+import com.example.travel.fragments.Refresh
 
 class MainActivity : AppCompatActivity() {
 
@@ -42,6 +43,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tripButton: Button
     private var activeTrip: Trip? = null
     private var photoUri: Uri? = null
+    private var currentFragmentTag: String? = null
     private var currentPhotoPath: String = ""
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var fab: FloatingActionButton
@@ -109,8 +111,9 @@ class MainActivity : AppCompatActivity() {
         // Load map fragment
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, MapFragment())
+                .replace(R.id.fragment_container, MapFragment(), "map")
                 .commit()
+            currentFragmentTag = "map"
         }
 
         // FAB click listener
@@ -125,29 +128,20 @@ class MainActivity : AppCompatActivity() {
 
         // Profile button - opens gallery view
         findViewById<ImageButton>(R.id.nav_profile).setOnClickListener {
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, ProfileFragment())
-                .commit()
-            fab.show()
-            lifecycleScope.launch { checkActiveTrip() }
+            switchToFragment(FriendsFragment(), "profile")
+            fab.hide()
         }
 
         // Friends button - opens friends list
         findViewById<ImageButton>(R.id.nav_friends).setOnClickListener {
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, FriendsFragment())
-                .commit()
+            switchToFragment(FriendsFragment(), "friends")
             fab.hide()
-            lifecycleScope.launch { checkActiveTrip() }
         }
 
         // Home button - opens map
         findViewById<ImageButton>(R.id.nav_home).setOnClickListener {
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, MapFragment())
-                .commit()
+            switchToFragment(MapFragment(), "map")
             fab.hide()
-            lifecycleScope.launch { checkActiveTrip() }
         }
     }
 
@@ -172,6 +166,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun createImageFile(): File {
+        // Using HHmmss format to track order of images in a trip done on the same date
         val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
         val storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         return File.createTempFile("PHOTO_${timestamp}_", ".jpg", storageDir).apply {
@@ -211,6 +206,21 @@ class MainActivity : AppCompatActivity() {
             tripButton.text = "Start Trip"
             tripButton.isEnabled = true
         }
+    }
+
+    private fun switchToFragment(fragment: Fragment, tag: String) {
+        if (currentFragmentTag == tag) {
+            // Already on this fragment - refresh the existing fragment
+            val existingFragment = supportFragmentManager.findFragmentByTag(tag)
+            (existingFragment as? Refresh)?.refresh()
+        } else {
+            // Switch to new fragment
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, fragment, tag)
+                .commit()
+            currentFragmentTag = tag
+        }
+        lifecycleScope.launch { checkActiveTrip() }
     }
 
     // Start a new trip

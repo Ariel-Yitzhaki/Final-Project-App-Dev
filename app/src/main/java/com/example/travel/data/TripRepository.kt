@@ -13,11 +13,6 @@ class TripRepository {
         tripsCollection.document(trip.id).set(trip).await()
     }
 
-    // Update existing trip
-    suspend fun updateTrip(trip: Trip) {
-        tripsCollection.document(trip.id).set(trip).await()
-    }
-
     // Get active trip for user (only one can be active)
     suspend fun getActiveTrip(userId: String): Trip? {
         val snapshot = tripsCollection

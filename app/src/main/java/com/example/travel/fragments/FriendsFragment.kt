@@ -13,7 +13,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.travel.R
-import com.example.travel.fragments.UserSearchFragment
 import com.example.travel.adapters.FriendAdapter
 import com.example.travel.adapters.FriendRequestAdapter
 import com.example.travel.data.AuthRepository
@@ -22,7 +21,7 @@ import com.example.travel.models.FriendRequest
 import com.example.travel.models.User
 import kotlinx.coroutines.launch
 
-class FriendsFragment : Fragment() {
+class FriendsFragment : Fragment(), Refresh {
 
     private lateinit var authRepository: AuthRepository
     private lateinit var friendsRepository: FriendsRepository
@@ -155,5 +154,9 @@ class FriendsFragment : Fragment() {
                 }
             )
         }
+    }
+
+    override fun refresh() {
+        loadData()
     }
 }

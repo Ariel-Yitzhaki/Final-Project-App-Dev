@@ -21,7 +21,7 @@ import com.example.travel.data.TripRepository
 import kotlinx.coroutines.launch
 import com.example.travel.models.Trip
 
-class ProfileFragment : Fragment() {
+class ProfileFragment : Fragment(), Refresh {
 
     private lateinit var authRepository: AuthRepository
     private lateinit var tripRepository: TripRepository
@@ -116,5 +116,9 @@ class ProfileFragment : Fragment() {
             // Refresh the list
             loadProfile()
         }
+    }
+
+    override fun refresh() {
+        loadProfile()
     }
 }

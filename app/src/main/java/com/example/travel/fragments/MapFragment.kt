@@ -40,7 +40,7 @@ import com.google.android.gms.maps.model.PolylineOptions
 import kotlinx.coroutines.launch
 
 // Fragment that displays a Google Map and centers it on user's location
-class MapFragment : Fragment(), OnMapReadyCallback {
+class MapFragment : Fragment(), OnMapReadyCallback, Refresh {
 
     // GoogleMap object - controls the map display, markers, camera, etc.
     private lateinit var map: GoogleMap
@@ -256,5 +256,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         for ((marker, photo) in photoMarkers) {
             updateMarkerWithSize(marker, photo, size)
         }
+    }
+
+    override fun refresh() {
+        map.clear()
+        photoMarkers.clear()
+        loadPhotosOnMap()
     }
 }
