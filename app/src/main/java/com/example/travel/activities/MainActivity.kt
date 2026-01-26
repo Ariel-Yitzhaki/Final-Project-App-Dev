@@ -36,6 +36,7 @@ import androidx.fragment.app.Fragment
 import com.example.travel.fragments.ProfileFragment
 import com.example.travel.fragments.Refresh
 import com.example.travel.fragments.TripEndListener
+import android.view.View
 
 class MainActivity : AppCompatActivity(), TripEndListener {
 
@@ -50,7 +51,6 @@ class MainActivity : AppCompatActivity(), TripEndListener {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var fab: FloatingActionButton
 
-    // Launches camera and handles result
     // Launches camera and handles result
     private val takePictureLauncher = registerForActivityResult(
         ActivityResultContracts.TakePicture()
@@ -211,6 +211,7 @@ class MainActivity : AppCompatActivity(), TripEndListener {
         }
     }
 
+    // Switches to a fragment or refreshes if already showing
     private fun switchToFragment(fragment: Fragment, tag: String) {
         if (currentFragmentTag == tag) {
             // Already on this fragment - refresh the existing fragment
@@ -223,6 +224,14 @@ class MainActivity : AppCompatActivity(), TripEndListener {
                 .commit()
             currentFragmentTag = tag
         }
+
+        // Only show trip button on map screen
+        if (tag == "map") {
+            tripButton.visibility = View.VISIBLE
+        } else {
+            tripButton.visibility = View.GONE
+        }
+
         lifecycleScope.launch { checkActiveTrip() }
     }
 

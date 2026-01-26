@@ -16,7 +16,6 @@ import com.example.travel.R
 import com.example.travel.activities.LoginActivity
 import com.example.travel.adapters.TripAdapter
 import com.example.travel.data.AuthRepository
-import com.example.travel.data.PhotoRepository
 import com.example.travel.data.TripRepository
 import kotlinx.coroutines.launch
 import com.example.travel.models.Trip
@@ -25,7 +24,6 @@ class ProfileFragment : Fragment(), Refresh {
 
     private lateinit var authRepository: AuthRepository
     private lateinit var tripRepository: TripRepository
-    private lateinit var photoRepository: PhotoRepository
     private var tripEndListener: TripEndListener? = null
     private lateinit var displayNameText: TextView
     private lateinit var usernameText: TextView
@@ -54,7 +52,6 @@ class ProfileFragment : Fragment(), Refresh {
 
         authRepository = AuthRepository()
         tripRepository = TripRepository()
-        photoRepository = PhotoRepository()
 
         // Bind views
         displayNameText = view.findViewById(R.id.displayNameText)

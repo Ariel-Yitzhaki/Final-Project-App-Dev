@@ -51,11 +51,4 @@ class TripAdapter(
     }
 
     override fun getItemCount() = trips.size
-
-    // Update the list and refresh
-    fun updateTrips(newTrips: List<Trip>) {
-        trips.clear()
-        trips.addAll(newTrips)
-        notifyDataSetChanged()
-    }
 }
