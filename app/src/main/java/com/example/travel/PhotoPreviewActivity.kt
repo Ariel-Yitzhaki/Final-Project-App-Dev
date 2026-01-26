@@ -20,6 +20,7 @@ import java.util.Date
 import java.util.Locale
 import java.util.UUID
 import com.bumptech.glide.Glide
+import com.example.travel.data.TripRepository
 
 class PhotoPreviewActivity : AppCompatActivity() {
 
@@ -35,6 +36,8 @@ class PhotoPreviewActivity : AppCompatActivity() {
     private var photoPath: String = ""
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
+    private lateinit var tripRepository: TripRepository
+    private var tripId: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +45,8 @@ class PhotoPreviewActivity : AppCompatActivity() {
 
         authRepository = AuthRepository()
         photoRepository = PhotoRepository()
+        tripRepository = TripRepository()
+        tripId = intent.getStringExtra("tripId") ?: ""
 
         // Get data from intent
         photoPath = intent.getStringExtra("photoPath") ?: ""
@@ -116,12 +121,15 @@ class PhotoPreviewActivity : AppCompatActivity() {
             longitude = longitude,
             date = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date()),
             timestamp = System.currentTimeMillis(),
-            tripId = "default_trip"
+            tripId = tripId
         )
 
         lifecycleScope.launch {
             try {
                 photoRepository.savePhoto(photo)
+                if (tripId.isNotEmpty()) {
+                    tripRepository.incrementPhotoCount(tripId)
+                }
                 Toast.makeText(this@PhotoPreviewActivity, "Photo uploaded!", Toast.LENGTH_SHORT).show()
                 setResult(RESULT_OK)
                 finish()

@@ -34,6 +34,8 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import android.graphics.drawable.Drawable
+import com.example.travel.data.AuthRepository
+import com.example.travel.data.TripRepository
 import com.google.android.gms.maps.model.PolylineOptions
 
 
@@ -46,6 +48,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     // Google's location service - gets device location using GPS, WiFi, cell towers
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var photoRepository: PhotoRepository
+    private lateinit var tripRepository: TripRepository
+    private lateinit var authRepository: AuthRepository
     private val photoMarkers = mutableListOf<Pair<Marker, Photo>>()
 
     // Modern way to request permissions - launches system permission dialog and handles result
@@ -73,6 +77,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         // Initialize Google's location service
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
         photoRepository = PhotoRepository()
+        tripRepository = TripRepository()
+        authRepository = AuthRepository()
 
         // Find the map fragment and request the GoogleMap object asynchronously
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
@@ -132,7 +138,15 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private fun loadPhotosOnMap() {
         lifecycleScope.launch {
-            val photos = photoRepository.getAllPhotos()
+            val userId = authRepository.getCurrentUser()?.uid ?: return@launch
+            val activeTrip = tripRepository.getActiveTrip(userId)
+
+            // Only load photos for active trip
+            val photos = if (activeTrip != null) {
+                photoRepository.getAllPhotos().filter { it.tripId == activeTrip.id }
+            } else {
+                emptyList()
+            }
 
             // Draw travel path first (so it's behind markers)
             drawTravelPath(photos)

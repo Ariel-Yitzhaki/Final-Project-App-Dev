@@ -1,10 +1,9 @@
 package com.example.travel.models
 
 data class Trip(
-    val id: String = "",
+    val id: String = "", // The trip's id
+    val userId: String = "", // The actual user's id
     val name: String = "",
-    val country: String = "",
-    val city: String = "",
     val startDate: String = "",
     val endDate: String = "",
     val isActive: Boolean = false,

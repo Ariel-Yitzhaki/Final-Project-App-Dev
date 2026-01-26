@@ -36,4 +36,5 @@ class PhotoRepository {
             .await()
         return snapshot.toObjects(Photo::class.java)
     }
+
 }

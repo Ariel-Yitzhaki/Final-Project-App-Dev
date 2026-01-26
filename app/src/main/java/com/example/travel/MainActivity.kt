@@ -19,14 +19,26 @@ import java.util.*
 import android.widget.ImageButton
 import com.example.travel.data.PhotoRepository
 import com.example.travel.data.AuthRepository
+import com.example.travel.data.TripRepository
+import com.example.travel.models.Trip
+import android.app.AlertDialog
+import android.widget.Button
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
+import java.util.Date
+import java.util.Locale
+import java.util.UUID
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var photoRepository: PhotoRepository
+    private lateinit var authRepository: AuthRepository
+    private lateinit var tripRepository: TripRepository
+    private lateinit var tripButton: Button
+    private var activeTrip: Trip? = null
     private var photoUri: Uri? = null
     private var currentPhotoPath: String = ""
-    private lateinit var authRepository: AuthRepository
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var fab: FloatingActionButton
 
     // Launches camera and handles result
@@ -74,6 +86,20 @@ class MainActivity : AppCompatActivity() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         photoRepository = PhotoRepository()
         authRepository = AuthRepository()
+        tripRepository = TripRepository()
+        tripButton = findViewById(R.id.tripButton)
+
+        // Check for active trip on startup
+        lifecycleScope.launch {
+            checkActiveTrip()
+        }
+
+// Trip button click
+        tripButton.setOnClickListener {
+            if (activeTrip == null) {
+                startNewTrip()
+            }
+        }
 
         // Load map fragment
         if (savedInstanceState == null) {
@@ -85,7 +111,11 @@ class MainActivity : AppCompatActivity() {
         // FAB click listener
         fab = findViewById(R.id.fab_add_picture)
         fab.setOnClickListener {
-            checkCameraPermissionAndOpen()
+            if (activeTrip == null) {
+                promptStartTrip()
+            } else {
+                checkCameraPermissionAndOpen()
+            }
         }
 
         // Profile button - opens gallery view
@@ -148,10 +178,64 @@ class MainActivity : AppCompatActivity() {
                     putExtra("photoPath", currentPhotoPath)
                     putExtra("latitude", location?.latitude ?: 0.0)
                     putExtra("longitude", location?.longitude ?: 0.0)
+                    putExtra("tripId", activeTrip?.id ?: "")
                 }
                 previewLauncher.launch(intent)
             }
         }
+    }
+
+    // Check if user has an active trip and update UI
+    private suspend fun checkActiveTrip() {
+        val userId = authRepository.getCurrentUser()?.uid ?: return
+        activeTrip = tripRepository.getActiveTrip(userId)
+        updateTripButtonUI()
+    }
+
+    // Update button text based on trip state
+    private fun updateTripButtonUI() {
+        if (activeTrip != null) {
+            tripButton.text = "TRAVELING"
+            tripButton.isEnabled = false
+        } else {
+            tripButton.text = "Start Trip"
+            tripButton.isEnabled = true
+        }
+    }
+
+    // Start a new trip
+    private fun startNewTrip() {
+        val userId = authRepository.getCurrentUser()?.uid ?: return
+        val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
+        val today = dateFormat.format(Date())
+
+        val trip = Trip(
+            id = UUID.randomUUID().toString(),
+            userId = userId,
+            name = "Trip - $today",
+            startDate = today,
+            isActive = true,
+            photoCount = 0
+        )
+
+        lifecycleScope.launch {
+            tripRepository.saveTrip(trip)
+            activeTrip = trip
+            updateTripButtonUI()
+        }
+    }
+
+    // Prompt user to start trip before taking photo
+    private fun promptStartTrip() {
+        AlertDialog.Builder(this)
+            .setTitle("No Active Trip")
+            .setMessage("Start a new trip to take photos?")
+            .setPositiveButton("Yes") { _, _ ->
+                startNewTrip()
+                checkCameraPermissionAndOpen()
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
 }
 
