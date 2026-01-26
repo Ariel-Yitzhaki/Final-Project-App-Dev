@@ -13,9 +13,51 @@ class TripRepository {
         tripsCollection.document(trip.id).set(trip).await()
     }
 
-    // Get all trips
-    suspend fun getAllTrips(): List<Trip> {
-        val snapshot = tripsCollection.get().await()
-        return snapshot.toObjects(Trip::class.java)
+    // Update existing trip
+    suspend fun updateTrip(trip: Trip) {
+        tripsCollection.document(trip.id).set(trip).await()
+    }
+
+    // Get active trip for user (only one can be active)
+    suspend fun getActiveTrip(userId: String): Trip? {
+        val snapshot = tripsCollection
+            .whereEqualTo("userId", userId)
+            .whereEqualTo("isActive", true)
+            .get()
+            .await()
+        return snapshot.toObjects(Trip::class.java).firstOrNull()
+    }
+
+    // Get all completed trips for user (with photos)
+    suspend fun getCompletedTrips(userId: String): List<Trip> {
+        val snapshot = tripsCollection
+            .whereEqualTo("userId", userId)
+            .whereEqualTo("isActive", false)
+            .get()
+            .await()
+        return snapshot.toObjects(Trip::class.java).filter { it.photoCount > 0 }
+    }
+
+    // End a trip - set isActive to false and set end date
+    suspend fun endTrip(tripId: String, endDate: String) {
+        tripsCollection.document(tripId).update(
+            mapOf(
+                "isActive" to false,
+                "endDate" to endDate
+            )
+        ).await()
+    }
+
+    // Increment photo count for a trip
+    suspend fun incrementPhotoCount(tripId: String) {
+        val trip = tripsCollection.document(tripId).get().await().toObject(Trip::class.java)
+        trip?.let {
+            tripsCollection.document(tripId).update("photoCount", it.photoCount + 1).await()
+        }
+    }
+
+    // Delete trip (for empty trips)
+    suspend fun deleteTrip(tripId: String) {
+        tripsCollection.document(tripId).delete().await()
     }
 }

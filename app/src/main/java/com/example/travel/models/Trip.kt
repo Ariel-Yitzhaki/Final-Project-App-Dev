@@ -5,5 +5,8 @@ data class Trip(
     val name: String = "",
     val country: String = "",
     val city: String = "",
-    val startDate: String = ""
+    val startDate: String = "",
+    val endDate: String = "",
+    val isActive: Boolean = false,
+    val photoCount: Int = 0
 )

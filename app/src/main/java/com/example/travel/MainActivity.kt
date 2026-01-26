@@ -27,6 +27,7 @@ class MainActivity : AppCompatActivity() {
     private var photoUri: Uri? = null
     private var currentPhotoPath: String = ""
     private lateinit var authRepository: AuthRepository
+    private lateinit var fab: FloatingActionButton
 
     // Launches camera and handles result
     // Launches camera and handles result
@@ -82,7 +83,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         // FAB click listener
-        findViewById<FloatingActionButton>(R.id.fab_add_picture).setOnClickListener {
+        fab = findViewById(R.id.fab_add_picture)
+        fab.setOnClickListener {
             checkCameraPermissionAndOpen()
         }
 
@@ -91,6 +93,7 @@ class MainActivity : AppCompatActivity() {
             supportFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, ProfileFragment())
                 .commit()
+            fab.show()
         }
 
         // Friends button - opens friends list
@@ -98,14 +101,14 @@ class MainActivity : AppCompatActivity() {
             supportFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, FriendsFragment())
                 .commit()
-        }
+            fab.hide()        }
 
         // Home button - opens map
         findViewById<ImageButton>(R.id.nav_home).setOnClickListener {
             supportFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, MapFragment())
                 .commit()
-        }
+            fab.hide()        }
     }
 
     private fun checkCameraPermissionAndOpen() {

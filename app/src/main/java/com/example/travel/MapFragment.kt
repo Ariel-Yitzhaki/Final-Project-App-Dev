@@ -34,6 +34,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import android.graphics.drawable.Drawable
+import com.google.android.gms.maps.model.PolylineOptions
 
 
 // Fragment that displays a Google Map and centers it on user's location
@@ -132,6 +133,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private fun loadPhotosOnMap() {
         lifecycleScope.launch {
             val photos = photoRepository.getAllPhotos()
+
+            // Draw travel path first (so it's behind markers)
+            drawTravelPath(photos)
+
             for (photo in photos) {
                 val position = LatLng(photo.latitude, photo.longitude)
                 val size = getMarkerSizeForZoom(map.cameraPosition.zoom)
@@ -158,6 +163,23 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     })
             }
         }
+    }
+
+    // Draws lines connecting photos in chronological order
+    private fun drawTravelPath(photos: List<Photo>) {
+        if (photos.size < 2) return
+
+        // Sort by timestamp and create path
+        val sortedPhotos = photos.sortedBy { it.timestamp }
+        val points = sortedPhotos.map { LatLng(it.latitude, it.longitude) }
+
+        val polylineOptions = PolylineOptions()
+            .addAll(points)
+            .width(8f)
+            .color(Color.BLUE)
+            .geodesic(true)
+
+        map.addPolyline(polylineOptions)
     }
 
     private fun updateMarkerWithSize(marker: Marker, photo: Photo, size: Int) {

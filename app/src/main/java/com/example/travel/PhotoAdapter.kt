@@ -28,6 +28,7 @@ class PhotoAdapter(private val photos: List<Photo>) :
     override fun onBindViewHolder(holder: PhotoViewHolder, position: Int) {
         val photo = photos[position]
         Glide.with(holder.itemView.context)
+
             .load(photo.localPath)
             .centerCrop()
             .into(holder.imageView)
