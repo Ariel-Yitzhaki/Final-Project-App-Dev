@@ -35,8 +35,9 @@ import java.util.UUID
 import androidx.fragment.app.Fragment
 import com.example.travel.fragments.ProfileFragment
 import com.example.travel.fragments.Refresh
+import com.example.travel.fragments.TripEndListener
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), TripEndListener {
 
     private lateinit var photoRepository: PhotoRepository
     private lateinit var authRepository: AuthRepository
@@ -223,6 +224,12 @@ class MainActivity : AppCompatActivity() {
             currentFragmentTag = tag
         }
         lifecycleScope.launch { checkActiveTrip() }
+    }
+
+    // Called by ProfileFragment when user ends a trip
+    override fun onTripEnded() {
+        activeTrip = null
+        updateTripButtonUI()
     }
 
     // Start a new trip

@@ -26,7 +26,7 @@ class ProfileFragment : Fragment(), Refresh {
     private lateinit var authRepository: AuthRepository
     private lateinit var tripRepository: TripRepository
     private lateinit var photoRepository: PhotoRepository
-
+    private var tripEndListener: TripEndListener? = null
     private lateinit var displayNameText: TextView
     private lateinit var usernameText: TextView
     private lateinit var tripsRecyclerView: RecyclerView
@@ -39,6 +39,14 @@ class ProfileFragment : Fragment(), Refresh {
         savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.fragment_profile, container, false)
+    }
+
+    // Attaches the listener when fragment connects to activity
+    override fun onAttach(context: android.content.Context) {
+        super.onAttach(context)
+        if (context is TripEndListener) {
+            tripEndListener = context
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -115,6 +123,7 @@ class ProfileFragment : Fragment(), Refresh {
             }
             // Refresh the list
             loadProfile()
+            tripEndListener?.onTripEnded()
         }
     }
 
