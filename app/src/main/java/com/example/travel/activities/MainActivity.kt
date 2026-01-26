@@ -8,7 +8,9 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -16,7 +18,6 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.travel.fragments.FriendsFragment
 import com.example.travel.fragments.MapFragment
-import com.example.travel.activities.PhotoPreviewActivity
 import com.example.travel.fragments.ProfileFragment
 import com.example.travel.R
 import com.example.travel.data.AuthRepository
@@ -101,7 +102,7 @@ class MainActivity : AppCompatActivity() {
 // Trip button click
         tripButton.setOnClickListener {
             if (activeTrip == null) {
-                startNewTrip()
+                showTripNameDialog()
             }
         }
 
@@ -128,6 +129,7 @@ class MainActivity : AppCompatActivity() {
                 .replace(R.id.fragment_container, ProfileFragment())
                 .commit()
             fab.show()
+            lifecycleScope.launch { checkActiveTrip() }
         }
 
         // Friends button - opens friends list
@@ -135,14 +137,18 @@ class MainActivity : AppCompatActivity() {
             supportFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, FriendsFragment())
                 .commit()
-            fab.hide()        }
+            fab.hide()
+            lifecycleScope.launch { checkActiveTrip() }
+        }
 
         // Home button - opens map
         findViewById<ImageButton>(R.id.nav_home).setOnClickListener {
             supportFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, MapFragment())
                 .commit()
-            fab.hide()        }
+            fab.hide()
+            lifecycleScope.launch { checkActiveTrip() }
+        }
     }
 
     private fun checkCameraPermissionAndOpen() {
@@ -208,7 +214,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // Start a new trip
-    private fun startNewTrip() {
+    private fun startNewTrip(name: String) {
         val userId = authRepository.getCurrentUser()?.uid ?: return
         val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
         val today = dateFormat.format(Date())
@@ -216,7 +222,7 @@ class MainActivity : AppCompatActivity() {
         val trip = Trip(
             id = UUID.randomUUID().toString(),
             userId = userId,
-            name = "Trip - $today",
+            name = name,
             startDate = today,
             isActive = true,
             photoCount = 0
@@ -229,14 +235,48 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun showTripNameDialog() {
+        val input = EditText(this).apply {
+            hint = "Enter trip name"
+            inputType = android.text.InputType.TYPE_CLASS_TEXT
+            setPadding(48, 32, 48, 32)
+        }
+
+        AlertDialog.Builder(this)
+            .setTitle("Name Your Trip")
+            .setView(input)
+            .setPositiveButton("Start") { _, _ ->
+                val name = input.text.toString().trim()
+                if (name.isNotEmpty()) {
+                    startNewTrip(name)
+                } else {
+                    Toast.makeText(this, "Please enter trip name", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
     // Prompt user to start trip before taking photo
     private fun promptStartTrip() {
+        val input = EditText(this).apply {
+            hint = "Enter trip name"
+            inputType = android.text.InputType.TYPE_CLASS_TEXT
+            setPadding(48, 32, 48, 32)
+        }
         AlertDialog.Builder(this)
             .setTitle("No Active Trip")
             .setMessage("Start a new trip to take photos?")
             .setPositiveButton("Yes") { _, _ ->
-                startNewTrip()
-                checkCameraPermissionAndOpen()
+                val name = input.text.toString().trim()
+                if (name.isNotEmpty()) {
+                    lifecycleScope.launch {
+                        startNewTrip(name)
+                        checkCameraPermissionAndOpen()
+                    }
+                } else {
+                    Toast.makeText(this, "Please enter trip name", Toast.LENGTH_SHORT).show()
+                }
             }
             .setNegativeButton("Cancel", null)
             .show()

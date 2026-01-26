@@ -19,6 +19,7 @@ import com.example.travel.data.AuthRepository
 import com.example.travel.data.PhotoRepository
 import com.example.travel.data.TripRepository
 import kotlinx.coroutines.launch
+import com.example.travel.models.Trip
 
 class ProfileFragment : Fragment() {
 
@@ -80,17 +81,40 @@ class ProfileFragment : Fragment() {
             }
 
             // Load completed trips
-            val trips = tripRepository.getCompletedTrips(userId)
+            val activeTrip = tripRepository.getActiveTrip(userId)
+            val completedTrips = tripRepository.getCompletedTrips(userId)
+
+            val allTrips = mutableListOf<Trip>()
+            activeTrip?.let {allTrips.add(it)}
+            allTrips.addAll(completedTrips)
 
             // Load cover photos for each trip
             progressBar.visibility = View.GONE
 
-            if (trips.isNotEmpty()) {
+            if (allTrips.isNotEmpty()) {
                 emptyText.visibility = View.GONE
-                tripsRecyclerView.adapter = TripAdapter(trips) { trip ->
-                    // TODO: Open trip detail screen
+                tripsRecyclerView.adapter = TripAdapter(allTrips.toMutableList()) { trip ->
+                    onEndTripClicked(trip)
                 }
+            } else {
+                emptyText.visibility = View.VISIBLE
             }
+        }
+    }
+
+    private fun onEndTripClicked(trip: Trip) {
+        lifecycleScope.launch {
+            if (trip.photoCount == 0) {
+                // Delete empty trip
+                tripRepository.deleteTrip(trip.id)
+            } else {
+                // Mark trip as completed with today's date
+                val dateFormat = java.text.SimpleDateFormat("MMM dd, yyyy", java.util.Locale.getDefault())
+                val today = dateFormat.format(java.util.Date())
+                tripRepository.endTrip(trip.id, today)
+            }
+            // Refresh the list
+            loadProfile()
         }
     }
 }
