@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.travel.R
@@ -15,13 +16,15 @@ class TripAdapter(
     // onEndTripClick: called when End Trip button is clicked (active trips only)
     private val onEndTripClick: (Trip) -> Unit,
     // onCardClick: called when the card itself is clicked (to view trip details)
-    private val onCardClick: (Trip) -> Unit
+    private val onCardClick: (Trip) -> Unit,
+    private val onOptionsClick: (Trip, View) -> Unit
 ) : RecyclerView.Adapter<TripAdapter.TripViewHolder>() {
 
     class TripViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tripName: TextView = view.findViewById(R.id.tripName)
         val tripDate: TextView = view.findViewById(R.id.tripDate)
         val endTripButton: Button = view.findViewById(R.id.endTripButton)
+        val optionsButton: ImageButton = view.findViewById(R.id.optionsButton)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TripViewHolder {
@@ -51,9 +54,13 @@ class TripAdapter(
         } else {
             holder.endTripButton.visibility = View.GONE
         }
-
+        // Card click
         holder.itemView.setOnClickListener {
             onCardClick.invoke(trip)
+        }
+        // Options menu click
+        holder.optionsButton.setOnClickListener { view ->
+            onOptionsClick.invoke(trip, view)
         }
     }
 

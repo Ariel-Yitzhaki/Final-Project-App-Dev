@@ -19,6 +19,7 @@ import com.example.travel.data.AuthRepository
 import com.example.travel.data.TripRepository
 import kotlinx.coroutines.launch
 import com.example.travel.models.Trip
+import android.widget.PopupMenu
 
 class ProfileFragment : Fragment(), Refresh {
 
@@ -102,7 +103,8 @@ class ProfileFragment : Fragment(), Refresh {
                 tripsRecyclerView.adapter = TripAdapter(
                     allTrips.toMutableList(),
                     onEndTripClick = { trip -> onEndTripClicked(trip) },
-                    onCardClick = { trip -> openTripDetail(trip) }
+                    onCardClick = { trip -> openTripDetail(trip) },
+                    onOptionsClick = { trip, view -> showOptionsMenu(trip, view) }
                 )
             } else {
                 emptyText.visibility = View.VISIBLE
@@ -133,6 +135,44 @@ class ProfileFragment : Fragment(), Refresh {
             .replace(R.id.fragment_container, TripDetailFragment.newInstance(trip.id))
             .addToBackStack(null)
             .commit()
+    }
+
+    // Shows popup menu with trip options
+    private fun showOptionsMenu(trip: Trip, anchor: View) {
+        val popup = PopupMenu(requireContext(), anchor)
+        popup.menu.add("Delete Trip")
+
+        popup.setOnMenuItemClickListener { item ->
+            when (item.title) {
+                "Delete Trip" -> {
+                    confirmDeleteTrip(trip)
+                    true
+                }
+                else -> false
+            }
+        }
+        popup.show()
+    }
+
+    // Confirms before deleting a trip
+    private fun confirmDeleteTrip(trip: Trip) {
+        android.app.AlertDialog.Builder(requireContext())
+            .setTitle("Delete Trip")
+            .setMessage("Are you sure you want to delete '${trip.name}'? This cannot be undone.")
+            .setPositiveButton("Delete") { _, _ ->
+                deleteTrip(trip)
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    // Deletes trip and its photos
+    private fun deleteTrip(trip: Trip) {
+        lifecycleScope.launch {
+            tripRepository.deleteTrip(trip.id)
+            loadProfile()
+            tripEndListener?.onTripEnded()
+        }
     }
 
     override fun refresh() {
