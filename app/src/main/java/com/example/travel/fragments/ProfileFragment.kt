@@ -98,9 +98,11 @@ class ProfileFragment : Fragment(), Refresh {
 
             if (allTrips.isNotEmpty()) {
                 emptyText.visibility = View.GONE
-                tripsRecyclerView.adapter = TripAdapter(allTrips.toMutableList()) { trip ->
-                    onEndTripClicked(trip)
-                }
+                tripsRecyclerView.adapter = TripAdapter(
+                    allTrips.toMutableList(),
+                    onEndTripClick = { trip -> onEndTripClicked(trip) },
+                    onCardClick = { trip -> openTripDetail(trip) }
+                )
             } else {
                 emptyText.visibility = View.VISIBLE
             }
@@ -122,6 +124,14 @@ class ProfileFragment : Fragment(), Refresh {
             loadProfile()
             tripEndListener?.onTripEnded()
         }
+    }
+
+    // Opens the trip detail view
+    private fun openTripDetail(trip: Trip) {
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, TripDetailFragment.newInstance(trip.id))
+            .addToBackStack(null)
+            .commit()
     }
 
     override fun refresh() {

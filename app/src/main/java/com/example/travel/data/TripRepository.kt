@@ -23,6 +23,12 @@ class TripRepository {
         return snapshot.toObjects(Trip::class.java).firstOrNull()
     }
 
+    // Get a single trip by its ID
+    suspend fun getTripById(tripId: String): Trip? {
+        val snapshot = tripsCollection.document(tripId).get().await()
+        return snapshot.toObject(Trip::class.java)
+    }
+
     // Get all completed trips for user (with photos)
     suspend fun getCompletedTrips(userId: String): List<Trip> {
         val snapshot = tripsCollection

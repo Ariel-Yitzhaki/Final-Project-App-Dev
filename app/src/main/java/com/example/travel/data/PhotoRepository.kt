@@ -28,13 +28,4 @@ class PhotoRepository {
         return snapshot.toObjects(Photo::class.java)
     }
 
-    // Get photos for a specific user
-    suspend fun getPhotosForUser(userId: String): List<Photo> {
-        val snapshot = photosCollection
-            .whereEqualTo("userId", userId)
-            .get()
-            .await()
-        return snapshot.toObjects(Photo::class.java)
-    }
-
 }

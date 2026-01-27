@@ -12,7 +12,10 @@ import com.example.travel.models.Trip
 // Adapter for displaying trip cards
 class TripAdapter(
     private val trips: MutableList<Trip>,
-    private val onTripClick: (Trip) -> Unit
+    // onEndTripClick: called when End Trip button is clicked (active trips only)
+    private val onEndTripClick: (Trip) -> Unit,
+    // onCardClick: called when the card itself is clicked (to view trip details)
+    private val onCardClick: (Trip) -> Unit
 ) : RecyclerView.Adapter<TripAdapter.TripViewHolder>() {
 
     class TripViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -43,10 +46,14 @@ class TripAdapter(
         if (trip.active) {
             holder.endTripButton.visibility = View.VISIBLE
             holder.endTripButton.setOnClickListener {
-                onTripClick.invoke(trip)
+                onEndTripClick.invoke(trip)
             }
         } else {
             holder.endTripButton.visibility = View.GONE
+        }
+
+        holder.itemView.setOnClickListener {
+            onCardClick.invoke(trip)
         }
     }
 
