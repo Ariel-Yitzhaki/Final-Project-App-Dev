@@ -258,6 +258,14 @@ class MapFragment : Fragment(), OnMapReadyCallback, Refresh {
         }
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        if (::map.isInitialized) {
+            map.setOnCameraMoveListener(null)
+        }
+        photoMarkers.clear()
+    }
+
     override fun refresh() {
         map.clear()
         photoMarkers.clear()

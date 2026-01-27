@@ -48,6 +48,11 @@ class ProfileFragment : Fragment(), Refresh {
         }
     }
 
+    override fun onDetach() {
+        super.onDetach()
+        tripEndListener = null
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
