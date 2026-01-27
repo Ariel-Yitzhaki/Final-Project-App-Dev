@@ -89,8 +89,8 @@ class TripDetailFragment : Fragment() {
                 tripNameText.text = it.name
             }
 
-            // Load photos for this trip
-            val photos = photoRepository.getPhotosForTrip(tripId)
+            // Load and sort photos for this trip by timestamp
+            val photos = photoRepository.getPhotosForTrip(tripId).sortedBy { it.timestamp }
 
             progressBar.visibility = View.GONE
 

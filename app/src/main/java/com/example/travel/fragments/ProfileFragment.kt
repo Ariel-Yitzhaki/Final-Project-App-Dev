@@ -89,9 +89,10 @@ class ProfileFragment : Fragment(), Refresh {
             val activeTrip = tripRepository.getActiveTrip(userId)
             val completedTrips = tripRepository.getCompletedTrips(userId)
 
+            // Active trip first, then completed trips sorted by date (newest first)
             val allTrips = mutableListOf<Trip>()
             activeTrip?.let {allTrips.add(it)}
-            allTrips.addAll(completedTrips)
+            allTrips.addAll(completedTrips.sortedByDescending { it.startDate })
 
             // Load cover photos for each trip
             progressBar.visibility = View.GONE
