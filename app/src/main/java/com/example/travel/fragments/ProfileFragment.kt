@@ -20,11 +20,15 @@ import com.example.travel.data.TripRepository
 import kotlinx.coroutines.launch
 import com.example.travel.models.Trip
 import android.widget.PopupMenu
+import com.example.travel.data.LikeRepository
+import com.example.travel.data.PhotoRepository
 
 class ProfileFragment : Fragment(), Refresh {
 
     private lateinit var authRepository: AuthRepository
     private lateinit var tripRepository: TripRepository
+    private lateinit var photoRepository: PhotoRepository
+    private lateinit var likeRepository: LikeRepository
     private var tripEndListener: TripEndListener? = null
     private lateinit var displayNameText: TextView
     private lateinit var usernameText: TextView
@@ -58,6 +62,8 @@ class ProfileFragment : Fragment(), Refresh {
 
         authRepository = AuthRepository()
         tripRepository = TripRepository()
+        photoRepository = PhotoRepository()
+        likeRepository = LikeRepository()
 
         // Bind views
         displayNameText = view.findViewById(R.id.displayNameText)
@@ -105,8 +111,12 @@ class ProfileFragment : Fragment(), Refresh {
 
             if (allTrips.isNotEmpty()) {
                 emptyText.visibility = View.GONE
+
+                val tripLikes = loadTripLikes(allTrips)
+
                 tripsRecyclerView.adapter = TripAdapter(
                     allTrips.toMutableList(),
+                    tripLikes,
                     onEndTripClick = { trip -> onEndTripClicked(trip) },
                     onCardClick = { trip -> openTripDetail(trip) },
                     onOptionsClick = { trip, view -> showOptionsMenu(trip, view) }
@@ -115,6 +125,17 @@ class ProfileFragment : Fragment(), Refresh {
                 emptyText.visibility = View.VISIBLE
             }
         }
+    }
+
+    // Loads like counts for a list of trips
+    private suspend fun loadTripLikes(trips: List<Trip>): Map<String, Int> {
+        val tripLikes = mutableMapOf<String, Int>()
+        for (trip in trips) {
+            val photos = photoRepository.getPhotosForTrip(trip.id)
+            val photoIds = photos.map { it.id }
+            tripLikes[trip.id] = likeRepository.getTotalLikesForTrip(photoIds)
+        }
+        return tripLikes
     }
 
     private fun onEndTripClicked(trip: Trip) {

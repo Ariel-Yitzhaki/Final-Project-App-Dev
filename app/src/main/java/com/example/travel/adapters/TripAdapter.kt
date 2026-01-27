@@ -13,6 +13,7 @@ import com.example.travel.models.Trip
 // Adapter for displaying trip cards
 class TripAdapter(
     private val trips: MutableList<Trip>,
+    private val tripLikes: Map<String, Int>,
     // onEndTripClick: called when End Trip button is clicked (active trips only)
     private val onEndTripClick: (Trip) -> Unit,
     // onCardClick: called when the card itself is clicked (to view trip details)
@@ -23,6 +24,7 @@ class TripAdapter(
     class TripViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tripName: TextView = view.findViewById(R.id.tripName)
         val tripDate: TextView = view.findViewById(R.id.tripDate)
+        val likesCount: TextView = view.findViewById(R.id.likesCount)
         val endTripButton: Button = view.findViewById(R.id.endTripButton)
         val optionsButton: ImageButton = view.findViewById(R.id.optionsButton)
     }
@@ -39,10 +41,20 @@ class TripAdapter(
         holder.tripName.text = trip.name
 
         // Show date range for completed trips, just start date for active card
-        holder.tripDate.text = if(trip.active) {
-            "Started: ${trip.startDate}"
+        if (trip.active) {
+            holder.tripDate.text = "Started: ${trip.startDate}"
         } else {
-            "${trip.startDate} - ${trip.endDate}"
+            holder.tripDate.text = "${trip.startDate} - ${trip.endDate}"
+        }
+
+        // Show like count (hide for active trips)
+        val likes = tripLikes[trip.id] ?: 0
+        if (trip.active) {
+            holder.likesCount.visibility = View.GONE
+        } else {
+            holder.likesCount.visibility = View.VISIBLE
+            if (likes == 1) holder.likesCount.text = "1 like" else holder.likesCount.text =
+                "$likes likes"
         }
 
         // Show End Trip button only for active trips

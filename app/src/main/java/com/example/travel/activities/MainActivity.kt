@@ -130,25 +130,26 @@ class MainActivity : AppCompatActivity(), TripEndListener {
             }
         }
 
-        // Profile button - opens gallery view
+        setupNavigation()
+    }
+
+    // Sets up bottom navigation button listeners
+    private fun setupNavigation() {
         findViewById<ImageButton>(R.id.nav_profile).setOnClickListener {
             switchToFragment(ProfileFragment(), "profile")
             fab.hide()
         }
 
-        // Friends button - opens friends list
         findViewById<ImageButton>(R.id.nav_friends).setOnClickListener {
             switchToFragment(FriendsFragment(), "friends")
             fab.hide()
         }
 
-        // Home button - opens map
         findViewById<ImageButton>(R.id.nav_map).setOnClickListener {
             switchToFragment(MapFragment(), "map")
             fab.show()
         }
 
-        // Home feed button - opens friends' trips feed
         findViewById<ImageButton>(R.id.nav_home).setOnClickListener {
             switchToFragment(HomeFeedFragment(), "home")
             fab.hide()

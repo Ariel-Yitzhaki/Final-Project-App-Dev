@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
@@ -56,6 +57,11 @@ class UserSearchFragment : Fragment() {
         progressBar = view.findViewById(R.id.progressBar)
 
         resultsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+        // Back button returns to friends list
+        view.findViewById<ImageButton>(R.id.backButton).setOnClickListener {
+            parentFragmentManager.popBackStack()
+        }
 
         searchButton.setOnClickListener {
             val query = searchInput.text.toString().trim()
