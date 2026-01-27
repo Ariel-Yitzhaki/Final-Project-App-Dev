@@ -104,7 +104,7 @@ class MainActivity : AppCompatActivity(), TripEndListener {
             checkActiveTrip()
         }
 
-// Trip button click
+        // Trip button click
         tripButton.setOnClickListener {
             if (activeTrip == null) {
                 showTripNameDialog()
@@ -114,13 +114,14 @@ class MainActivity : AppCompatActivity(), TripEndListener {
         // Load map fragment
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, MapFragment(), "map")
+                .replace(R.id.fragment_container, HomeFeedFragment(), "home")
                 .commit()
-            currentFragmentTag = "map"
+            currentFragmentTag = "home"
         }
 
         // FAB click listener
         fab = findViewById(R.id.fab_add_picture)
+        fab.hide() // Hide FAB on startup
         fab.setOnClickListener {
             if (activeTrip == null) {
                 promptStartTrip()
@@ -220,7 +221,7 @@ class MainActivity : AppCompatActivity(), TripEndListener {
 
     // Switches to a fragment or refreshes if already showing
     private fun switchToFragment(fragment: Fragment, tag: String) {
-        clearbackStack()
+        clearBackStack()
         if (currentFragmentTag == tag) {
             // Already on this fragment - refresh the existing fragment
             val existingFragment = supportFragmentManager.findFragmentByTag(tag)
@@ -244,8 +245,9 @@ class MainActivity : AppCompatActivity(), TripEndListener {
     }
 
     // Clears all fragments from back stack
-    private fun clearbackStack() {
-        for (i in 0 until supportFragmentManager.backStackEntryCount) {
+    private fun clearBackStack() {
+        // Repeats .backstackEntryCount times to remove all fragments
+        repeat(supportFragmentManager.backStackEntryCount) {
             supportFragmentManager.popBackStack()
         }
     }
