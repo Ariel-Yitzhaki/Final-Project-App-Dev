@@ -42,7 +42,7 @@ class LikeRepository {
     }
 
     // Gets total likes for all photos in a trip
-    suspend fun getTotalLikesForTrip(photoIds: String): Int {
+    suspend fun getTotalLikesForTrip(photoIds: List<String>): Int {
         if (photoIds.isEmpty()) return 0
         var total = 0
         for (photoId in photoIds) {

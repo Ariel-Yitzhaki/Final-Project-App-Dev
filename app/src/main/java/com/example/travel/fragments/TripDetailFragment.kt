@@ -13,6 +13,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.travel.R
 import com.example.travel.adapters.TripPhotoAdapter
+import com.example.travel.data.AuthRepository
+import com.example.travel.data.LikeRepository
 import com.example.travel.data.PhotoRepository
 import com.example.travel.data.TripRepository
 import kotlinx.coroutines.launch
@@ -96,7 +98,16 @@ class TripDetailFragment : Fragment() {
 
             if (photos.isNotEmpty()) {
                 emptyText.visibility = View.GONE
-                photosRecyclerView.adapter = TripPhotoAdapter(photos)
+
+                // Gets the current logged-in user's ID from Firebase Auth
+                val currentUserId = AuthRepository().getCurrentUser()?.uid ?: ""
+                val likeRepository = LikeRepository()
+                photosRecyclerView.adapter = TripPhotoAdapter(
+                    photos,
+                    currentUserId,
+                    lifecycleScope,
+                    likeRepository
+                )
             } else {
                 emptyText.visibility = View.VISIBLE
             }
