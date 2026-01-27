@@ -74,7 +74,7 @@
             android:src="@drawable/ic_home"
             android:scaleType="centerInside"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Home" />
+            android:contentDescription="Home Feed" />
 
         <ImageButton
             android:id="@+id/nav_friends"
@@ -94,15 +94,15 @@
             android:layout_weight="1" />
 
         <ImageButton
-            android:id="@+id/nav_messages"
+            android:id="@+id/nav_map"
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_weight="1"
             android:padding="10dp"
-            android:src="@drawable/ic_msg"
+            android:src="@drawable/ic_globe"
             android:scaleType="centerInside"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Messages" />
+            android:contentDescription="Map" />
 
         <ImageButton
             android:id="@+id/nav_profile"

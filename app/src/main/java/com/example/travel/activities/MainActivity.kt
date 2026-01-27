@@ -37,6 +37,7 @@ import com.example.travel.fragments.ProfileFragment
 import com.example.travel.fragments.Refresh
 import com.example.travel.fragments.TripEndListener
 import android.view.View
+import com.example.travel.fragments.HomeFeedFragment
 
 class MainActivity : AppCompatActivity(), TripEndListener {
 
@@ -141,9 +142,15 @@ class MainActivity : AppCompatActivity(), TripEndListener {
         }
 
         // Home button - opens map
-        findViewById<ImageButton>(R.id.nav_home).setOnClickListener {
+        findViewById<ImageButton>(R.id.nav_map).setOnClickListener {
             switchToFragment(MapFragment(), "map")
             fab.show()
+        }
+
+        // Home feed button - opens friends' trips feed
+        findViewById<ImageButton>(R.id.nav_home).setOnClickListener {
+            switchToFragment(HomeFeedFragment(), "home")
+            fab.hide()
         }
     }
 

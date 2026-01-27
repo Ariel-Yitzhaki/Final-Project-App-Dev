@@ -39,6 +39,24 @@ class TripRepository {
         return snapshot.toObjects(Trip::class.java).filter { it.photoCount > 0 }
     }
 
+    // Get completed trips for multiple users (for home feed), batched for >10 friends
+    suspend fun getCompletedTripsForUsers(userIds: List<String>): List<Trip> {
+        if (userIds.isEmpty()) return emptyList()
+
+        val allTrips = mutableListOf<Trip>()
+
+        userIds.chunked(10).forEach { batch ->
+            val snapshot = tripsCollection
+                .whereIn("userId", batch)
+                .whereEqualTo("active", false)
+                .get()
+                .await()
+            allTrips.addAll(snapshot.toObjects(Trip::class.java))
+        }
+
+        return allTrips.filter { it.photoCount > 0 }
+    }
+
     // End a trip - set active to false and set end date
     suspend fun endTrip(tripId: String, endDate: String) {
         tripsCollection.document(tripId).update(

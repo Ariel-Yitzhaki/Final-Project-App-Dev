@@ -92,6 +92,12 @@ class FriendsRepository {
         }
     }
 
+    // Get list of friend user IDs
+    suspend fun getFriendIds(userId: String): List<String> {
+        val friends = getFriends(userId)
+        return friends.map { it.id }
+    }
+
     // Remove a friend
     suspend fun removeFriend(currentUserId: String, friendId: String): Result<Unit> {
         return try {
