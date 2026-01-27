@@ -213,6 +213,7 @@ class MainActivity : AppCompatActivity(), TripEndListener {
 
     // Switches to a fragment or refreshes if already showing
     private fun switchToFragment(fragment: Fragment, tag: String) {
+        clearbackStack()
         if (currentFragmentTag == tag) {
             // Already on this fragment - refresh the existing fragment
             val existingFragment = supportFragmentManager.findFragmentByTag(tag)
@@ -233,6 +234,13 @@ class MainActivity : AppCompatActivity(), TripEndListener {
         }
 
         lifecycleScope.launch { checkActiveTrip() }
+    }
+
+    // Clears all fragments from back stack
+    private fun clearbackStack() {
+        for (i in 0 until supportFragmentManager.backStackEntryCount) {
+            supportFragmentManager.popBackStack()
+        }
     }
 
     // Called by ProfileFragment when user ends a trip
@@ -261,7 +269,7 @@ class MainActivity : AppCompatActivity(), TripEndListener {
         updateTripButtonUI()
     }
 
-    private fun showTripNameDialog() {
+    private fun showTripNameDialog(openCameraAfter: Boolean = false) {
         val input = EditText(this).apply {
             hint = "Enter trip name"
             inputType = android.text.InputType.TYPE_CLASS_TEXT
@@ -276,6 +284,9 @@ class MainActivity : AppCompatActivity(), TripEndListener {
                 if (name.isNotEmpty()) {
                     lifecycleScope.launch {
                         startNewTrip(name)
+                        if (openCameraAfter) {
+                            checkCameraPermissionAndOpen()
+                        }
                     }
                 } else {
                     Toast.makeText(this, "Please enter trip name", Toast.LENGTH_SHORT).show()
@@ -287,24 +298,11 @@ class MainActivity : AppCompatActivity(), TripEndListener {
 
     // Prompt user to start trip before taking photo
     private fun promptStartTrip() {
-        val input = EditText(this).apply {
-            hint = "Enter trip name"
-            inputType = android.text.InputType.TYPE_CLASS_TEXT
-            setPadding(48, 32, 48, 32)
-        }
         AlertDialog.Builder(this)
             .setTitle("No Active Trip")
             .setMessage("Start a new trip to take photos?")
             .setPositiveButton("Yes") { _, _ ->
-                val name = input.text.toString().trim()
-                if (name.isNotEmpty()) {
-                    lifecycleScope.launch {
-                        startNewTrip(name)
-                        checkCameraPermissionAndOpen()
-                    }
-                } else {
-                    Toast.makeText(this, "Please enter trip name", Toast.LENGTH_SHORT).show()
-                }
+                showTripNameDialog(openCameraAfter = true)
             }
             .setNegativeButton("Cancel", null)
             .show()
