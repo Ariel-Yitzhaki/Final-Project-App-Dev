@@ -48,14 +48,6 @@ class TripPhotoAdapter(
             .centerCrop()
             .into(holder.photoImage)
 
-        // Set image height to 4:5 aspect ratio based on screen width
-        holder.photoImage.post {
-            val width = holder.photoImage.width
-            val height = (width * 1.25).toInt()
-            holder.photoImage.layoutParams.height = height
-            holder.photoImage.requestLayout()
-        }
-
         // Shows coordinates for now, need to turn to geocoding later
         holder.locationText.text = "%.4f, %.4f".format(photo.latitude, photo.longitude)
 
