@@ -18,7 +18,8 @@ class TripAdapter(
     private val onEndTripClick: (Trip) -> Unit,
     // onCardClick: called when the card itself is clicked (to view trip details)
     private val onCardClick: (Trip) -> Unit,
-    private val onOptionsClick: (Trip, View) -> Unit
+    private val onOptionsClick: (Trip, View) -> Unit,
+    private val showOptions: Boolean = true
 ) : RecyclerView.Adapter<TripAdapter.TripViewHolder>() {
 
     class TripViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -74,6 +75,9 @@ class TripAdapter(
         holder.optionsButton.setOnClickListener { view ->
             onOptionsClick.invoke(trip, view)
         }
+
+        // Hide options button if not allowed
+        holder.optionsButton.visibility = if (showOptions) View.VISIBLE else View.GONE
     }
 
     override fun getItemCount() = trips.size

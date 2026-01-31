@@ -22,7 +22,7 @@ class FeedTripAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FeedTripViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_feed_trip, parent, false)
+            .inflate(R.layout.item_trip_card, parent, false)
         return FeedTripViewHolder(view)
     }
 

@@ -25,7 +25,6 @@ class FriendsFragment : Fragment(), Refresh {
 
     private lateinit var authRepository: AuthRepository
     private lateinit var friendsRepository: FriendsRepository
-
     private lateinit var requestsLabel: TextView
     private lateinit var requestsRecyclerView: RecyclerView
     private lateinit var friendsRecyclerView: RecyclerView
@@ -101,14 +100,11 @@ class FriendsFragment : Fragment(), Refresh {
             }
 
             // Show friends or empty state
-            if (friends.isNotEmpty()) {
-                emptyText.visibility = View.GONE
-                friendsRecyclerView.adapter = FriendAdapter(friends) { friend ->
-                    removeFriend(friend)
-                }
-            } else {
-                emptyText.visibility = View.VISIBLE
-            }
+            friendsRecyclerView.adapter = FriendAdapter(
+                friends,
+                onRemoveClick = { friend -> removeFriend(friend) },
+                onFriendClick = { friend -> openFriendProfile(friend) }
+            )
         }
     }
 
@@ -154,6 +150,14 @@ class FriendsFragment : Fragment(), Refresh {
                 }
             )
         }
+    }
+
+    // Opens friend's profile page
+    private fun openFriendProfile(friend: User) {
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, FriendProfileFragment.newInstance(friend.id))
+            .addToBackStack(null)
+            .commit()
     }
 
     override fun refresh() {

@@ -12,7 +12,8 @@ import com.example.travel.models.User
 // Adapter for displaying friends list
 class FriendAdapter(
     private val friends: List<User>,
-    private val onRemoveClick: (User) -> Unit
+    private val onRemoveClick: (User) -> Unit,
+    private val onFriendClick: (User) -> Unit
 ) : RecyclerView.Adapter<FriendAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -32,6 +33,7 @@ class FriendAdapter(
         holder.displayNameText.text = friend.displayName
         holder.usernameText.text = "@${friend.username}"
         holder.actionButton.setOnClickListener { onRemoveClick(friend) }
+        holder.itemView.setOnClickListener { onFriendClick(friend) }
     }
 
     override fun getItemCount() = friends.size
