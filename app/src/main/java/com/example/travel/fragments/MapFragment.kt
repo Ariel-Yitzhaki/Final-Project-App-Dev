@@ -157,7 +157,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, Refresh {
 
                 Glide.with(this@MapFragment)
                     .asBitmap()
-                    .load(photo.localPath)
+                    .load(photo.imageUrl)
                     .override(size, size)
                     .centerCrop()
                     .into(object : CustomTarget<Bitmap>() {
@@ -199,7 +199,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, Refresh {
     private fun updateMarkerWithSize(marker: Marker, photo: Photo, size: Int) {
         Glide.with(this@MapFragment)
             .asBitmap()
-            .load(photo.localPath)
+            .load(photo.imageUrl)
             .override(size, size)
             .centerCrop()
             .into(object : CustomTarget<Bitmap>() {

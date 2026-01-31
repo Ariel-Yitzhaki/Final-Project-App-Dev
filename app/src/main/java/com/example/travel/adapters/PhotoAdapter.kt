@@ -30,7 +30,7 @@ class PhotoAdapter(private val photos: List<Photo>) :
         val photo = photos[position]
         Glide.with(holder.itemView.context)
 
-            .load(photo.localPath)
+            .load(photo.imageUrl)
             .centerCrop()
             .into(holder.imageView)
     }

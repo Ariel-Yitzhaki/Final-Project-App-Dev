@@ -118,7 +118,7 @@ class PhotoPreviewActivity : AppCompatActivity() {
         val photo = Photo(
             id = UUID.randomUUID().toString(),
             userId = userId,
-            localPath = photoPath,
+            imageUrl = "", // Will be set by repository after upload
             latitude = latitude,
             longitude = longitude,
             date = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date()),
@@ -128,7 +128,7 @@ class PhotoPreviewActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             try {
-                photoRepository.savePhoto(photo)
+                photoRepository.savePhoto(photo, photoPath)
                 if (tripId.isNotEmpty()) {
                     tripRepository.incrementPhotoCount(tripId)
                 }
