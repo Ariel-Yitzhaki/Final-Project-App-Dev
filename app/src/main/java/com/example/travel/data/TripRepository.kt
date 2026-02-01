@@ -57,7 +57,6 @@ class TripRepository {
         return allTrips.filter { it.photoCount > 0 }
     }
 
-    // End a trip - set active to false and set end date
     suspend fun endTrip(tripId: String, endDate: String) {
         tripsCollection.document(tripId).update(
             mapOf(

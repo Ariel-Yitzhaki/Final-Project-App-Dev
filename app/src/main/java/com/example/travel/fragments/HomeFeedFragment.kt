@@ -14,6 +14,8 @@ import com.example.travel.R
 import com.example.travel.adapters.FeedTripAdapter
 import com.example.travel.data.AuthRepository
 import com.example.travel.data.FriendsRepository
+import com.example.travel.data.LikeRepository
+import com.example.travel.data.PhotoRepository
 import com.example.travel.data.TripRepository
 import com.example.travel.models.Trip
 import kotlinx.coroutines.launch
@@ -79,15 +81,33 @@ class HomeFeedFragment : Fragment(), Refresh {
                 user?.let { Pair(trip, it.username) }
             }
 
+            // Load likes for all trips
+            val tripLikes = loadTripLikes(trips)
+
             progressBar.visibility = View.GONE
 
             if (tripsWithUsernames.isNotEmpty()) {
-                feedRecyclerView.adapter = FeedTripAdapter(tripsWithUsernames) { trip ->
+                feedRecyclerView.adapter = FeedTripAdapter(
+                    tripsWithUsernames,
+                    tripLikes
+                ) { trip ->
                     openTripDetail(trip)
                 }
             } else {
                 emptyText.visibility = View.VISIBLE
             }
+        }
+    }
+
+    // Loads like counts for trips
+    private suspend fun loadTripLikes(trips: List<Trip>): Map<String, Int> {
+        val likeRepository = LikeRepository()
+        val photoRepository = PhotoRepository()
+
+        return trips.associate { trip ->
+            val photos = photoRepository.getPhotosForTrip(trip.id)
+            val photoIds = photos.map { it.id }
+            trip.id to likeRepository.getTotalLikesForTrip(photoIds)
         }
     }
 
