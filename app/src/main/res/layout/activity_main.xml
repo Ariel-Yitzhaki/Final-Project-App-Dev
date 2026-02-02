@@ -34,7 +34,7 @@
             android:id="@+id/hero_location"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Start a TRAVEL"
+            android:text="TRAVEL"
             android:textColor="@color/gray_dark"
             android:textSize="14sp"
             android:textStyle="bold"

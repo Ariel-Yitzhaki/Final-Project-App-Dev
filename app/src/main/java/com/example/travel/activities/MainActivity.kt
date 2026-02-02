@@ -1,147 +1,106 @@
 package com.example.travel.activities
 
-import android.Manifest
-import android.app.AlertDialog
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
+import android.view.View
 import android.widget.Button
-import android.widget.EditText
 import android.widget.ImageButton
-import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.content.FileProvider
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import com.example.travel.fragments.FriendsFragment
-import com.example.travel.fragments.MapFragment
 import com.example.travel.R
 import com.example.travel.data.AuthRepository
 import com.example.travel.data.PhotoRepository
 import com.example.travel.data.TripRepository
-import com.example.travel.models.Trip
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import kotlinx.coroutines.launch
-import java.io.File
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
-import java.util.UUID
-import androidx.fragment.app.Fragment
+import com.example.travel.fragments.FriendsFragment
+import com.example.travel.fragments.HomeFeedFragment
+import com.example.travel.fragments.MapFragment
 import com.example.travel.fragments.ProfileFragment
 import com.example.travel.interfaces.Refresh
 import com.example.travel.interfaces.TripEndListener
-import android.view.View
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.example.travel.adapters.TripMenuAdapter
-import com.example.travel.fragments.HomeFeedFragment
-import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.gms.location.LocationServices
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity(), TripEndListener {
 
-    private lateinit var photoRepository: PhotoRepository
-    private lateinit var authRepository: AuthRepository
-    private lateinit var tripRepository: TripRepository
     private lateinit var tripButton: Button
-    private var activeTrip: Trip? = null
-    private var photoUri: Uri? = null
-    private var currentFragmentTag: String? = null
-    private var currentPhotoPath: String = ""
-    private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var fab: FloatingActionButton
-
-    // Launches camera and handles result
-    private val takePictureLauncher = registerForActivityResult(
-        ActivityResultContracts.TakePicture()
-    ) { success ->
-        if (success) {
-            openPhotoPreview()
-        }
-    }
-
-    // Launches preview screen and handles result
-    private val previewLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        when (result.resultCode) {
-            RESULT_OK -> {
-                // Photo uploaded, refresh map
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.fragment_container, MapFragment())
-                    .commit()
-            }
-            RESULT_FIRST_USER -> {
-                // Retake requested
-                openCamera()
-            }
-            // result canceled - do nothing, photo discarded
-        }
-    }
-
-    // Requests camera permission
-    private val cameraPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        if (isGranted) {
-            openCamera()
-        }
-    }
+    private lateinit var tripManager: TripManager
+    private lateinit var cameraManager: CameraManager
+    private var currentFragmentTag: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Initialize managers before setContentView (for registerLaunchers)
+        initializeManagers()
+
         setContentView(R.layout.activity_main)
 
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-        photoRepository = PhotoRepository()
-        authRepository = AuthRepository()
-        tripRepository = TripRepository()
         tripButton = findViewById(R.id.tripButton)
-
-        // Check for active trip on startup
-        lifecycleScope.launch {
-            checkActiveTrip()
-        }
-
-        // Trip button click
-        tripButton.setOnClickListener {
-            if (activeTrip == null) {
-                showTripNameDialog()
-            }
-        }
-
-        // Load map fragment
-        if (savedInstanceState == null) {
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, HomeFeedFragment(), "home")
-                .commit()
-            currentFragmentTag = "home"
-            updateNavigationIconColors("home")
-        }
-
-        // FAB click listener
         fab = findViewById(R.id.fab_add_picture)
-        fab.hide() // Hide FAB on startup
-        fab.setOnClickListener {
-            if (activeTrip == null) {
-                promptStartTrip()
-            } else {
-                checkCameraPermissionAndOpen()
-            }
+
+        setupTripButton()
+        setupFab()
+        setupNavigation()
+
+        // Load home fragment on startup
+        if (savedInstanceState == null) {
+            switchToFragment(HomeFeedFragment(), "home")
         }
 
-        setupNavigation()
+        // Check for active trip
+        lifecycleScope.launch {
+            tripManager.checkActiveTrip()
+        }
+    }
+
+    // Initializes TripManager and CameraManager with callbacks
+    private fun initializeManagers() {
+        val authRepository = AuthRepository()
+        val tripRepository = TripRepository()
+        val photoRepository = PhotoRepository()
+        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+        tripManager = TripManager(this, authRepository, tripRepository, photoRepository)
+        tripManager.onTripStateChanged = { trip -> updateTripButtonUI(trip) }
+        tripManager.onOpenCamera = { cameraManager.checkPermissionAndOpen() }
+
+        cameraManager = CameraManager(this, fusedLocationClient) { tripManager.activeTrip?.id }
+        cameraManager.registerLaunchers()
+        cameraManager.onPhotoUploaded = {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, MapFragment(), "map")
+                .commit()
+            currentFragmentTag = "map"
+            updateNavigationIconColors("map")
+        }
+    }
+
+    // Sets up trip button click listener
+    private fun setupTripButton() {
+        tripButton.setOnClickListener {
+            tripManager.showTripMenu()
+        }
+    }
+
+    // Sets up FAB click listener
+    private fun setupFab() {
+        fab.hide()
+        fab.setOnClickListener {
+            if (tripManager.activeTrip == null) {
+                tripManager.promptStartTrip()
+            } else {
+                cameraManager.checkPermissionAndOpen()
+            }
+        }
     }
 
     // Sets up bottom navigation button listeners
     private fun setupNavigation() {
-        findViewById<ImageButton>(R.id.nav_profile).setOnClickListener {
-            switchToFragment(ProfileFragment(), "profile")
+        findViewById<ImageButton>(R.id.nav_home).setOnClickListener {
+            switchToFragment(HomeFeedFragment(), "home")
             fab.hide()
         }
 
@@ -155,103 +114,20 @@ class MainActivity : AppCompatActivity(), TripEndListener {
             fab.show()
         }
 
-        findViewById<ImageButton>(R.id.nav_home).setOnClickListener {
-            switchToFragment(HomeFeedFragment(), "home")
+        findViewById<ImageButton>(R.id.nav_profile).setOnClickListener {
+            switchToFragment(ProfileFragment(), "profile")
             fab.hide()
-        }
-    }
-
-    // Updates navigation icon colors based on selected tab (Chose this way because it's only
-    // 4 icons, no need for efficiency
-    private fun updateNavigationIconColors(selectedTag: String) {
-        val homeButton = findViewById<ImageButton>(R.id.nav_home)
-        val friendsButton = findViewById<ImageButton>(R.id.nav_friends)
-        val mapButton = findViewById<ImageButton>(R.id.nav_map)
-        val profileButton = findViewById<ImageButton>(R.id.nav_profile)
-
-        val blackColor = ContextCompat.getColor(this, R.color.black)
-        val whiteColor = ContextCompat.getColor(this, R.color.white)
-
-        // Set all buttons based on selection
-        homeButton.setColorFilter(if (selectedTag == "home") whiteColor else blackColor)
-        friendsButton.setColorFilter(if (selectedTag == "friends") whiteColor else blackColor)
-        mapButton.setColorFilter(if (selectedTag == "map") whiteColor else blackColor)
-        profileButton.setColorFilter(if (selectedTag == "profile") whiteColor else blackColor)
-    }
-
-    private fun checkCameraPermissionAndOpen() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-            == PackageManager.PERMISSION_GRANTED
-        ) {
-            openCamera()
-        } else {
-            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
-        }
-    }
-
-    private fun openCamera() {
-        val photoFile = createImageFile()
-        photoUri = FileProvider.getUriForFile(
-            this,
-            "${packageName}.fileprovider",
-            photoFile
-        )
-        takePictureLauncher.launch(photoUri)
-    }
-
-    private fun createImageFile(): File {
-        // Using HHmmss format to track order of images in a trip done on the same date
-        val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-        val storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        return File.createTempFile("PHOTO_${timestamp}_", ".jpg", storageDir).apply {
-            currentPhotoPath = absolutePath
-        }
-    }
-
-    private fun openPhotoPreview() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-            == PackageManager.PERMISSION_GRANTED
-        ) {
-            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-                val intent = Intent(this, PhotoPreviewActivity::class.java).apply {
-                    putExtra("photoPath", currentPhotoPath)
-                    putExtra("latitude", location?.latitude ?: 0.0)
-                    putExtra("longitude", location?.longitude ?: 0.0)
-                    putExtra("tripId", activeTrip?.id ?: "")
-                }
-                previewLauncher.launch(intent)
-            }
-        }
-    }
-
-    // Check if user has an active trip and update UI
-    private suspend fun checkActiveTrip() {
-        val userId = authRepository.getCurrentUser()?.uid ?: return
-        activeTrip = tripRepository.getActiveTrip(userId)
-
-        updateTripButtonUI()
-    }
-
-    // Update button text based on trip state
-    private fun updateTripButtonUI() {
-        if (activeTrip != null) {
-            tripButton.text = "TRAVELING"
-            tripButton.isEnabled = false
-        } else {
-            tripButton.text = "Start Trip"
-            tripButton.isEnabled = true
         }
     }
 
     // Switches to a fragment or refreshes if already showing
     private fun switchToFragment(fragment: Fragment, tag: String) {
         clearBackStack()
+
         if (currentFragmentTag == tag) {
-            // Already on this fragment - refresh the existing fragment
             val existingFragment = supportFragmentManager.findFragmentByTag(tag)
             (existingFragment as? Refresh)?.refresh()
         } else {
-            // Switch to new fragment
             supportFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, fragment, tag)
                 .commit()
@@ -259,157 +135,51 @@ class MainActivity : AppCompatActivity(), TripEndListener {
         }
 
         // Only show trip button on map screen
-        if (tag == "map") {
-            tripButton.visibility = View.VISIBLE
-        } else {
-            tripButton.visibility = View.GONE
-        }
+        tripButton.visibility = if (tag == "map") View.VISIBLE else View.GONE
 
-        lifecycleScope.launch { checkActiveTrip() }
+        lifecycleScope.launch { tripManager.checkActiveTrip() }
         updateNavigationIconColors(tag)
     }
 
     // Clears all fragments from back stack
     private fun clearBackStack() {
-        // Repeats .backstackEntryCount times to remove all fragments
         repeat(supportFragmentManager.backStackEntryCount) {
             supportFragmentManager.popBackStack()
         }
     }
 
+    // Updates navigation icon colors based on selected tab
+    private fun updateNavigationIconColors(selectedTag: String) {
+        val blackColor = ContextCompat.getColor(this, R.color.black)
+        val whiteColor = ContextCompat.getColor(this, R.color.white)
+
+        findViewById<ImageButton>(R.id.nav_home).setColorFilter(
+            if (selectedTag == "home") whiteColor else blackColor
+        )
+        findViewById<ImageButton>(R.id.nav_friends).setColorFilter(
+            if (selectedTag == "friends") whiteColor else blackColor
+        )
+        findViewById<ImageButton>(R.id.nav_map).setColorFilter(
+            if (selectedTag == "map") whiteColor else blackColor
+        )
+        findViewById<ImageButton>(R.id.nav_profile).setColorFilter(
+            if (selectedTag == "profile") whiteColor else blackColor
+        )
+    }
+
+    // Updates trip button text based on trip state
+    private fun updateTripButtonUI(trip: com.example.travel.models.Trip?) {
+        if (trip != null) {
+            tripButton.text = trip.name
+            tripButton.isEnabled = true
+        } else {
+            tripButton.text = "Start Trip"
+            tripButton.isEnabled = true
+        }
+    }
+
     // Called by ProfileFragment when user ends a trip
     override fun onTripEnded() {
-        activeTrip = null
-        updateTripButtonUI()
-    }
-
-    // Start a new trip
-    private suspend fun startNewTrip(name: String) {
-        val userId = authRepository.getCurrentUser()?.uid ?: return
-        val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
-        val today = dateFormat.format(Date())
-
-        val trip = Trip(
-            id = UUID.randomUUID().toString(),
-            userId = userId,
-            name = name,
-            startDate = today,
-            active = true,
-            photoCount = 0
-        )
-
-        tripRepository.saveTrip(trip)
-        activeTrip = trip
-        updateTripButtonUI()
-    }
-
-    private fun showTripNameDialog(openCameraAfter: Boolean = false) {
-        val input = EditText(this).apply {
-            hint = "Enter trip name"
-            inputType = android.text.InputType.TYPE_CLASS_TEXT
-            setPadding(48, 32, 48, 32)
-        }
-
-        AlertDialog.Builder(this)
-            .setTitle("Name Your Trip")
-            .setView(input)
-            .setPositiveButton("Start") { _, _ ->
-                val name = input.text.toString().trim()
-                if (name.isNotEmpty()) {
-                    lifecycleScope.launch {
-                        startNewTrip(name)
-                        if (openCameraAfter) {
-                            checkCameraPermissionAndOpen()
-                        }
-                    }
-                } else {
-                    Toast.makeText(this, "Please enter trip name", Toast.LENGTH_SHORT).show()
-                }
-            }
-            .setNegativeButton("Cancel", null)
-            .show()
-    }
-
-    // Shows bottom sheet menu for trip selection
-    private fun showTripMenu() {
-        val userId = authRepository.getcurrentUser()?.uid ?: return
-
-        lifecyclescope.launch {
-            val allTrips = tripRepository.getAllTripsForUser(userId)
-            val activeTrip = tripRepository.getActiveTrip(userId)
-
-            // Build menu items
-            val menuItems = mutableListOf<Trip?>()
-            menuItems.add(null) // "None" option
-            menuItems.add(Trip()) // Empty trip = "New Trip" option
-
-            // Add existing trips sorted by the one that's active and then by startDate descending
-            val stortedTrips = allTrips.sortedWith(
-                compareByDescending<Trip> { it.active }
-                    .thenByDescending { it.startDate }
-            )
-            menuItems.addAll(sortedTrips)
-
-            // Cap at 7 items for display
-            val displayItems = menuItems.take(7)
-
-            // Create and show bottom sheet
-            val bottomSheet = BottomSheetDialog(this@MainActivity)
-            val view = layoutInflater.inflate(R.layout.bottom_sheet_trip_menu, null)
-            bottomSheet.setContentView(view)
-
-            val recycler = view.findViewById<RecyclerView>(R.id.recyclerTrips)
-            recycler.layoutManager = LinearLayoutManager(this@MainActivity)
-            recycler.adapter = TripMenuAdapter(displayItems, activeTrip?.id) { selectedTrip ->
-                bottomSheet.dismiss()
-                handleTripSelection(selectedTrip, activeTrip)
-            }
-
-            bottomSheet.show()
-        }
-    }
-
-
-    // Handle user selection from trip menu
-    private fun handleTripSelection(selectedTrip: Trip?, currentActiveTrip: Trip?) {
-        lifecycleScope.launch {
-            // Selected "None" - deactivate current trip
-            if (selectedTrip == null) {
-                currentActiveTrip?.let { deactivateCurrentTrip(it) }
-            } else if (selectedTrip.id.isEmpty()) { // Selected "New Trip" - show name dialog
-                currentActiveTrip?.let { deactivateCurrentTrip(it) }
-                showTripNameDialog(openCameraAfter = false)
-            } else {
-                if (currentActiveTrip != null && currentActiveTrip.id != selectedTrip.id) {
-                    deactivateCurrentTrip(currentActiveTrip)
-                }
-                if (selectedTrip.id != currentActiveTrip?.id) {
-                    tripRepository.reactivateTrip(selectedTrip.id)
-                }
-                updateTripButtonUI()
-            }
-
-        }
-    }
-
-    // Deactivates a trip, setting endDate to last photo's date
-    private suspend fun deactivateCurrentTrip(trip: Trip) {
-        val lastPhoto = photoRepository.getLastPhotoForTrip(trip.id)
-        val endDate = lastPhoto?.date ?: trip.startDate
-        tripRepository.deactivateTrip(trip.id, endDate)
-        activeTrip = null
-        updateTripButtonUI()
-    }
-
-    // Prompt user to start trip before taking photo
-    private fun promptStartTrip() {
-        AlertDialog.Builder(this)
-            .setTitle("No Active Trip")
-            .setMessage("Start a new trip to take photos?")
-            .setPositiveButton("Yes") { _, _ ->
-                showTripNameDialog(openCameraAfter = true)
-            }
-            .setNegativeButton("Cancel", null)
-            .show()
+        tripManager.clearActiveTrip()
     }
 }

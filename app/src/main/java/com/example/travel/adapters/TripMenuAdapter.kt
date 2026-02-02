@@ -5,7 +5,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.cardview.widget.CardView
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.travel.R
 import com.example.travel.models.Trip
@@ -17,10 +16,10 @@ class TripMenuAdapter(
     private val activeTripId: String?,
     private val onItemClick: (Trip?) -> Unit
 ) : RecyclerView.Adapter<TripMenuAdapter.ViewHolder>() {
-    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(view) {
-        val card: CardView = view.findViewById(R.id.tripMenuCard)
-        val tripName: TextView = view.findViewById(R.id.tripMenuName)
-        val activeIndicator: View = view.findViewById(R.id.tripMenuActive)
+    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val card: CardView = itemView.findViewById(R.id.tripMenuCard)
+        val tripName: TextView = itemView.findViewById(R.id.tripMenuName)
+        val activeIndicator: View = itemView.findViewById(R.id.tripMenuActive)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -32,26 +31,32 @@ class TripMenuAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val trip = trips[position]
 
-        when {
-            // "None" option - deselect active trip
-            trip == null -> {
-                holder.tripName.text = "None"
-                holder.activeIndicator.visibility = if (activeTripId == null) View.VISIBLE else View.GONE
-            }
 
-            // "New Trip" option - starts trip name dialog
-            trip.id.isEmpty() -> {
-                holder.tripName.text = "New Trip"
-                holder.activeIndicator.visibility = View.GONE
-            }
-
-            // Regular trip - can be reactivated
-            else -> {
-                holder.tripName.text = trip.name
-                holder.activeIndicator.visibility = if (trip.id == activeTripId) View.VISIBLE else View.GONE
-            }
+        // "None" option - deselect active trip
+        if (trip == null) {
+            holder.tripName.text = "None"
+            holder.card.setCardBackgroundColor(0xFFE0E0E0.toInt())
+            holder.tripName.setTextColor(0xFF757575.toInt())
+            holder.activeIndicator.visibility = if (activeTripId == null) View.VISIBLE else View.GONE
+            holder.card.setOnClickListener { onItemClick(trip) }
+            return
         }
 
+        // "New Trip" option - starts trip name dialog
+        if (trip.id.isEmpty()) {
+            holder.tripName.text = "New Trip"
+            holder.card.setCardBackgroundColor(0x00000000)
+            holder.tripName.setTextColor(0xFF2196F3.toInt())
+            holder.activeIndicator.visibility = View.GONE
+            holder.card.setOnClickListener { onItemClick(trip) }
+            return
+        }
+
+        // Regular trip - can be reactivated
+        holder.tripName.text = trip.name
+        holder.card.setCardBackgroundColor(0xFFE3F2FD.toInt())
+        holder.tripName.setTextColor(0xFF000000.toInt())
+        holder.activeIndicator.visibility = if (trip.id == activeTripId) View.VISIBLE else View.GONE
         holder.card.setOnClickListener { onItemClick(trip) }
     }
 
