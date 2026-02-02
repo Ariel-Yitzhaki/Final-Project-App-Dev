@@ -3,10 +3,10 @@ package com.example.travel.data
 import android.net.Uri
 import com.example.travel.models.Photo
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
 import java.io.File
-import com.google.firebase.firestore.Query
 
 class PhotoRepository {
 
@@ -51,7 +51,7 @@ class PhotoRepository {
     // Returns the most recent photo for a trip (by timestamp), or null if no photos
     suspend fun getLastPhotoForTrip(tripId: String): Photo? {
         return try {
-            val snapshot = firestore.collection("photos")
+            val snapshot = photosCollection
                 .whereEqualTo("tripId", tripId)
                 .orderBy("timestamp", Query.Direction.DESCENDING)
                 .limit(1)

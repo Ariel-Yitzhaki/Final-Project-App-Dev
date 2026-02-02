@@ -74,7 +74,42 @@ class TripRepository {
         }
     }
 
-    // Returns all trips for a user
+    // Returns all trips for a user (for dropdown menu)
+    suspend fun getAllTripsForUser(userId: String): List<Trip> {
+        return try {
+            val snapshot = tripsCollection
+                .whereEqualTo("userId", userId)
+                .get()
+                .await()
+            snapshot.documents.mapNotNull { it.toObject(Trip::class.java) }
+        } catch (_: Exception) {
+            emptyList()
+        }
+    }
+
+    // Reactivates a trip (sets active = true, clears endDate)
+    suspend fun reactivateTrip(tripId: String): Boolean {
+        return try {
+            tripsCollection.document(tripId)
+                .update(mapOf("active" to true, "endDate" to ""))
+                .await()
+            true
+        } catch (_: Exception) {
+            false
+        }
+    }
+
+    // Deactivates a trip (sets active = false, sets endDate to last photo's date)
+    suspend fun deactivateTrip(tripId: String, endDate: String): Boolean {
+        return try {
+            tripsCollection.document(tripId)
+                .update(mapOf("active" to false, "endDate" to endDate))
+                .await()
+            true
+        } catch (_: Exception) {
+            false
+        }
+    }
 
     // Delete trip (for empty trips)
     suspend fun deleteTrip(tripId: String) {

@@ -37,7 +37,11 @@ import com.example.travel.fragments.ProfileFragment
 import com.example.travel.interfaces.Refresh
 import com.example.travel.interfaces.TripEndListener
 import android.view.View
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.travel.adapters.TripMenuAdapter
 import com.example.travel.fragments.HomeFeedFragment
+import com.google.android.material.bottomsheet.BottomSheetDialog
 
 class MainActivity : AppCompatActivity(), TripEndListener {
 
@@ -324,6 +328,77 @@ class MainActivity : AppCompatActivity(), TripEndListener {
             }
             .setNegativeButton("Cancel", null)
             .show()
+    }
+
+    // Shows bottom sheet menu for trip selection
+    private fun showTripMenu() {
+        val userId = authRepository.getcurrentUser()?.uid ?: return
+
+        lifecyclescope.launch {
+            val allTrips = tripRepository.getAllTripsForUser(userId)
+            val activeTrip = tripRepository.getActiveTrip(userId)
+
+            // Build menu items
+            val menuItems = mutableListOf<Trip?>()
+            menuItems.add(null) // "None" option
+            menuItems.add(Trip()) // Empty trip = "New Trip" option
+
+            // Add existing trips sorted by the one that's active and then by startDate descending
+            val stortedTrips = allTrips.sortedWith(
+                compareByDescending<Trip> { it.active }
+                    .thenByDescending { it.startDate }
+            )
+            menuItems.addAll(sortedTrips)
+
+            // Cap at 7 items for display
+            val displayItems = menuItems.take(7)
+
+            // Create and show bottom sheet
+            val bottomSheet = BottomSheetDialog(this@MainActivity)
+            val view = layoutInflater.inflate(R.layout.bottom_sheet_trip_menu, null)
+            bottomSheet.setContentView(view)
+
+            val recycler = view.findViewById<RecyclerView>(R.id.recyclerTrips)
+            recycler.layoutManager = LinearLayoutManager(this@MainActivity)
+            recycler.adapter = TripMenuAdapter(displayItems, activeTrip?.id) { selectedTrip ->
+                bottomSheet.dismiss()
+                handleTripSelection(selectedTrip, activeTrip)
+            }
+
+            bottomSheet.show()
+        }
+    }
+
+
+    // Handle user selection from trip menu
+    private fun handleTripSelection(selectedTrip: Trip?, currentActiveTrip: Trip?) {
+        lifecycleScope.launch {
+            // Selected "None" - deactivate current trip
+            if (selectedTrip == null) {
+                currentActiveTrip?.let { deactivateCurrentTrip(it) }
+            } else if (selectedTrip.id.isEmpty()) { // Selected "New Trip" - show name dialog
+                currentActiveTrip?.let { deactivateCurrentTrip(it) }
+                showTripNameDialog(openCameraAfter = false)
+            } else {
+                if (currentActiveTrip != null && currentActiveTrip.id != selectedTrip.id) {
+                    deactivateCurrentTrip(currentActiveTrip)
+                }
+                if (selectedTrip.id != currentActiveTrip?.id) {
+                    tripRepository.reactivateTrip(selectedTrip.id)
+                }
+                updateTripButtonUI()
+            }
+
+        }
+    }
+
+    // Deactivates a trip, setting endDate to last photo's date
+    private suspend fun deactivateCurrentTrip(trip: Trip) {
+        val lastPhoto = photoRepository.getLastPhotoForTrip(trip.id)
+        val endDate = lastPhoto?.date ?: trip.startDate
+        tripRepository.deactivateTrip(trip.id, endDate)
+        activeTrip = null
+        updateTripButtonUI()
     }
 
     // Prompt user to start trip before taking photo
