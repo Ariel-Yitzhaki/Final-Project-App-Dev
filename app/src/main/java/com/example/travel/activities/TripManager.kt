@@ -29,6 +29,8 @@ class TripManager(
 ) {
     var activeTrip: Trip? = null
         private set
+    var viewingTrip: Trip? = null
+        private set
 
     // Callback when trip state changes (for UI updates)
     var onTripStateChanged: ((Trip?) -> Unit)? = null
@@ -36,8 +38,8 @@ class TripManager(
     // Callback to open camera after starting new trip
     var onOpenCamera: (() -> Unit)? = null
 
-    // Callback to refresh current fragment
-    var onRefreshMap: (() -> Unit)? = null
+    // Callback when viewing trip changes (for map refresh)
+    var onViewingTripChanged: ((Trip?) -> Unit)? = null
 
     // Checks if user has an active trip and updates state
     suspend fun checkActiveTrip() {
@@ -83,7 +85,7 @@ class TripManager(
             recycler.layoutManager = LinearLayoutManager(activity)
             recycler.adapter = TripMenuAdapter(displayItems, currentActive?.id) { selectedTrip ->
                 bottomSheet.dismiss()
-                handleTripSelection(selectedTrip, currentActive)
+                handleTripSelection(selectedTrip)
             }
 
             bottomSheet.show()
@@ -91,39 +93,19 @@ class TripManager(
     }
 
     // Handles user selection from trip menu
-    // Handles user selection from trip menu
-    private fun handleTripSelection(selectedTrip: Trip?, currentActiveTrip: Trip?) {
+    private fun handleTripSelection(selectedTrip: Trip?) {
         activity.lifecycleScope.launch {
             if (selectedTrip == null) {
-                // Selected "None" - deactivate current trip
-                if (currentActiveTrip != null) {
-                    deactivateTrip(currentActiveTrip)
-                }
-                onRefreshMap?.invoke()
+                // Selected "None" - just clear viewing, don't deactivate
+                viewingTrip = null
+                onViewingTripChanged?.invoke(null)
             } else if (selectedTrip.id.isEmpty()) {
-                // Selected "New Trip" - deactivate current and show name dialog
-                if (currentActiveTrip != null) {
-                    deactivateTrip(currentActiveTrip)
-                }
+                // Selected "New Trip" - create and activate new trip
                 showTripNameDialog(openCameraAfter = false)
             } else {
-                // Selected existing trip - reactivate it
-                if (currentActiveTrip != null && currentActiveTrip.id != selectedTrip.id) {
-                    // Deactivate old trip in database only (don't update UI yet)
-                    if (currentActiveTrip.photoCount == 0) {
-                        tripRepository.deleteTrip(currentActiveTrip.id)
-                    } else {
-                        val lastPhoto = photoRepository.getLastPhotoForTrip(currentActiveTrip.id)
-                        val endDate = lastPhoto?.date ?: currentActiveTrip.startDate
-                        tripRepository.deactivateTrip(currentActiveTrip.id, endDate)
-                    }
-                }
-                if (selectedTrip.id != currentActiveTrip?.id) {
-                    tripRepository.reactivateTrip(selectedTrip.id)
-                    activeTrip = selectedTrip.copy(active = true, endDate = "")
-                    onTripStateChanged?.invoke(activeTrip)
-                }
-                onRefreshMap?.invoke()
+                // Selected existing trip - view only, don't activate
+                viewingTrip = selectedTrip
+                onViewingTripChanged?.invoke(selectedTrip)
             }
         }
     }
@@ -188,19 +170,32 @@ class TripManager(
 
         tripRepository.saveTrip(trip)
         activeTrip = trip
+        viewingTrip = trip
         onTripStateChanged?.invoke(activeTrip)
-        onRefreshMap?.invoke()
+        onViewingTripChanged?.invoke(viewingTrip)
     }
 
-    // Prompts user to start trip before taking photo
-    fun promptStartTrip() {
-        AlertDialog.Builder(activity)
-            .setTitle("No Active Trip")
-            .setMessage("Start a new trip to take photos?")
-            .setPositiveButton("Yes") { _, _ ->
-                showTripNameDialog(openCameraAfter = true)
+    // Activates the currently viewed trip (when user confirms adding a photo)
+    fun activateViewingTrip() {
+        val trip = viewingTrip ?: return
+
+        activity.lifecycleScope.launch {
+            // Deactivate current active trip if different
+            val currentActive = activeTrip
+            if (currentActive != null && currentActive.id != trip.id) {
+                if(currentActive.photoCount == 0) {
+                    tripRepository.deleteTrip(currentActive.id)
+                } else {
+                    val lastPhoto = photoRepository.getLastPhotoForTrip(currentActive.id)
+                    val endDate = lastPhoto?.date ?: currentActive.startDate
+                    tripRepository.deactivateTrip(currentActive.id, endDate)
+                }
             }
-            .setNegativeButton("Cancel", null)
-            .show()
+
+            // Reactivate the viewed trip
+            tripRepository.reactivateTrip(trip.id)
+            activeTrip = trip.copy(active = true, endDate = "")
+            onTripStateChanged?.invoke(activeTrip)
+        }
     }
 }

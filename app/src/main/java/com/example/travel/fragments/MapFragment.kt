@@ -22,9 +22,8 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.example.travel.R
-import com.example.travel.data.AuthRepository
+import com.example.travel.activities.MainActivity
 import com.example.travel.data.PhotoRepository
-import com.example.travel.data.TripRepository
 import com.example.travel.interfaces.Refresh
 import com.example.travel.models.Photo
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -49,8 +48,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, Refresh {
     // Google's location service - gets device location using GPS, WiFi, cell towers
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var photoRepository: PhotoRepository
-    private lateinit var tripRepository: TripRepository
-    private lateinit var authRepository: AuthRepository
     private val photoMarkers = mutableListOf<Pair<Marker, Photo>>()
 
     // Modern way to request permissions - launches system permission dialog and handles result
@@ -78,8 +75,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, Refresh {
         // Initialize Google's location service
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
         photoRepository = PhotoRepository()
-        tripRepository = TripRepository()
-        authRepository = AuthRepository()
 
         // Find the map fragment and request the GoogleMap object asynchronously
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
@@ -139,12 +134,12 @@ class MapFragment : Fragment(), OnMapReadyCallback, Refresh {
 
     private fun loadPhotosOnMap() {
         lifecycleScope.launch {
-            val userId = authRepository.getCurrentUser()?.uid ?: return@launch
-            val activeTrip = tripRepository.getActiveTrip(userId)
+            // Get viewing trip ID from MainActivity
+            val viewingTripId = (activity as? MainActivity)?.getViewingTripId()
 
-            // Only load photos for active trip
-            val photos = if (activeTrip != null) {
-                photoRepository.getAllPhotos().filter { it.tripId == activeTrip.id }
+            // Load photos for viewing trip, or empty if none selected
+            val photos = if (viewingTripId != null) {
+                photoRepository.getPhotosForTrip(viewingTripId)
             } else {
                 emptyList()
             }
@@ -152,11 +147,12 @@ class MapFragment : Fragment(), OnMapReadyCallback, Refresh {
             // Draw travel path first (so it's behind markers)
             drawTravelPath(photos)
 
+            val fragment = this@MapFragment
             for (photo in photos) {
                 val position = LatLng(photo.latitude, photo.longitude)
                 val size = getMarkerSizeForZoom(map.cameraPosition.zoom)
 
-                Glide.with(this@MapFragment)
+                Glide.with(fragment)
                     .asBitmap()
                     .load(photo.imageUrl)
                     .override(size, size)
