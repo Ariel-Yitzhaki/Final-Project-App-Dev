@@ -26,10 +26,10 @@
         android:text="Preview"
         android:textSize="18sp"
         android:textStyle="bold"
-        app:layout_constraintTop_toTopOf="@id/backButton"
-        app:layout_constraintBottom_toBottomOf="@id/backButton"
+        app:layout_constraintBottom_toTopOf="@+id/photoCard"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toTopOf="@id/backButton" />
 
 
     <androidx.cardview.widget.CardView

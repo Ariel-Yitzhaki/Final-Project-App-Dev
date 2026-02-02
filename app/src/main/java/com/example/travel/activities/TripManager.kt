@@ -91,20 +91,32 @@ class TripManager(
     }
 
     // Handles user selection from trip menu
+    // Handles user selection from trip menu
     private fun handleTripSelection(selectedTrip: Trip?, currentActiveTrip: Trip?) {
         activity.lifecycleScope.launch {
             if (selectedTrip == null) {
                 // Selected "None" - deactivate current trip
-                currentActiveTrip?.let { deactivateTrip(it) }
+                if (currentActiveTrip != null) {
+                    deactivateTrip(currentActiveTrip)
+                }
                 onRefreshMap?.invoke()
             } else if (selectedTrip.id.isEmpty()) {
                 // Selected "New Trip" - deactivate current and show name dialog
-                currentActiveTrip?.let { deactivateTrip(it) }
+                if (currentActiveTrip != null) {
+                    deactivateTrip(currentActiveTrip)
+                }
                 showTripNameDialog(openCameraAfter = false)
             } else {
                 // Selected existing trip - reactivate it
                 if (currentActiveTrip != null && currentActiveTrip.id != selectedTrip.id) {
-                    deactivateTrip(currentActiveTrip)
+                    // Deactivate old trip in database only (don't update UI yet)
+                    if (currentActiveTrip.photoCount == 0) {
+                        tripRepository.deleteTrip(currentActiveTrip.id)
+                    } else {
+                        val lastPhoto = photoRepository.getLastPhotoForTrip(currentActiveTrip.id)
+                        val endDate = lastPhoto?.date ?: currentActiveTrip.startDate
+                        tripRepository.deactivateTrip(currentActiveTrip.id, endDate)
+                    }
                 }
                 if (selectedTrip.id != currentActiveTrip?.id) {
                     tripRepository.reactivateTrip(selectedTrip.id)
