@@ -1,4 +1,4 @@
-package com.example.travel.fragments
+package com.example.travel.interfaces
 
 interface Refresh {
     fun refresh()

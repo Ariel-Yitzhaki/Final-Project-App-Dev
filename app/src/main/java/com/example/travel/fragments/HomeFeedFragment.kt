@@ -17,6 +17,7 @@ import com.example.travel.data.FriendsRepository
 import com.example.travel.data.LikeRepository
 import com.example.travel.data.PhotoRepository
 import com.example.travel.data.TripRepository
+import com.example.travel.interfaces.Refresh
 import com.example.travel.models.Trip
 import kotlinx.coroutines.launch
 

@@ -22,6 +22,8 @@ import com.example.travel.models.Trip
 import android.widget.PopupMenu
 import com.example.travel.data.LikeRepository
 import com.example.travel.data.PhotoRepository
+import com.example.travel.interfaces.Refresh
+import com.example.travel.interfaces.TripEndListener
 
 class ProfileFragment : Fragment(), Refresh {
 

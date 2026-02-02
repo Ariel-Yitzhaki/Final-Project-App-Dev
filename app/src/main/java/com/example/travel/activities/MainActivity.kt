@@ -34,8 +34,8 @@ import java.util.Locale
 import java.util.UUID
 import androidx.fragment.app.Fragment
 import com.example.travel.fragments.ProfileFragment
-import com.example.travel.fragments.Refresh
-import com.example.travel.fragments.TripEndListener
+import com.example.travel.interfaces.Refresh
+import com.example.travel.interfaces.TripEndListener
 import android.view.View
 import com.example.travel.fragments.HomeFeedFragment
 
@@ -76,7 +76,7 @@ class MainActivity : AppCompatActivity(), TripEndListener {
                 // Retake requested
                 openCamera()
             }
-            // RESULT_CANCELED - do nothing, photo discarded
+            // result canceled - do nothing, photo discarded
         }
     }
 
@@ -117,6 +117,7 @@ class MainActivity : AppCompatActivity(), TripEndListener {
                 .replace(R.id.fragment_container, HomeFeedFragment(), "home")
                 .commit()
             currentFragmentTag = "home"
+            updateNavigationIconColors("home")
         }
 
         // FAB click listener
@@ -154,6 +155,19 @@ class MainActivity : AppCompatActivity(), TripEndListener {
             switchToFragment(HomeFeedFragment(), "home")
             fab.hide()
         }
+    }
+
+    // Updates navigation icon colors based on selected tab
+    private fun updateNavigationIconColors(selectedTag: String) {
+        val homeButton = findViewById<ImageButton>(R.id.nav_home)
+        val friendsButton = findViewById<ImageButton>(R.id.nav_friends)
+        val mapButton = findViewById<ImageButton>(R.id.nav_map)
+        val profileButton = findViewById<ImageButton>(R.id.nav_profile)
+
+        val blackColor = ContextCompat.getColor(this, R.color.black)
+        val whiteColor = ContextCompat.getColor(this, R.color.white)
+
+        // Set all buttons based on
     }
 
     private fun checkCameraPermissionAndOpen() {
@@ -243,6 +257,7 @@ class MainActivity : AppCompatActivity(), TripEndListener {
         }
 
         lifecycleScope.launch { checkActiveTrip() }
+        updateNavigationIconColors(tag)
     }
 
     // Clears all fragments from back stack

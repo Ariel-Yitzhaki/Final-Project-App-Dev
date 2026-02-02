@@ -25,6 +25,7 @@ import com.example.travel.R
 import com.example.travel.data.AuthRepository
 import com.example.travel.data.PhotoRepository
 import com.example.travel.data.TripRepository
+import com.example.travel.interfaces.Refresh
 import com.example.travel.models.Photo
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -162,7 +163,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, Refresh {
                     .centerCrop()
                     .into(object : CustomTarget<Bitmap>() {
                         override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                            val pinBitmap = createPinWithPhoto(resource, 8, Color.WHITE)
+                            val pinBitmap = createPinWithPhoto(resource, 8, Color.WHITE, photo.date)
                             val markerOptions = MarkerOptions()
                                 .position(position)
                                 .title(photo.date)
@@ -204,7 +205,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, Refresh {
             .centerCrop()
             .into(object : CustomTarget<Bitmap>() {
                 override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                    val pinBitmap = createPinWithPhoto(resource, 8, Color.WHITE)
+                    val pinBitmap = createPinWithPhoto(resource, 8, Color.WHITE, photo.date)
                     marker.setIcon(BitmapDescriptorFactory.fromBitmap(pinBitmap))
                 }
 
@@ -212,10 +213,13 @@ class MapFragment : Fragment(), OnMapReadyCallback, Refresh {
             })
     }
 
-    private fun createPinWithPhoto(photo: Bitmap, borderWidth: Int, borderColor: Int): Bitmap {
+    private fun createPinWithPhoto(photo: Bitmap, borderWidth: Int, borderColor: Int, date: String): Bitmap {
         val pointerHeight = 50
+        val dateTextSize = 32f
+        val dateAreaHeight = 40 // Space below photo for date text
+
         val totalWidth = photo.width + borderWidth * 2
-        val totalHeight = photo.height + borderWidth * 2 + pointerHeight
+        val totalHeight = photo.height + borderWidth * 2 + dateAreaHeight + pointerHeight
 
         val output = createBitmap(totalWidth, totalHeight)
         val canvas = Canvas(output)
@@ -228,6 +232,24 @@ class MapFragment : Fragment(), OnMapReadyCallback, Refresh {
         val rectF = RectF(0f, 0f, totalWidth.toFloat(), (totalHeight - pointerHeight).toFloat())
         canvas.drawRect(rectF, paint)
 
+        // Draw photo inside frame at top
+        canvas.drawBitmap(photo, borderWidth.toFloat(), borderWidth.toFloat(), null)
+
+        // Draw date text in white area below photo
+        val textPaint = Paint().apply {
+            color = Color.BLACK
+            textSize = dateTextSize
+            textAlign = Paint.Align.CENTER
+            isAntiAlias = true
+        }
+
+        canvas.drawText(
+            date,
+            totalWidth /2f,
+            photo.height + borderWidth + dateAreaHeight / 2f + dateTextSize / 3f,
+            textPaint
+        )
+
         // Draw pointer triangle from full width
         val path = Path()
         path.moveTo(0f, (totalHeight - pointerHeight).toFloat())
@@ -235,9 +257,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, Refresh {
         path.lineTo(totalWidth / 2f, totalHeight.toFloat())
         path.close()
         canvas.drawPath(path, paint)
-
-        // Draw photo inside frame
-        canvas.drawBitmap(photo, borderWidth.toFloat(), borderWidth.toFloat(), null)
 
         return output
     }

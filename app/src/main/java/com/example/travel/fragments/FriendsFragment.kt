@@ -17,6 +17,7 @@ import com.example.travel.adapters.FriendAdapter
 import com.example.travel.adapters.FriendRequestAdapter
 import com.example.travel.data.AuthRepository
 import com.example.travel.data.FriendsRepository
+import com.example.travel.interfaces.Refresh
 import com.example.travel.models.FriendRequest
 import com.example.travel.models.User
 import kotlinx.coroutines.launch

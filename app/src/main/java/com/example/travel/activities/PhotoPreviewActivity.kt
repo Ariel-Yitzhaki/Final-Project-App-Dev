@@ -9,6 +9,7 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
@@ -24,6 +25,7 @@ import java.util.Date
 import java.util.Locale
 import java.util.UUID
 
+// Loads the screen to display photo and location after taking a picture
 class PhotoPreviewActivity : AppCompatActivity() {
 
     private lateinit var authRepository: AuthRepository
@@ -44,6 +46,11 @@ class PhotoPreviewActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_photo_preview)
+
+        // Handle device back button press
+        onBackPressedDispatcher.addCallback(this) {
+            discardAndFinish()
+        }
 
         authRepository = AuthRepository()
         photoRepository = PhotoRepository()
