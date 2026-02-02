@@ -157,7 +157,8 @@ class MainActivity : AppCompatActivity(), TripEndListener {
         }
     }
 
-    // Updates navigation icon colors based on selected tab
+    // Updates navigation icon colors based on selected tab (Chose this way because it's only
+    // 4 icons, no need for efficiency
     private fun updateNavigationIconColors(selectedTag: String) {
         val homeButton = findViewById<ImageButton>(R.id.nav_home)
         val friendsButton = findViewById<ImageButton>(R.id.nav_friends)
@@ -167,7 +168,11 @@ class MainActivity : AppCompatActivity(), TripEndListener {
         val blackColor = ContextCompat.getColor(this, R.color.black)
         val whiteColor = ContextCompat.getColor(this, R.color.white)
 
-        // Set all buttons based on
+        // Set all buttons based on selection
+        homeButton.setColorFilter(if (selectedTag == "home") whiteColor else blackColor)
+        friendsButton.setColorFilter(if (selectedTag == "friends") whiteColor else blackColor)
+        mapButton.setColorFilter(if (selectedTag == "map") whiteColor else blackColor)
+        profileButton.setColorFilter(if (selectedTag == "profile") whiteColor else blackColor)
     }
 
     private fun checkCameraPermissionAndOpen() {

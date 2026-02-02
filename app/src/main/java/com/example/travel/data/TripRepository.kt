@@ -74,6 +74,8 @@ class TripRepository {
         }
     }
 
+    // Returns all trips for a user
+
     // Delete trip (for empty trips)
     suspend fun deleteTrip(tripId: String) {
         tripsCollection.document(tripId).delete().await()

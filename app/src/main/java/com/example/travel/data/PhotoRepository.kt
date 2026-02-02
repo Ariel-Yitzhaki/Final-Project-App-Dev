@@ -6,6 +6,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
 import java.io.File
+import com.google.firebase.firestore.Query
 
 class PhotoRepository {
 
@@ -47,4 +48,18 @@ class PhotoRepository {
         return snapshot.toObjects(Photo::class.java)
     }
 
+    // Returns the most recent photo for a trip (by timestamp), or null if no photos
+    suspend fun getLastPhotoForTrip(tripId: String): Photo? {
+        return try {
+            val snapshot = firestore.collection("photos")
+                .whereEqualTo("tripId", tripId)
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .limit(1)
+                .get()
+                .await()
+            snapshot.documents.firstOrNull()?.toObject(Photo::class.java)
+        } catch (_: Exception) {
+            null
+        }
+    }
 }
