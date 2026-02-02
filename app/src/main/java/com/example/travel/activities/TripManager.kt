@@ -118,9 +118,15 @@ class TripManager(
 
     // Deactivates a trip, setting endDate to last photo's date
     private suspend fun deactivateTrip(trip: Trip) {
-        val lastPhoto = photoRepository.getLastPhotoForTrip(trip.id)
-        val endDate = lastPhoto?.date ?: trip.startDate
-        tripRepository.deactivateTrip(trip.id, endDate)
+        if (trip.photoCount == 0) {
+            // Delete empty trip
+            tripRepository.deleteTrip(trip.id)
+        } else {
+            val lastPhoto = photoRepository.getLastPhotoForTrip(trip.id)
+            val endDate = lastPhoto?.date ?: trip.startDate
+            tripRepository.deactivateTrip(trip.id, endDate)
+        }
+
         activeTrip = null
         onTripStateChanged?.invoke(null)
     }
