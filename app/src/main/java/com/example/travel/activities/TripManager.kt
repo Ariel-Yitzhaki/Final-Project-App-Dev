@@ -36,6 +36,9 @@ class TripManager(
     // Callback to open camera after starting new trip
     var onOpenCamera: (() -> Unit)? = null
 
+    // Callback to refresh current fragment
+    var onRefreshMap: (() -> Unit)? = null
+
     // Checks if user has an active trip and updates state
     suspend fun checkActiveTrip() {
         val userId = authRepository.getCurrentUser()?.uid ?: return
@@ -93,6 +96,7 @@ class TripManager(
             if (selectedTrip == null) {
                 // Selected "None" - deactivate current trip
                 currentActiveTrip?.let { deactivateTrip(it) }
+                onRefreshMap?.invoke()
             } else if (selectedTrip.id.isEmpty()) {
                 // Selected "New Trip" - deactivate current and show name dialog
                 currentActiveTrip?.let { deactivateTrip(it) }
@@ -107,6 +111,7 @@ class TripManager(
                     activeTrip = selectedTrip.copy(active = true, endDate = "")
                     onTripStateChanged?.invoke(activeTrip)
                 }
+                onRefreshMap?.invoke()
             }
         }
     }
@@ -166,6 +171,7 @@ class TripManager(
         tripRepository.saveTrip(trip)
         activeTrip = trip
         onTripStateChanged?.invoke(activeTrip)
+        onRefreshMap?.invoke()
     }
 
     // Prompts user to start trip before taking photo

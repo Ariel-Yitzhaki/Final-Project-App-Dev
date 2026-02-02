@@ -66,6 +66,12 @@ class MainActivity : AppCompatActivity(), TripEndListener {
         tripManager = TripManager(this, authRepository, tripRepository, photoRepository)
         tripManager.onTripStateChanged = { trip -> updateTripButtonUI(trip) }
         tripManager.onOpenCamera = { cameraManager.checkPermissionAndOpen() }
+        tripManager.onRefreshMap = {
+            val currentFragment = supportFragmentManager.findFragmentByTag(currentFragmentTag)
+            if (currentFragment is Refresh) {
+                currentFragment.refresh()
+            }
+        }
 
         cameraManager = CameraManager(this, fusedLocationClient) { tripManager.activeTrip?.id }
         cameraManager.registerLaunchers()
