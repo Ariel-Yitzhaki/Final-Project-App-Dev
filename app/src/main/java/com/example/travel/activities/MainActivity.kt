@@ -65,28 +65,25 @@ class MainActivity : AppCompatActivity(), TripEndListener {
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         tripManager = TripManager(this, authRepository, tripRepository, photoRepository)
-        tripManager.onTripStateChanged = { trip -> updateTripButtonUI() }
-        tripManager.onViewingTripChanged = { trip ->
-            updateTripButtonUI()
-            refreshCurrentFragment()
-        }
+        tripManager.onTripStateChanged = { _ -> updateTripButtonUI() }
         tripManager.onOpenCamera = { cameraManager.checkPermissionAndOpen() }
 
         cameraManager = CameraManager(this, fusedLocationClient) { tripManager.activeTrip?.id }
         cameraManager.registerLaunchers()
         cameraManager.onPhotoUploaded = {
+            tripManager.incrementLocalPhotoCount()
             supportFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, MapFragment(), "map")
                 .commit()
             currentFragmentTag = "map"
             updateNavigationIconColors("map")
         }
-    }
 
-    private fun refreshCurrentFragment() {
-        val currentFragment = supportFragmentManager.findFragmentById(R.id.fragment_container)
-        if (currentFragment is Refresh) {
-            currentFragment.refresh()
+        tripManager.onRefreshMap = {
+            val currentFragment = supportFragmentManager.findFragmentById(R.id.fragment_container)
+            if (currentFragment is Refresh) {
+                currentFragment.refresh()
+            }
         }
     }
 
@@ -101,13 +98,10 @@ class MainActivity : AppCompatActivity(), TripEndListener {
     private fun setupFab() {
         fab.hide()
         fab.setOnClickListener {
-            val viewing = tripManager.viewingTrip
-            if (viewing == null) {
-                // No trip selected
+            if (tripManager.activeTrip == null) {
                 promptStartNewTrip()
             } else {
-                // Viewing a trip
-                promptAddPhotoToTrip(viewing.name)
+                cameraManager.checkPermissionAndOpen()
             }
         }
     }
@@ -118,18 +112,6 @@ class MainActivity : AppCompatActivity(), TripEndListener {
             .setMessage("Start a new trip?")
             .setPositiveButton("Yes") { _, _ ->
                 tripManager.showTripNameDialog(openCameraAfter = true)
-            }
-            .setNegativeButton("Cancel", null)
-            .show()
-    }
-
-    private fun promptAddPhotoToTrip(tripName: String) {
-        AlertDialog.Builder(this)
-            .setTitle("Add Photo")
-            .setMessage("Add a photo to $tripName?")
-            .setPositiveButton("Yes") { _, _ ->
-                tripManager.activateViewingTrip()
-                cameraManager.checkPermissionAndOpen()
             }
             .setNegativeButton("Cancel", null)
             .show()
@@ -205,20 +187,15 @@ class MainActivity : AppCompatActivity(), TripEndListener {
         )
     }
 
-    // Updates trip button text based on viewing trip state
+    // Updates trip button text based on trip selected
     private fun updateTripButtonUI() {
-        val viewing = tripManager.viewingTrip
-        if (viewing != null) {
-            tripButton.text = viewing.name
+        val active = tripManager.activeTrip
+        if (active != null) {
+            tripButton.text = active.name
         } else {
             tripButton.text = "Trips"
         }
         tripButton.isEnabled = true
-    }
-
-    // Returns the currently viewed trip ID for MapFragment
-    fun getViewingTripId(): String? {
-        return tripManager.viewingTrip?.id
     }
 
     // Called by ProfileFragment when user ends a trip

@@ -31,7 +31,6 @@ class TripMenuAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val trip = trips[position]
 
-
         // "None" option - deselect active trip
         if (trip == null) {
             holder.tripName.text = "None"

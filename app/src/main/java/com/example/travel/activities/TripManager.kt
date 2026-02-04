@@ -29,8 +29,6 @@ class TripManager(
 ) {
     var activeTrip: Trip? = null
         private set
-    var viewingTrip: Trip? = null
-        private set
 
     // Callback when trip state changes (for UI updates)
     var onTripStateChanged: ((Trip?) -> Unit)? = null
@@ -38,8 +36,7 @@ class TripManager(
     // Callback to open camera after starting new trip
     var onOpenCamera: (() -> Unit)? = null
 
-    // Callback when viewing trip changes (for map refresh)
-    var onViewingTripChanged: ((Trip?) -> Unit)? = null
+    var onRefreshMap: (() -> Unit)? = null
 
     // Checks if user has an active trip and updates state
     suspend fun checkActiveTrip() {
@@ -95,34 +92,67 @@ class TripManager(
     // Handles user selection from trip menu
     private fun handleTripSelection(selectedTrip: Trip?) {
         activity.lifecycleScope.launch {
-            if (selectedTrip == null) {
-                // Selected "None" - just clear viewing, don't deactivate
-                viewingTrip = null
-                onViewingTripChanged?.invoke(null)
-            } else if (selectedTrip.id.isEmpty()) {
-                // Selected "New Trip" - create and activate new trip
-                showTripNameDialog(openCameraAfter = false)
+            val currentActive = activeTrip
+
+            // Check if switching away from an empty active trip
+            if (currentActive != null && currentActive.photoCount == 0) {
+                if (selectedTrip == null || selectedTrip.id != currentActive.id) {
+                    showDiscardEmptyTripDialog(selectedTrip, currentActive)
+                }
             } else {
-                // Selected existing trip - view only, don't activate
-                viewingTrip = selectedTrip
-                onViewingTripChanged?.invoke(selectedTrip)
+                // No empty trip to discard, proceed
+                applyTripSelection(selectedTrip)
             }
         }
     }
 
-    // Deactivates a trip, setting endDate to last photo's date
-    private suspend fun deactivateTrip(trip: Trip) {
-        if (trip.photoCount == 0) {
-            // Delete empty trip
-            tripRepository.deleteTrip(trip.id)
-        } else {
-            val lastPhoto = photoRepository.getLastPhotoForTrip(trip.id)
-            val endDate = lastPhoto?.date ?: trip.startDate
-            tripRepository.deactivateTrip(trip.id, endDate)
-        }
+    // Shows dialog warning user that empty trip will be discarded
+    private fun showDiscardEmptyTripDialog(selectedTrip: Trip?, emptyTrip: Trip) {
+        AlertDialog.Builder(activity)
+            .setTitle("Discard Empty Trip?")
+            .setMessage("'${emptyTrip.name}' has no photos and will be discarded.")
+            .setPositiveButton("Discard") { _, _ ->
+                activity.lifecycleScope.launch {
+                    tripRepository.deleteTrip(emptyTrip.id)
+                    activeTrip = null
+                    applyTripSelection(selectedTrip)
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
 
-        activeTrip = null
-        onTripStateChanged?.invoke(null)
+    // Applies the trip selection (view only, no activation)
+    private suspend fun applyTripSelection(selectedTrip: Trip?, currentActive: Trip?) {
+        if (selectedTrip == null) {
+            if (currentActive != null) {
+                val lastPhoto = photoRepository.getLastPhotoForTrip(currentActive.id)
+                val endDate = lastPhoto?.date ?: currentActive.startDate
+                tripRepository.deactivateTrip(currentActive.id, endDate)
+                activeTrip = null
+                onTripStateChanged?.invoke(null)
+            }
+            onRefreshMap?.invoke()
+        } else if (selectedTrip.id.isEmpty()) {
+            if (currentActive != null) {
+                val lastPhoto = photoRepository.getLastPhotoForTrip(currentActive.id)
+                val endDate = lastPhoto?.date ?: currentActive.startDate
+                tripRepository.deactivateTrip(currentActive.id, endDate)
+            }
+            showTripNameDialog(openCameraAfter = false)
+        } else {
+            if (currentActive != null && currentActive.id != selectedTrip.id) {
+                tripRepository.reactivateTrip(selectedTrip.id)
+                activeTrip = selectedTrip.copy(active = true, endDate = "")
+                onTripStateChanged?.invoke(activeTrip)
+            }
+            if (currentActive?.id != selectedTrip.id) {
+                tripRepository.reactivateTrip(selectedTrip.id)
+                activeTrip = selectedTrip.copy(active = true, endDate = "")
+                onTripStateChanged?.invoke(activeTrip)
+            }
+            onRefreshMap?.invoke()
+        }
     }
 
     // Shows dialog to name a new trip
@@ -170,32 +200,15 @@ class TripManager(
 
         tripRepository.saveTrip(trip)
         activeTrip = trip
-        viewingTrip = trip
         onTripStateChanged?.invoke(activeTrip)
-        onViewingTripChanged?.invoke(viewingTrip)
+        onRefreshMap?.invoke()
     }
 
-    // Activates the currently viewed trip (when user confirms adding a photo)
-    fun activateViewingTrip() {
-        val trip = viewingTrip ?: return
-
-        activity.lifecycleScope.launch {
-            // Deactivate current active trip if different
-            val currentActive = activeTrip
-            if (currentActive != null && currentActive.id != trip.id) {
-                if(currentActive.photoCount == 0) {
-                    tripRepository.deleteTrip(currentActive.id)
-                } else {
-                    val lastPhoto = photoRepository.getLastPhotoForTrip(currentActive.id)
-                    val endDate = lastPhoto?.date ?: currentActive.startDate
-                    tripRepository.deactivateTrip(currentActive.id, endDate)
-                }
-            }
-
-            // Reactivate the viewed trip
-            tripRepository.reactivateTrip(trip.id)
-            activeTrip = trip.copy(active = true, endDate = "")
-            onTripStateChanged?.invoke(activeTrip)
+    // Increments local photo count after upload
+    fun incrementLocalPhotoCount() {
+        val current = activeTrip
+        if (current != null) {
+            activeTrip = current.copy(photoCount = current.photoCount + 1)
         }
     }
 }
