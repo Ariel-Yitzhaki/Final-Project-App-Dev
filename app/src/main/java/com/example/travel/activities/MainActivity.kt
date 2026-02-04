@@ -117,6 +117,10 @@ class MainActivity : AppCompatActivity(), TripEndListener {
             .show()
     }
 
+    fun getActiveTripId(): String? {
+        return tripManager.activeTrip?.id
+    }
+
     // Sets up bottom navigation button listeners
     private fun setupNavigation() {
         findViewById<ImageButton>(R.id.nav_home).setOnClickListener {

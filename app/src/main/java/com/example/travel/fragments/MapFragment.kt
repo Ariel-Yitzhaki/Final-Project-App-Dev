@@ -133,13 +133,15 @@ class MapFragment : Fragment(), OnMapReadyCallback, Refresh {
     }
 
     private fun loadPhotosOnMap() {
-        lifecycleScope.launch {
-            // Get viewing trip ID from MainActivity
-            val viewingTripId = (activity as? MainActivity)?.getViewingTripId()
+        val fragment = this
 
-            // Load photos for viewing trip, or empty if none selected
-            val photos = if (viewingTripId != null) {
-                photoRepository.getPhotosForTrip(viewingTripId)
+        lifecycleScope.launch {
+            // Get active trip ID from MainActivity
+            val activeTripId = (activity as? MainActivity)?.getActiveTripId()
+
+            // Load photos for active trip, or empty if none selected
+            val photos = if (activeTripId != null) {
+                photoRepository.getPhotosForTrip(activeTripId)
             } else {
                 emptyList()
             }
@@ -147,7 +149,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, Refresh {
             // Draw travel path first (so it's behind markers)
             drawTravelPath(photos)
 
-            val fragment = this@MapFragment
             for (photo in photos) {
                 val position = LatLng(photo.latitude, photo.longitude)
                 val size = getMarkerSizeForZoom(map.cameraPosition.zoom)

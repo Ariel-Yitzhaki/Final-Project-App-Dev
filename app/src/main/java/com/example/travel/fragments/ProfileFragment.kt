@@ -24,6 +24,8 @@ import com.example.travel.data.LikeRepository
 import com.example.travel.data.PhotoRepository
 import com.example.travel.interfaces.Refresh
 import com.example.travel.interfaces.TripEndListener
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class ProfileFragment : Fragment(), Refresh {
 
@@ -106,7 +108,10 @@ class ProfileFragment : Fragment(), Refresh {
             // Active trip first, then completed trips sorted by date (newest first)
             val allTrips = mutableListOf<Trip>()
             activeTrip?.let {allTrips.add(it)}
-            allTrips.addAll(completedTrips.sortedByDescending { it.startDate })
+            val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
+            allTrips.addAll(completedTrips.sortedByDescending {
+                try { dateFormat.parse(it.startDate)?.time ?: 0L } catch (e: Exception) { 0L }
+            })
 
             // Load cover photos for each trip
             progressBar.visibility = View.GONE

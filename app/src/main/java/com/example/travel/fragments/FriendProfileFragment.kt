@@ -19,6 +19,8 @@ import com.example.travel.data.PhotoRepository
 import com.example.travel.data.TripRepository
 import com.example.travel.models.Trip
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 // Displays a friend's profile (read-only)
 class FriendProfileFragment : Fragment() {
@@ -96,7 +98,10 @@ class FriendProfileFragment : Fragment() {
 
             val allTrips = mutableListOf<Trip>()
             activeTrip?.let {allTrips.add(it)}
-            allTrips.addAll(completedTrips.sortedByDescending { it.startDate })
+            val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
+            allTrips.addAll(completedTrips.sortedByDescending {
+                try { dateFormat.parse(it.startDate)?.time ?: 0L } catch (e: Exception) { 0L }
+            })
 
             progressBar.visibility = View.GONE
 

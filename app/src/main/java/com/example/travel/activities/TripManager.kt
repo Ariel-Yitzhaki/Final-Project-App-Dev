@@ -65,9 +65,15 @@ class TripManager(
             menuItems.add(Trip()) // Empty trip = "New Trip" option
 
             // Add existing trips, sorted: active first, then by startDate descending
-            val sortedTrips = allTrips.sortedWith(
-                compareByDescending<Trip> { it.active }.thenByDescending { it.startDate }
-            )
+            val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
+            val sortedTrips = allTrips
+                .filter { it.active || it.photoCount > 0 }
+                .sortedWith(
+                    compareByDescending<Trip> { it.active }.thenByDescending {
+                        try { dateFormat.parse(it.startDate)?.time ?: 0L } catch (e: Exception) { 0L }
+                    }
+                )
+
             menuItems.addAll(sortedTrips)
 
             // Cap at 7 items for display
@@ -101,7 +107,7 @@ class TripManager(
                 }
             } else {
                 // No empty trip to discard, proceed
-                applyTripSelection(selectedTrip)
+                applyTripSelection(selectedTrip, currentActive)
             }
         }
     }
@@ -115,7 +121,8 @@ class TripManager(
                 activity.lifecycleScope.launch {
                     tripRepository.deleteTrip(emptyTrip.id)
                     activeTrip = null
-                    applyTripSelection(selectedTrip)
+                    // Sending null as currentActive because emptyTrip is being deleted
+                    applyTripSelection(selectedTrip, null)
                 }
             }
             .setNegativeButton("Cancel", null)
@@ -141,11 +148,13 @@ class TripManager(
             }
             showTripNameDialog(openCameraAfter = false)
         } else {
+            // Deactivate current trip if different
             if (currentActive != null && currentActive.id != selectedTrip.id) {
-                tripRepository.reactivateTrip(selectedTrip.id)
-                activeTrip = selectedTrip.copy(active = true, endDate = "")
-                onTripStateChanged?.invoke(activeTrip)
+                val lastPhoto = photoRepository.getLastPhotoForTrip(currentActive.id)
+                val endDate = lastPhoto?.date ?: currentActive.startDate
+                tripRepository.deactivateTrip(currentActive.id, endDate)
             }
+            // Activate selected trip if not already active
             if (currentActive?.id != selectedTrip.id) {
                 tripRepository.reactivateTrip(selectedTrip.id)
                 activeTrip = selectedTrip.copy(active = true, endDate = "")
