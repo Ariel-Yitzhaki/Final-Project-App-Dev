@@ -1,6 +1,5 @@
 package com.example.travel.fragments
 
-import android.location.Geocoder
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -19,8 +18,8 @@ import com.example.travel.data.LikeRepository
 import com.example.travel.data.PhotoRepository
 import com.example.travel.data.TripRepository
 import com.example.travel.models.Photo
+import com.example.travel.utils.GeocodingUtils
 import kotlinx.coroutines.launch
-import java.util.Locale
 
 // Displays photos from a single trip in a vertical scrollable list
 class TripDetailFragment : Fragment() {
@@ -129,24 +128,17 @@ class TripDetailFragment : Fragment() {
     }
 
     // Converts photo coordinates to readable addresses
-    @Suppress("DEPRECATION")
     private fun getAddressesForPhotos(photos: List<Photo>): Map<String, String> {
-        val geocoder = Geocoder(requireContext(), Locale.getDefault())
         val addresses = mutableMapOf<String, String>()
 
         for (photo in photos) {
-            try {
-                val results = geocoder.getFromLocation(photo.latitude, photo.longitude, 1)
-                val address = results?.firstOrNull()
-                if (address != null) {
-                    addresses[photo.id] = address.locality ?: address.subAdminArea ?: address.adminArea ?: "%.4f, %.4f".format(photo.latitude, photo.longitude)
-                } else {
-                    addresses[photo.id] = "%.4f, %.4f".format(photo.latitude, photo.longitude)
-                }
-            } catch (_: Exception) {
-                addresses[photo.id] = "%.4f, %.4f".format(photo.latitude, photo.longitude)
-            }
+            addresses[photo.id] = GeocodingUtils.getAddressFromCoordinates(
+                requireContext(),
+                photo.latitude,
+                photo.longitude
+            )
         }
+
         return addresses
     }
 }

@@ -25,6 +25,8 @@ import kotlinx.coroutines.launch
 // Displays friends' completed trips in a feed
 class HomeFeedFragment : Fragment(), Refresh {
 
+    private lateinit var photoRepository: PhotoRepository
+    private lateinit var likeRepository: LikeRepository
     private lateinit var authRepository: AuthRepository
     private lateinit var friendsRepository: FriendsRepository
     private lateinit var tripRepository: TripRepository
@@ -46,6 +48,8 @@ class HomeFeedFragment : Fragment(), Refresh {
         authRepository = AuthRepository()
         friendsRepository = FriendsRepository()
         tripRepository = TripRepository()
+        photoRepository = PhotoRepository()
+        likeRepository = LikeRepository()
 
         feedRecyclerView = view.findViewById(R.id.feedRecyclerView)
         emptyText = view.findViewById(R.id.emptyText)
@@ -76,7 +80,7 @@ class HomeFeedFragment : Fragment(), Refresh {
                 .sortedByDescending { it.endDate }
 
             val tripsWithUsers = getTripsWithUsers(trips)
-            val tripLikes = loadTripLikes(trips)
+            val tripLikes = likeRepository.getLikesForTrips(trips, photoRepository)
 
             progressBar.visibility = View.GONE
             displayFeed(tripsWithUsers, tripLikes)
@@ -106,18 +110,6 @@ class HomeFeedFragment : Fragment(), Refresh {
             }
         } else {
             emptyText.visibility = View.VISIBLE
-        }
-    }
-
-    // Loads like counts for trips
-    private suspend fun loadTripLikes(trips: List<Trip>): Map<String, Int> {
-        val likeRepository = LikeRepository()
-        val photoRepository = PhotoRepository()
-
-        return trips.associate { trip ->
-            val photos = photoRepository.getPhotosForTrip(trip.id)
-            val photoIds = photos.map { it.id }
-            trip.id to likeRepository.getTotalLikesForTrip(photoIds)
         }
     }
 

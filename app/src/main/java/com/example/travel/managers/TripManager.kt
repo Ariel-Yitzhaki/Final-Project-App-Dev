@@ -73,7 +73,7 @@ class TripManager(
                     compareByDescending<Trip> { it.active }.thenByDescending {
                         try {
                             dateFormat.parse(it.startDate)?.time ?: 0L
-                        } catch (e: Exception) { 0L }
+                        } catch (_: Exception) { 0L }
                     }
                 )
 
@@ -138,28 +138,20 @@ class TripManager(
     private suspend fun applyTripSelection(selectedTrip: Trip?, currentActive: Trip?) {
         if (selectedTrip == null) {
             if (currentActive != null) {
-                val lastPhoto = photoRepository.getLastPhotoForTrip(currentActive.id)
-                val endDate = lastPhoto?.date ?: currentActive.startDate
-                tripRepository.deactivateTrip(currentActive.id, endDate)
+                deactivateWithEndDate(currentActive)
                 activeTrip = null
                 onTripStateChanged?.invoke(null)
             }
             onRefreshMap?.invoke()
         } else if (selectedTrip.id.isEmpty()) {
             if (currentActive != null) {
-                val lastPhoto = photoRepository.getLastPhotoForTrip(currentActive.id)
-                val endDate = lastPhoto?.date ?: currentActive.startDate
-                tripRepository.deactivateTrip(currentActive.id, endDate)
+                deactivateWithEndDate(currentActive)
             }
             showTripNameDialog(openCameraAfter = false)
         } else {
-            // Deactivate current trip if different
             if (currentActive != null && currentActive.id != selectedTrip.id) {
-                val lastPhoto = photoRepository.getLastPhotoForTrip(currentActive.id)
-                val endDate = lastPhoto?.date ?: currentActive.startDate
-                tripRepository.deactivateTrip(currentActive.id, endDate)
+                deactivateWithEndDate(currentActive)
             }
-            // Activate selected trip if not already active
             if (currentActive?.id != selectedTrip.id) {
                 tripRepository.reactivateTrip(selectedTrip.id)
                 activeTrip = selectedTrip.copy(active = true, endDate = "")
@@ -167,6 +159,13 @@ class TripManager(
             }
             onRefreshMap?.invoke()
         }
+    }
+
+    // Deactivates a trip with the last photo's date as end date
+    private suspend fun deactivateWithEndDate(trip: Trip) {
+        val lastPhoto = photoRepository.getLastPhotoForTrip(trip.id)
+        val endDate = lastPhoto?.date ?: trip.startDate
+        tripRepository.deactivateTrip(trip.id, endDate)
     }
 
     // Shows dialog to name a new trip

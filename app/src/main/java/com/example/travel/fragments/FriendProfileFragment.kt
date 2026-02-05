@@ -100,7 +100,9 @@ class FriendProfileFragment : Fragment() {
             activeTrip?.let {allTrips.add(it)}
             val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
             allTrips.addAll(completedTrips.sortedByDescending {
-                try { dateFormat.parse(it.startDate)?.time ?: 0L } catch (e: Exception) { 0L }
+                try {
+                    dateFormat.parse(it.startDate)?.time ?: 0L
+                } catch (_: Exception) { 0L }
             })
 
             progressBar.visibility = View.GONE
@@ -108,7 +110,7 @@ class FriendProfileFragment : Fragment() {
             if (allTrips.isNotEmpty()) {
                 emptyText.visibility = View.GONE
 
-                val tripLikes = loadTripLikes(allTrips)
+                val tripLikes = likeRepository.getLikesForTrips(allTrips, photoRepository)
 
                 tripsRecyclerView.adapter = TripAdapter(
                     allTrips.toMutableList(),
@@ -122,17 +124,6 @@ class FriendProfileFragment : Fragment() {
                 emptyText.visibility = View.VISIBLE
             }
         }
-    }
-
-    // Loads like counts for a list of trips
-    private suspend fun loadTripLikes(trips: List<Trip>): Map<String, Int> {
-        val tripLikes = mutableMapOf<String, Int>()
-        for (trip in trips) {
-            val photos = photoRepository.getPhotosForTrip(trip.id)
-            val photoIds = photos.map { it.id }
-            tripLikes[trip.id] = likeRepository.getTotalLikesForTrip(photoIds)
-        }
-        return tripLikes
     }
 
     // Opens the trip detail view

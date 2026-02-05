@@ -34,7 +34,8 @@ class UserSearchAdapter(
         holder.usernameText.text = "@${user.username}"
 
         // Set button state based on relationship status
-        when (statusMap[user.id]) {
+        val status = statusMap[user.id]
+        when (status) {
             "friend" -> {
                 holder.actionButton.text = "Friends"
                 holder.actionButton.isEnabled = false

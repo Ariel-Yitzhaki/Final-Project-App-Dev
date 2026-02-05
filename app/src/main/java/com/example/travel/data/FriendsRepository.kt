@@ -7,7 +7,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
 class FriendsRepository {
-
+    private val authRepository: AuthRepository = AuthRepository()
     private val firestore = FirebaseFirestore.getInstance()
     private val usersCollection = firestore.collection("users")
     private val friendsCollection = firestore.collection("friends")
@@ -69,8 +69,8 @@ class FriendsRepository {
         }
     }
 
-    // Get all friends for a user
-    suspend fun getFriends(userId: String): List<User> {
+    // Gets list of friend user IDs
+    suspend fun getFriendIds(userId: String): List<String> {
         return try {
             val asUser1 = friendsCollection
                 .whereEqualTo("user1Id", userId)
@@ -84,18 +84,16 @@ class FriendsRepository {
                 .await()
                 .toObjects(Friends::class.java)
 
-            val friendIds = asUser1.map { it.user2Id } + asUser2.map { it.user1Id }
-
-            friendIds.mapNotNull { getUserProfile(it) }
+            asUser1.map { it.user2Id } + asUser2.map { it.user1Id }
         } catch (_: Exception) {
             emptyList()
         }
     }
 
-    // Get list of friend user IDs
-    suspend fun getFriendIds(userId: String): List<String> {
-        val friends = getFriends(userId)
-        return friends.map { it.id }
+    // Gets all friends as User objects
+    suspend fun getFriends(userId: String): List<User> {
+        val friendIds = getFriendIds(userId)
+        return friendIds.mapNotNull { authRepository.getUserProfile(it) }
     }
 
     // Remove a friend
@@ -153,15 +151,6 @@ class FriendsRepository {
             }
 
             null
-        } catch (_: Exception) {
-            null
-        }
-    }
-
-    // Helper to get user profile
-    private suspend fun getUserProfile(uid: String): User? {
-        return try {
-            usersCollection.document(uid).get().await().toObject(User::class.java)
         } catch (_: Exception) {
             null
         }

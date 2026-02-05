@@ -110,7 +110,9 @@ class ProfileFragment : Fragment(), Refresh {
             activeTrip?.let {allTrips.add(it)}
             val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
             allTrips.addAll(completedTrips.sortedByDescending {
-                try { dateFormat.parse(it.startDate)?.time ?: 0L } catch (e: Exception) { 0L }
+                try {
+                    dateFormat.parse(it.startDate)?.time ?: 0L
+                } catch (_: Exception) { 0L }
             })
 
             // Load cover photos for each trip
@@ -119,7 +121,7 @@ class ProfileFragment : Fragment(), Refresh {
             if (allTrips.isNotEmpty()) {
                 emptyText.visibility = View.GONE
 
-                val tripLikes = loadTripLikes(allTrips)
+                val tripLikes = likeRepository.getLikesForTrips(allTrips, photoRepository)
 
                 tripsRecyclerView.adapter = TripAdapter(
                     allTrips.toMutableList(),
@@ -134,17 +136,6 @@ class ProfileFragment : Fragment(), Refresh {
         }
     }
 
-    // Loads like counts for a list of trips
-    private suspend fun loadTripLikes(trips: List<Trip>): Map<String, Int> {
-        val tripLikes = mutableMapOf<String, Int>()
-        for (trip in trips) {
-            val photos = photoRepository.getPhotosForTrip(trip.id)
-            val photoIds = photos.map { it.id }
-            tripLikes[trip.id] = likeRepository.getTotalLikesForTrip(photoIds)
-        }
-        return tripLikes
-    }
-
     private fun onEndTripClicked(trip: Trip) {
         lifecycleScope.launch {
             if (trip.photoCount == 0) {
@@ -152,9 +143,9 @@ class ProfileFragment : Fragment(), Refresh {
                 tripRepository.deleteTrip(trip.id)
             } else {
                 // Mark trip as completed with today's date
-                val dateFormat = java.text.SimpleDateFormat("MMM dd, yyyy", java.util.Locale.getDefault())
+                val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
                 val today = dateFormat.format(java.util.Date())
-                tripRepository.endTrip(trip.id, today)
+                tripRepository.deactivateTrip(trip.id, today)
             }
             // Refresh the list
             loadProfile()
@@ -176,12 +167,11 @@ class ProfileFragment : Fragment(), Refresh {
         popup.menu.add("Delete Trip")
 
         popup.setOnMenuItemClickListener { item ->
-            when (item.title) {
-                "Delete Trip" -> {
-                    confirmDeleteTrip(trip)
-                    true
-                }
-                else -> false
+            if (item.title == "Delete Trip") {
+                confirmDeleteTrip(trip)
+                true
+            } else {
+                false
             }
         }
         popup.show()

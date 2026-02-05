@@ -1,6 +1,7 @@
 package com.example.travel.data
 
 import com.example.travel.models.Like
+import com.example.travel.models.Trip
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
@@ -49,6 +50,17 @@ class LikeRepository {
             total += getLikeCount(photoId)
         }
         return total
+    }
+
+    // Gets like counts for multiple trips
+    suspend fun getLikesForTrips(trips: List<Trip>, photoRepository: PhotoRepository): Map<String, Int> {
+        val tripLikes = mutableMapOf<String, Int>()
+        for (trip in trips) {
+            val photos = photoRepository.getPhotosForTrip(trip.id)
+            val photoIds = photos.map { it.id }
+            tripLikes[trip.id] = getTotalLikesForTrip(photoIds)
+        }
+        return tripLikes
     }
 
 }

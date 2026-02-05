@@ -1,6 +1,5 @@
 package com.example.travel.activities
 
-import android.location.Geocoder
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -18,6 +17,7 @@ import com.example.travel.data.AuthRepository
 import com.example.travel.data.PhotoRepository
 import com.example.travel.data.TripRepository
 import com.example.travel.models.Photo
+import com.example.travel.utils.GeocodingUtils
 import kotlinx.coroutines.launch
 import java.io.File
 import java.text.SimpleDateFormat
@@ -95,25 +95,8 @@ class PhotoPreviewActivity : AppCompatActivity() {
     }
 
     // Convert coordinates to address
-    @Suppress("DEPRECATION")
     private fun loadAddress() {
-        try {
-            val geocoder = Geocoder(this, Locale.getDefault())
-            val addresses = geocoder.getFromLocation(latitude, longitude, 1)
-            if (!addresses.isNullOrEmpty()) {
-                val address = addresses[0]
-                val addressText = listOfNotNull(
-                    address.thoroughfare,
-                    address.locality,
-                    address.countryName
-                ).joinToString(", ")
-                locationText.text = addressText.ifEmpty { "$latitude, $longitude" }
-            } else {
-                locationText.text = "$latitude, $longitude"
-            }
-        } catch (_: Exception) {
-            locationText.text = "$latitude, $longitude"
-        }
+        locationText.text = GeocodingUtils.getAddressFromCoordinates(this, latitude, longitude)
     }
 
     private fun uploadPhoto() {
