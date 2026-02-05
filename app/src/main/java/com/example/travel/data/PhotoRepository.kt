@@ -42,12 +42,6 @@ class PhotoRepository {
         return snapshot.toObjects(Photo::class.java)
     }
 
-    // Get all photos
-    suspend fun getAllPhotos(): List<Photo> {
-        val snapshot = photosCollection.get().await()
-        return snapshot.toObjects(Photo::class.java)
-    }
-
     // Returns the most recent photo for a trip (by timestamp), or null if no photos
     suspend fun getLastPhotoForTrip(tripId: String): Photo? {
         return try {

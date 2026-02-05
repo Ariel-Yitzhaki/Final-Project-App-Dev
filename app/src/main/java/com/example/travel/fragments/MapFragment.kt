@@ -65,7 +65,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, Refresh {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_map, container, false)
+        return inflater.inflate(R.layout.fragment_map, container,
+            false)
     }
 
     // Called after view is created - initializes location client and starts loading the map
@@ -126,55 +127,59 @@ class MapFragment : Fragment(), OnMapReadyCallback, Refresh {
                 location?.let {
                     val currentLatLng = LatLng(it.latitude, it.longitude)
                     // Move camera to location with zoom level 15 (street level)
-                    map.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15f))
+                    map.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng,
+                        15f))
                 }
             }
         }
     }
 
+    // Loads photos for active trip and displays them on map
     private fun loadPhotosOnMap() {
-        val fragment = this
-
         lifecycleScope.launch {
-            // Get active trip ID from MainActivity
             val activeTripId = (activity as? MainActivity)?.getActiveTripId()
 
-            // Load photos for active trip, or empty if none selected
             val photos = if (activeTripId != null) {
                 photoRepository.getPhotosForTrip(activeTripId)
             } else {
                 emptyList()
             }
 
-            // Draw travel path first (so it's behind markers)
             drawTravelPath(photos)
 
             for (photo in photos) {
-                val position = LatLng(photo.latitude, photo.longitude)
-                val size = getMarkerSizeForZoom(map.cameraPosition.zoom)
-
-                Glide.with(fragment)
-                    .asBitmap()
-                    .load(photo.imageUrl)
-                    .override(size, size)
-                    .centerCrop()
-                    .into(object : CustomTarget<Bitmap>() {
-                        override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                            val pinBitmap = createPinWithPhoto(resource, 8, Color.WHITE)
-                            val markerOptions = MarkerOptions()
-                                .position(position)
-                                .title(photo.date)
-                                .icon(BitmapDescriptorFactory.fromBitmap(pinBitmap))
-
-                            map.addMarker(markerOptions)?.let { marker ->
-                                photoMarkers.add(Pair(marker, photo))
-                            }
-                        }
-
-                        override fun onLoadCleared(placeholder: Drawable?) {}
-                    })
+                addPhotoMarker(photo)
             }
         }
+    }
+
+    // Creates and adds a custom marker for a photo on the map
+    private fun addPhotoMarker(photo: Photo) {
+        val position = LatLng(photo.latitude, photo.longitude)
+        val size = getMarkerSizeForZoom(map.cameraPosition.zoom)
+
+        Glide.with(this)
+            .asBitmap()
+            .load(photo.imageUrl)
+            .override(size, size)
+            .centerCrop()
+            .into(object : CustomTarget<Bitmap>() {
+                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                    val pinBitmap = createPinWithPhoto(resource, 8,
+                        Color.WHITE)
+
+                    val markerOptions = MarkerOptions()
+                        .position(position)
+                        .title(photo.date)
+                        .icon(BitmapDescriptorFactory.fromBitmap(pinBitmap))
+
+                    map.addMarker(markerOptions)?.let { marker ->
+                        photoMarkers.add(Pair(marker, photo))
+                    }
+                }
+
+                override fun onLoadCleared(placeholder: Drawable?) {}
+            })
     }
 
     // Draws lines connecting photos in chronological order
@@ -204,7 +209,9 @@ class MapFragment : Fragment(), OnMapReadyCallback, Refresh {
             .centerCrop()
             .into(object : CustomTarget<Bitmap>() {
                 override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                    val pinBitmap = createPinWithPhoto(resource, 8, Color.WHITE)
+                    val pinBitmap = createPinWithPhoto(resource, 8,
+                        Color.WHITE)
+
                     marker.setIcon(BitmapDescriptorFactory.fromBitmap(pinBitmap))
                 }
 
@@ -230,7 +237,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, Refresh {
         canvas.drawRect(rectF, paint)
 
         // Draw photo inside frame
-        canvas.drawBitmap(photo, borderWidth.toFloat(), borderWidth.toFloat(), null)
+        canvas.drawBitmap(photo, borderWidth.toFloat(), borderWidth.toFloat(),
+            null)
 
         // Draw pointer triangle
         val path = Path()
@@ -245,9 +253,9 @@ class MapFragment : Fragment(), OnMapReadyCallback, Refresh {
 
     private fun getMarkerSizeForZoom(zoom: Float): Int {
         return when {
-            zoom >= 18f -> 250  // Very zoomed in
-            zoom >= 16f -> 200  // Zoomed in
-            zoom >= 14f -> 150  // Medium
+            zoom >= 18f -> 300  // Very zoomed in
+            zoom >= 16f -> 250  // Zoomed in
+            zoom >= 14f -> 200  // Medium
             else -> 100         // Zoomed out
         }
     }

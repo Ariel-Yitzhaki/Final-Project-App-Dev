@@ -1,6 +1,7 @@
-package com.example.travel.activities
+package com.example.travel.managers
 
 import android.app.AlertDialog
+import android.text.InputType
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -70,7 +71,9 @@ class TripManager(
                 .filter { it.active || it.photoCount > 0 }
                 .sortedWith(
                     compareByDescending<Trip> { it.active }.thenByDescending {
-                        try { dateFormat.parse(it.startDate)?.time ?: 0L } catch (e: Exception) { 0L }
+                        try {
+                            dateFormat.parse(it.startDate)?.time ?: 0L
+                        } catch (e: Exception) { 0L }
                     }
                 )
 
@@ -81,12 +84,14 @@ class TripManager(
 
             // Create and show bottom sheet
             val bottomSheet = BottomSheetDialog(activity)
-            val view = activity.layoutInflater.inflate(R.layout.bottom_sheet_trip_menu, null)
+            val view = activity.layoutInflater.inflate(R.layout.bottom_sheet_trip_menu,
+                null)
             bottomSheet.setContentView(view)
 
             val recycler = view.findViewById<RecyclerView>(R.id.recyclerTrips)
             recycler.layoutManager = LinearLayoutManager(activity)
-            recycler.adapter = TripMenuAdapter(displayItems, currentActive?.id) { selectedTrip ->
+            recycler.adapter = TripMenuAdapter(displayItems, currentActive?.id) {
+                selectedTrip ->
                 bottomSheet.dismiss()
                 handleTripSelection(selectedTrip)
             }
@@ -168,7 +173,7 @@ class TripManager(
     fun showTripNameDialog(openCameraAfter: Boolean = false) {
         val input = EditText(activity).apply {
             hint = "Enter trip name"
-            inputType = android.text.InputType.TYPE_CLASS_TEXT
+            inputType = InputType.TYPE_CLASS_TEXT
             setPadding(48, 32, 48, 32)
         }
 
@@ -185,7 +190,8 @@ class TripManager(
                         }
                     }
                 } else {
-                    Toast.makeText(activity, "Please enter trip name", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(activity, "Please enter trip name",
+                        Toast.LENGTH_SHORT).show()
                 }
             }
             .setNegativeButton("Cancel", null)

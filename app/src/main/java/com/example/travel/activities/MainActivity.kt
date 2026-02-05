@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.ImageButton
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -19,9 +20,13 @@ import com.example.travel.fragments.MapFragment
 import com.example.travel.fragments.ProfileFragment
 import com.example.travel.interfaces.Refresh
 import com.example.travel.interfaces.TripEndListener
+import com.example.travel.managers.CameraManager
+import com.example.travel.managers.TripManager
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.launch
+import com.google.android.gms.location.FusedLocationProviderClient
+import kotlinx.coroutines.tasks.await
 
 class MainActivity : AppCompatActivity(), TripEndListener {
 
@@ -30,6 +35,7 @@ class MainActivity : AppCompatActivity(), TripEndListener {
     private lateinit var tripManager: TripManager
     private lateinit var cameraManager: CameraManager
     private var currentFragmentTag: String? = null
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,6 +61,8 @@ class MainActivity : AppCompatActivity(), TripEndListener {
         lifecycleScope.launch {
             tripManager.checkActiveTrip()
         }
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
     }
 
     // Initializes TripManager and CameraManager with callbacks
@@ -68,12 +76,15 @@ class MainActivity : AppCompatActivity(), TripEndListener {
         tripManager.onTripStateChanged = { _ -> updateTripButtonUI() }
         tripManager.onOpenCamera = { cameraManager.checkPermissionAndOpen() }
 
-        cameraManager = CameraManager(this, fusedLocationClient) { tripManager.activeTrip?.id }
+        cameraManager = CameraManager(this, fusedLocationClient) {
+            tripManager.activeTrip?.id
+        }
         cameraManager.registerLaunchers()
         cameraManager.onPhotoUploaded = {
             tripManager.incrementLocalPhotoCount()
             supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, MapFragment(), "map")
+                .replace(R.id.fragment_container, MapFragment(),
+                    "map")
                 .commit()
             currentFragmentTag = "map"
             updateNavigationIconColors("map")
@@ -98,11 +109,54 @@ class MainActivity : AppCompatActivity(), TripEndListener {
     private fun setupFab() {
         fab.hide()
         fab.setOnClickListener {
-            if (tripManager.activeTrip == null) {
+            val activeTripId = tripManager.activeTrip?.id
+
+            if (activeTripId == null) {
                 promptStartNewTrip()
             } else {
-                cameraManager.checkPermissionAndOpen()
+                lifecycleScope.launch {
+                    val tooClose = isTooCloseToExistingPhoto(activeTripId)
+                    if (tooClose) {
+                        Toast.makeText(applicationContext,
+                            "Less than 100m from a previous photo",
+                            Toast.LENGTH_SHORT).show()
+                    } else {
+                        cameraManager.checkPermissionAndOpen()
+                    }
+                }
+
             }
+        }
+    }
+
+    // Checks if user is too close to an existing photo in the trip (within 100 meters)
+    private suspend fun isTooCloseToExistingPhoto(tripId: String): Boolean {
+        try {
+            val location = fusedLocationClient.lastLocation.await()
+            if (location == null) {
+                Toast.makeText(this, "Could not get location",
+                    Toast.LENGTH_SHORT).show()
+                return true
+            }
+
+            val photos = PhotoRepository().getPhotosForTrip(tripId)
+
+            for (photo in photos) {
+                val results = FloatArray(1)
+                android.location.Location.distanceBetween(
+                    location.latitude, location.longitude,
+                    photo.latitude, photo.longitude,
+                    results
+                )
+                if (results[0] < 100f) {
+                    return true
+                }
+            }
+            return false
+        } catch (_: SecurityException) {
+            Toast.makeText(this, "Could not get location",
+                Toast.LENGTH_SHORT).show()
+            return true
         }
     }
 
