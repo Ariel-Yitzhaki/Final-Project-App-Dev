@@ -1,5 +1,6 @@
 package com.example.travel.fragments
 
+import android.location.Geocoder
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -17,7 +18,9 @@ import com.example.travel.data.AuthRepository
 import com.example.travel.data.LikeRepository
 import com.example.travel.data.PhotoRepository
 import com.example.travel.data.TripRepository
+import com.example.travel.models.Photo
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 // Displays photos from a single trip in a vertical scrollable list
 class TripDetailFragment : Fragment() {
@@ -78,7 +81,7 @@ class TripDetailFragment : Fragment() {
         loadTripDetails()
     }
 
-    // Load trip info and photos from repositories
+    // Loads trip info and photos from repositories
     private fun loadTripDetails() {
         if (tripId.isEmpty()) return
 
@@ -87,7 +90,6 @@ class TripDetailFragment : Fragment() {
         lifecycleScope.launch {
             val trip = tripRepository.getTripById(tripId)
 
-            // Check if trip still exists
             if (trip == null) {
                 progressBar.visibility = View.GONE
                 tripNameText.text = "Trip unavailable"
@@ -98,26 +100,53 @@ class TripDetailFragment : Fragment() {
 
             tripNameText.text = trip.name
 
-            // Load and sort photos for this trip by timestamp
             val photos = photoRepository.getPhotosForTrip(tripId).sortedBy { it.timestamp }
 
             progressBar.visibility = View.GONE
 
             if (photos.isNotEmpty()) {
                 emptyText.visibility = View.GONE
-
-                // Gets the current logged-in user's ID from Firebase Auth
-                val currentUserId = AuthRepository().getCurrentUser()?.uid ?: ""
-                val likeRepository = LikeRepository()
-                photosRecyclerView.adapter = TripPhotoAdapter(
-                    photos,
-                    currentUserId,
-                    lifecycleScope,
-                    likeRepository
-                )
+                displayPhotos(photos)
             } else {
                 emptyText.visibility = View.VISIBLE
             }
         }
+    }
+
+    // Sets up adapter with photos and their addresses
+    private fun displayPhotos(photos: List<Photo>) {
+        val addresses = getAddressesForPhotos(photos)
+        val currentUserId = AuthRepository().getCurrentUser()?.uid ?: ""
+        val likeRepository = LikeRepository()
+
+        photosRecyclerView.adapter = TripPhotoAdapter(
+            photos,
+            addresses,
+            currentUserId,
+            lifecycleScope,
+            likeRepository
+        )
+    }
+
+    // Converts photo coordinates to readable addresses
+    @Suppress("DEPRECATION")
+    private fun getAddressesForPhotos(photos: List<Photo>): Map<String, String> {
+        val geocoder = Geocoder(requireContext(), Locale.getDefault())
+        val addresses = mutableMapOf<String, String>()
+
+        for (photo in photos) {
+            try {
+                val results = geocoder.getFromLocation(photo.latitude, photo.longitude, 1)
+                val address = results?.firstOrNull()
+                if (address != null) {
+                    addresses[photo.id] = address.locality ?: address.subAdminArea ?: address.adminArea ?: "%.4f, %.4f".format(photo.latitude, photo.longitude)
+                } else {
+                    addresses[photo.id] = "%.4f, %.4f".format(photo.latitude, photo.longitude)
+                }
+            } catch (_: Exception) {
+                addresses[photo.id] = "%.4f, %.4f".format(photo.latitude, photo.longitude)
+            }
+        }
+        return addresses
     }
 }

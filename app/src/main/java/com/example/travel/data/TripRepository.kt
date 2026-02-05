@@ -3,7 +3,6 @@ package com.example.travel.data
 import com.example.travel.models.Trip
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.tasks.await
 
 class TripRepository {
 
@@ -95,7 +94,7 @@ class TripRepository {
         val allTrips = mutableListOf<Trip>()
 
         for (batch in userIds.chunked(10)) {
-            val snapshot = firestore.collection("trips")
+            val snapshot = tripsCollection
                 .whereIn("userId", batch)
                 .whereGreaterThan("photoCount", 0)
                 .get()

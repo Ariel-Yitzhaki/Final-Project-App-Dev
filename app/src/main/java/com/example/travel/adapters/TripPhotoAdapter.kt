@@ -17,6 +17,7 @@ import kotlinx.coroutines.launch
 // Adapter for displaying trip photos in a vertical scrollable list
 class TripPhotoAdapter(
     private val photos: List<Photo>,
+    private val addresses: Map<String, String>,
     private val currentUserId: String,
     private val lifecycleScope: LifecycleCoroutineScope,
     private val likeRepository: LikeRepository
@@ -49,7 +50,9 @@ class TripPhotoAdapter(
             .into(holder.photoImage)
 
         // Shows coordinates for now, need to turn to geocoding later
-        holder.locationText.text = "%.4f, %.4f".format(photo.latitude, photo.longitude)
+        // Shows geocoded address or coordinates as fallback
+        holder.locationText.text = addresses[photo.id] ?: "%.4f, %.4f"
+            .format(photo.latitude, photo.longitude)
 
         // Like button placeholder
         loadLikeState(holder, photo)
