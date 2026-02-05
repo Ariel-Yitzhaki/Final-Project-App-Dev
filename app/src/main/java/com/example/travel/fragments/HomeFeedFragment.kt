@@ -19,6 +19,7 @@ import com.example.travel.data.PhotoRepository
 import com.example.travel.data.TripRepository
 import com.example.travel.interfaces.Refresh
 import com.example.travel.models.Trip
+import com.example.travel.models.User
 import kotlinx.coroutines.launch
 
 // Displays friends' completed trips in a feed
@@ -63,7 +64,6 @@ class HomeFeedFragment : Fragment(), Refresh {
         emptyText.visibility = View.GONE
 
         lifecycleScope.launch {
-            // Get friend IDs
             val friendIds = friendsRepository.getFriendIds(currentUserId)
 
             if (friendIds.isEmpty()) {
@@ -72,31 +72,40 @@ class HomeFeedFragment : Fragment(), Refresh {
                 return@launch
             }
 
-            // Get friends' completed trips
-            val trips = tripRepository.getCompletedTripsForUsers(friendIds)
+            val trips = tripRepository.getTripsWithPhotosForUsers(friendIds)
                 .sortedByDescending { it.endDate }
 
-            // Get usernames for each trip
-            val tripsWithUsernames = trips.mapNotNull { trip ->
-                val user = authRepository.getUserProfile(trip.userId)
-                user?.let { Pair(trip, it.username) }
-            }
-
-            // Load likes for all trips
+            val tripsWithUsers = getTripsWithUsers(trips)
             val tripLikes = loadTripLikes(trips)
 
             progressBar.visibility = View.GONE
+            displayFeed(tripsWithUsers, tripLikes)
+        }
+    }
 
-            if (tripsWithUsernames.isNotEmpty()) {
-                feedRecyclerView.adapter = FeedTripAdapter(
-                    tripsWithUsernames,
-                    tripLikes
-                ) { trip ->
-                    openTripDetail(trip)
-                }
+    // Maps trips to their owner's username
+    private suspend fun getTripsWithUsers(trips: List<Trip>): List<Pair<Trip, User>> {
+        return trips.mapNotNull { trip ->
+            val user = authRepository.getUserProfile(trip.userId)
+            if (user != null) {
+                Pair(trip, user)
             } else {
-                emptyText.visibility = View.VISIBLE
+                null
             }
+        }
+    }
+
+    // Displays feed or empty state
+    private fun displayFeed(tripsWithUsers: List<Pair<Trip, User>>, tripLikes: Map<String, Int>) {
+        if (tripsWithUsers.isNotEmpty()) {
+            feedRecyclerView.adapter = FeedTripAdapter(
+                tripsWithUsers,
+                tripLikes
+            ) { trip ->
+                openTripDetail(trip)
+            }
+        } else {
+            emptyText.visibility = View.VISIBLE
         }
     }
 

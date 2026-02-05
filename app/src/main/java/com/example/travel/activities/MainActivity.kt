@@ -118,7 +118,7 @@ class MainActivity : AppCompatActivity(), TripEndListener {
                     val tooClose = isTooCloseToExistingPhoto(activeTripId)
                     if (tooClose) {
                         Toast.makeText(applicationContext,
-                            "Less than 100m from a previous photo",
+                            "Less than 200m from a previous photo",
                             Toast.LENGTH_SHORT).show()
                     } else {
                         cameraManager.checkPermissionAndOpen()
@@ -129,7 +129,7 @@ class MainActivity : AppCompatActivity(), TripEndListener {
         }
     }
 
-    // Checks if user is too close to an existing photo in the trip (within 100 meters)
+    // Checks if user is too close to an existing photo in the trip (within 200 meters)
     private suspend fun isTooCloseToExistingPhoto(tripId: String): Boolean {
         try {
             val location = fusedLocationClient.lastLocation.await()
@@ -148,7 +148,7 @@ class MainActivity : AppCompatActivity(), TripEndListener {
                     photo.latitude, photo.longitude,
                     results
                 )
-                if (results[0] < 100f) {
+                if (results[0] < 200f) {
                     return true
                 }
             }

@@ -3,6 +3,7 @@ package com.example.travel.data
 import com.example.travel.models.Trip
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.tasks.await
 
 class TripRepository {
 
@@ -85,6 +86,25 @@ class TripRepository {
         } catch (_: Exception) {
             emptyList()
         }
+    }
+
+    // Gets trips with at least one photo for multiple users
+    suspend fun getTripsWithPhotosForUsers(userIds: List<String>): List<Trip> {
+        if (userIds.isEmpty()) return emptyList()
+
+        val allTrips = mutableListOf<Trip>()
+
+        for (batch in userIds.chunked(10)) {
+            val snapshot = firestore.collection("trips")
+                .whereIn("userId", batch)
+                .whereGreaterThan("photoCount", 0)
+                .get()
+                .await()
+
+            allTrips.addAll(snapshot.toObjects(Trip::class.java))
+        }
+
+        return allTrips
     }
 
     // Reactivates a trip (sets active = true, clears endDate)

@@ -85,11 +85,18 @@ class TripDetailFragment : Fragment() {
         progressBar.visibility = View.VISIBLE
 
         lifecycleScope.launch {
-            // Load trip name
             val trip = tripRepository.getTripById(tripId)
-            trip?.let {
-                tripNameText.text = it.name
+
+            // Check if trip still exists
+            if (trip == null) {
+                progressBar.visibility = View.GONE
+                tripNameText.text = "Trip unavailable"
+                emptyText.text = "This trip is no longer available"
+                emptyText.visibility = View.VISIBLE
+                return@launch
             }
+
+            tripNameText.text = trip.name
 
             // Load and sort photos for this trip by timestamp
             val photos = photoRepository.getPhotosForTrip(tripId).sortedBy { it.timestamp }
