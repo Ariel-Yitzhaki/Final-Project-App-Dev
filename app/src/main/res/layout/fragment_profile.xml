@@ -26,12 +26,14 @@
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="4dp" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/signOutButton"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:text="Sign Out"
         android:padding="10dp"
+        app:cornerRadius="4dp"
+        android:backgroundTint="@color/light_blue"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

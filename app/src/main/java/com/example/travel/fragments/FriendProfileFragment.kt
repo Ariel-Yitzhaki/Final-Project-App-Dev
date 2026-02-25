@@ -118,7 +118,8 @@ class FriendProfileFragment : Fragment() {
                     onEndTripClick = {},
                     onCardClick = {trip -> openTripDetail(trip)},
                     onOptionsClick = {_,_ ->},
-                    showOptions = false
+                    showOptions = false,
+                    showEndButton = false
                 )
             } else {
                 emptyText.visibility = View.VISIBLE

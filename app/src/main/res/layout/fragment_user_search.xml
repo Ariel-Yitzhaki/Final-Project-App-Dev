@@ -30,13 +30,16 @@
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/searchButton"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:text="Search"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:padding="10dp"
+        app:cornerRadius="4dp"
+        android:backgroundTint="@color/light_blue"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/resultsRecyclerView"

@@ -5,4 +5,9 @@
         <item name="colorPrimary">#2196F3</item>
         <item name="colorOnPrimary">@android:color/white</item>
     </style>
+
+    <style name="RoundedFAB" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">8dp</item>
+    </style>
 </resources>

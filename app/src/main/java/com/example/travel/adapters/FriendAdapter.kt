@@ -19,7 +19,7 @@ class FriendAdapter(
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val displayNameText: TextView = view.findViewById(R.id.displayNameText)
         val usernameText: TextView = view.findViewById(R.id.usernameText)
-        val actionButton: Button = view.findViewById(R.id.actionButton)
+        val actionButton: Button = view.findViewById(R.id.remove)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

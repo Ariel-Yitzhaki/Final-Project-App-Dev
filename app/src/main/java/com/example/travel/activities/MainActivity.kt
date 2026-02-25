@@ -229,7 +229,7 @@ class MainActivity : AppCompatActivity(), TripEndListener {
     // Updates navigation icon colors based on selected tab
     private fun updateNavigationIconColors(selectedTag: String) {
         val blackColor = ContextCompat.getColor(this, R.color.black)
-        val whiteColor = ContextCompat.getColor(this, R.color.white)
+        val whiteColor = ContextCompat.getColor(this, R.color.light_blue)
 
         findViewById<ImageButton>(R.id.nav_home).setColorFilter(
             if (selectedTag == "home") whiteColor else blackColor

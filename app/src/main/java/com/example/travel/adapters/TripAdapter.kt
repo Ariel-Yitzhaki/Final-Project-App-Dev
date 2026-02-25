@@ -19,7 +19,8 @@ class TripAdapter(
     // onCardClick: called when the card itself is clicked (to view trip details)
     private val onCardClick: (Trip) -> Unit,
     private val onOptionsClick: (Trip, View) -> Unit,
-    private val showOptions: Boolean = true
+    private val showOptions: Boolean = true,
+    private val showEndButton: Boolean = true
 ) : RecyclerView.Adapter<TripAdapter.TripViewHolder>() {
 
     class TripViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -59,7 +60,7 @@ class TripAdapter(
         }
 
         // Show End Trip button only for active trips
-        if (trip.active) {
+        if (trip.active && showEndButton) {
             holder.endTripButton.visibility = View.VISIBLE
             holder.endTripButton.setOnClickListener {
                 onEndTripClick.invoke(trip)

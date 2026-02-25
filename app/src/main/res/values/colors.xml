@@ -32,7 +32,6 @@
 
     <!-- Greens -->
     <color name="green_light">#FF81C784</color>
-    <color name="green">#FF4CAF50</color>
     <color name="green_dark">#FF2E7D32</color>
 
     <!-- Yellows -->
@@ -50,4 +49,12 @@
     <color name="indigo">#FF3F51B5</color>
     <color name="lime">#FFCDDC39</color>
     <color name="amber">#FFFFC107</color>
+
+    <!-- main theme -->
+    <color name="green">#51B946</color>
+    <color name="Dark_blue">#1765B7</color>
+    <color name="Azur">#0066FF</color>
+    <color name="light_blue">#28A8E5</color>
+    <color name="Winter">#EEF9FA</color>
+    <color name="black_logo">#050A27</color>
 </resources>
