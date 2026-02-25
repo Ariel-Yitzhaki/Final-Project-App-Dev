@@ -48,7 +48,7 @@ class FeedTripAdapter(
         }
 
         holder.tripName.text = trip.name
-        holder.tripDate.text = "${trip.startDate} - ${trip.endDate}"
+        holder.tripDate.text = trip.startDate
         val likes = tripLikes[trip.id] ?: 0
         holder.likesCount.text = if (likes == 1) "1 like" else "$likes likes"
 

@@ -37,11 +37,13 @@
             app:layout_constraintEnd_toStartOf="@id/actionButton"
             android:layout_marginEnd="8dp" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/actionButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Add"
+            app:cornerRadius="6dp"
+            android:backgroundTint="@color/light_blue"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />

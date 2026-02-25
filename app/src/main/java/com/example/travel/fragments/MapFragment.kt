@@ -33,6 +33,8 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.Dash
+import com.google.android.gms.maps.model.Gap
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
@@ -182,21 +184,81 @@ class MapFragment : Fragment(), OnMapReadyCallback, Refresh {
             })
     }
 
-    // Draws lines connecting photos in chronological order
+    // Draws lines connecting photos in chronological order with direction arrows
     private fun drawTravelPath(photos: List<Photo>) {
         if (photos.size < 2) return
 
         // Sort by timestamp and create path
         val sortedPhotos = photos.sortedBy { it.timestamp }
-        val points = sortedPhotos.map { LatLng(it.latitude, it.longitude) }
-
+        val points = sortedPhotos.map {LatLng(it.latitude, it.longitude)}
+        val lineColor = Color.parseColor("#51B946")
+        val arrowColor = Color.parseColor("#BF2C2B")
+        // Draw line segment
         val polylineOptions = PolylineOptions()
             .addAll(points)
-            .width(8f)
-            .color(Color.BLUE)
+            .width(4f)
+            .color(lineColor)
             .geodesic(true)
+            .pattern(listOf(Dash(30f), Gap(20f)))
 
         map.addPolyline(polylineOptions)
+
+        // Add arrow markers between each segment
+        for (i in 0 until sortedPhotos.size - 1) {
+            val start = points[i]
+            val end = points[i + 1]
+            addDirectionArrow(start, end, arrowColor)
+        }
+    }
+
+    // Adds an arrow marker at the midpoint between two locations
+    private fun addDirectionArrow(start: LatLng, end: LatLng, color: Int) {
+        val midLat = (start.latitude + end.latitude) / 2
+        val midLng = (start.longitude + end.longitude) / 2
+        val midpoint = LatLng(midLat, midLng)
+
+        // Use Location class to calculate bearing
+        val results = FloatArray(2)
+        android.location.Location.distanceBetween(
+            start.latitude, start.longitude,
+            end.latitude, end.longitude,
+            results
+        )
+        val bearing = results[1] // Initial bearing in degrees
+
+        val arrowBitmap = createArrowBitmap(color)
+
+        map.addMarker(
+            MarkerOptions()
+                .position(midpoint)
+                .icon(BitmapDescriptorFactory.fromBitmap(arrowBitmap))
+                .rotation(bearing)
+                .anchor(0.5f, 0.5f)
+                .flat(true)
+        )
+    }
+
+    // Creates a small arrow bitmap
+    private fun createArrowBitmap(color: Int): Bitmap {
+        val size = 30
+        val bitmap = createBitmap(size, size)
+        val canvas = Canvas(bitmap)
+        val paint = Paint().apply {
+            this.color = color
+            isAntiAlias = true
+            style = Paint.Style.FILL
+        }
+
+        val path = Path().apply {
+            moveTo(size / 2f, 0f) // Top point (tip)
+            lineTo(size.toFloat(), size.toFloat()) // Bottom right
+            lineTo(size / 2f, size* 0.65f) // Center
+            lineTo(0f, size.toFloat()) // Bottom left
+            close()
+        }
+
+        canvas.drawPath(path, paint)
+        return bitmap
     }
 
     private fun updateMarkerWithSize(marker: Marker, photo: Photo, size: Int) {

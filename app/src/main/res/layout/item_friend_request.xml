@@ -27,21 +27,25 @@
         app:layout_constraintEnd_toStartOf="@id/acceptButton"
         android:layout_marginEnd="8dp" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/acceptButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Accept"
+        android:backgroundTint="@color/light_blue"
+        app:cornerRadius="6dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/declineButton"
         android:layout_marginEnd="8dp" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/declineButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Decline"
+        app:cornerRadius="6dp"
+        android:textColor="@color/light_blue"
         style="@style/Widget.Material3.Button.OutlinedButton"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
