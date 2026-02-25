@@ -20,6 +20,7 @@ import com.example.travel.data.TripRepository
 import kotlinx.coroutines.launch
 import com.example.travel.models.Trip
 import android.widget.PopupMenu
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.travel.data.LikeRepository
 import com.example.travel.data.PhotoRepository
 import com.example.travel.interfaces.Refresh
@@ -39,6 +40,7 @@ class ProfileFragment : Fragment(), Refresh {
     private lateinit var tripsRecyclerView: RecyclerView
     private lateinit var emptyText: TextView
     private lateinit var progressBar: ProgressBar
+    private lateinit var swipeRefresh: SwipeRefreshLayout
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -75,6 +77,10 @@ class ProfileFragment : Fragment(), Refresh {
         tripsRecyclerView = view.findViewById(R.id.tripsRecyclerView)
         emptyText = view.findViewById(R.id.emptyText)
         progressBar = view.findViewById(R.id.progressBar)
+        swipeRefresh = view.findViewById(R.id.swipeRefresh)
+        swipeRefresh.setOnRefreshListener {
+            loadProfile()
+        }
 
         tripsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
 
@@ -133,6 +139,7 @@ class ProfileFragment : Fragment(), Refresh {
             } else {
                 emptyText.visibility = View.VISIBLE
             }
+            swipeRefresh.isRefreshing = false
         }
     }
 

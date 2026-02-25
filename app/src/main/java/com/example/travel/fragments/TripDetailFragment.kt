@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.travel.R
 import com.example.travel.adapters.TripPhotoAdapter
 import com.example.travel.data.AuthRepository
@@ -30,6 +31,7 @@ class TripDetailFragment : Fragment() {
     private lateinit var photosRecyclerView: RecyclerView
     private lateinit var emptyText: TextView
     private lateinit var progressBar: ProgressBar
+    private lateinit var swipeRefresh: SwipeRefreshLayout
     private var tripId: String = ""
 
     companion object {
@@ -69,6 +71,10 @@ class TripDetailFragment : Fragment() {
         photosRecyclerView = view.findViewById(R.id.photosRecyclerView)
         emptyText = view.findViewById(R.id.emptyText)
         progressBar = view.findViewById(R.id.progressBar)
+        swipeRefresh = view.findViewById(R.id.swipeRefresh)
+        swipeRefresh.setOnRefreshListener {
+            loadTripDetails()
+        }
 
         photosRecyclerView.layoutManager = LinearLayoutManager(requireContext())
 
@@ -102,6 +108,7 @@ class TripDetailFragment : Fragment() {
             val photos = photoRepository.getPhotosForTrip(tripId).sortedBy { it.timestamp }
 
             progressBar.visibility = View.GONE
+            swipeRefresh.isRefreshing = false
 
             if (photos.isNotEmpty()) {
                 emptyText.visibility = View.GONE

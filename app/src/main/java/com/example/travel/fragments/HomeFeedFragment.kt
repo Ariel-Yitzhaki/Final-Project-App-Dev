@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.travel.R
 import com.example.travel.adapters.FeedTripAdapter
 import com.example.travel.data.AuthRepository
@@ -33,6 +34,7 @@ class HomeFeedFragment : Fragment(), Refresh {
     private lateinit var feedRecyclerView: RecyclerView
     private lateinit var emptyText: TextView
     private lateinit var progressBar: ProgressBar
+    private lateinit var swipeRefresh: SwipeRefreshLayout
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -54,6 +56,11 @@ class HomeFeedFragment : Fragment(), Refresh {
         feedRecyclerView = view.findViewById(R.id.feedRecyclerView)
         emptyText = view.findViewById(R.id.emptyText)
         progressBar = view.findViewById(R.id.progressBar)
+
+        swipeRefresh = view.findViewById(R.id.swipeRefresh)
+        swipeRefresh.setOnRefreshListener {
+            loadFeed()
+        }
 
         feedRecyclerView.layoutManager = LinearLayoutManager(requireContext())
 
@@ -84,6 +91,7 @@ class HomeFeedFragment : Fragment(), Refresh {
 
             progressBar.visibility = View.GONE
             displayFeed(tripsWithUsers, tripLikes)
+            swipeRefresh.isRefreshing = false
         }
     }
 
