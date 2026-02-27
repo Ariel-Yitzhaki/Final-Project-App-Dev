@@ -16,8 +16,8 @@ import kotlinx.coroutines.launch
 
 // Adapter for displaying trip photos in a vertical scrollable list
 class TripPhotoAdapter(
-    private val photos: List<Photo>,
-    private val addresses: Map<String, String>,
+    private val photos: MutableList<Photo>,
+    private val addresses: MutableMap<String, String>,
     private val currentUserId: String,
     private val lifecycleScope: LifecycleCoroutineScope,
     private val likeRepository: LikeRepository
@@ -94,6 +94,17 @@ class TripPhotoAdapter(
             if (isLiked) R.drawable.ic_liked else R.drawable.ic_unliked
         )
         holder.likeCountText.text = count.toString()
+    }
+
+    // Updates photos list and refreshes display
+    fun updatePhotos(newPhotos: List<Photo>, newAddresses: Map<String, String>) {
+        photos.clear()
+        photos.addAll(newPhotos)
+        addresses.clear()
+        addresses.putAll(newAddresses)
+        likeStates.clear()
+        likeCounts.clear()
+        notifyDataSetChanged()
     }
 
     override fun getItemCount() = photos.size

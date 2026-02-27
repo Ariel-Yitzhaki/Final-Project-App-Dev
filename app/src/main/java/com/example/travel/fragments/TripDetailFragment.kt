@@ -33,6 +33,7 @@ class TripDetailFragment : Fragment() {
     private lateinit var progressBar: ProgressBar
     private lateinit var swipeRefresh: SwipeRefreshLayout
     private var tripId: String = ""
+    private var photoAdapter: TripPhotoAdapter? = null
 
     companion object {
         private const val ARG_TRIP_ID = "tripId"
@@ -122,16 +123,22 @@ class TripDetailFragment : Fragment() {
     // Sets up adapter with photos and their addresses
     private fun displayPhotos(photos: List<Photo>) {
         val addresses = getAddressesForPhotos(photos)
-        val currentUserId = AuthRepository().getCurrentUser()?.uid ?: ""
-        val likeRepository = LikeRepository()
 
-        photosRecyclerView.adapter = TripPhotoAdapter(
-            photos,
-            addresses,
-            currentUserId,
-            lifecycleScope,
-            likeRepository
-        )
+        if (photoAdapter == null) {
+            val currentUserId = AuthRepository().getCurrentUser()?.uid ?: ""
+            val likeRepository = LikeRepository()
+
+            photoAdapter = TripPhotoAdapter(
+                photos.toMutableList(),
+                addresses.toMutableMap(),
+                currentUserId,
+                lifecycleScope,
+                likeRepository
+            )
+            photosRecyclerView.adapter = photoAdapter
+        } else {
+            photoAdapter?.updatePhotos(photos.toMutableList(), addresses.toMutableMap())
+        }
     }
 
     // Converts photo coordinates to readable addresses
