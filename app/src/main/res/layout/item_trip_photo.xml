@@ -15,16 +15,34 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+        <View
+            android:id="@+id/topDivider"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:background="#000000"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
         <ImageView
             android:id="@+id/photoImage"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:adjustViewBounds="true"
             android:scaleType="centerCrop"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintDimensionRatio="4:5"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintDimensionRatio="4:5" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/topDivider" />
+
+        <View
+            android:id="@+id/divider"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:background="#000000"
+            app:layout_constraintTop_toBottomOf="@id/photoImage"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <ImageButton
             android:id="@+id/likeButton"
@@ -36,7 +54,7 @@
             android:scaleType="centerInside"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Like"
-            app:layout_constraintTop_toBottomOf="@id/photoImage"
+            app:layout_constraintTop_toBottomOf="@id/divider"
             app:layout_constraintStart_toStartOf="parent" />
 
         <TextView
@@ -58,20 +76,13 @@
             android:paddingHorizontal="12dp"
             android:paddingTop="4dp"
             android:paddingBottom="12dp"
-            android:textColor="#8E8E8E"
+            android:textColor="#666666"
             android:textSize="12sp"
             app:layout_constraintTop_toBottomOf="@id/likeButton"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <View
-            android:id="@+id/divider"
-            android:layout_width="0dp"
-            android:layout_height="0.5dp"
-            android:background="#DBDBDB"
-            app:layout_constraintTop_toBottomOf="@id/locationText"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
