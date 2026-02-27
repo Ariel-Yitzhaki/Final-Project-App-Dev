@@ -57,4 +57,6 @@
     <color name="light_blue">#28A8E5</color>
     <color name="Winter">#EEF9FA</color>
     <color name="black_logo">#050A27</color>
+    <color name="button">#000000</color>
+    <color name="button_background">#EFEFEF</color>
 </resources>

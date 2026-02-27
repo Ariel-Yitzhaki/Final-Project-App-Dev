@@ -10,14 +10,18 @@
         android:id="@+id/backButton"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:src="@drawable/ic_back"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="Back"
-        android:scaleType="centerCrop"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_back"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_percent="0.05"
-        app:layout_constraintWidth_percent="0.1"/>
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0"
+        app:layout_constraintWidth_percent="0.06" />
 
     <EditText
         android:id="@+id/searchInput"
@@ -39,7 +43,8 @@
         android:text="Search"
         android:padding="10dp"
         app:cornerRadius="6dp"
-        android:backgroundTint="@color/light_blue"
+        android:textColor="@color/button"
+        android:backgroundTint="@color/button_background"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
