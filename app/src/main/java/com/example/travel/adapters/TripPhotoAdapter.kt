@@ -91,7 +91,7 @@ class TripPhotoAdapter(
     // Updates the like button icon and count text
     private fun updateLikeUI(holder: PhotoViewHolder, isLiked: Boolean, count: Int) {
         holder.likeButton.setImageResource(
-            if (isLiked) R.drawable.ic_liked else R.drawable.ic_unliked
+            if (isLiked) R.drawable.ic_heart_filled else R.drawable.ic_heart
         )
         holder.likeCountText.text = count.toString()
     }
