@@ -376,7 +376,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, Refresh {
 
         AlertDialog.Builder(requireContext())
             .setView(dialogView)
-            .setPositiveButton("Close", null)
             .show()
     }
 }
