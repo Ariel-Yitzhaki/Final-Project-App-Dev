@@ -1,6 +1,7 @@
 package com.example.travel.fragments
 
 import android.Manifest
+import android.app.AlertDialog
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -26,6 +27,7 @@ import com.example.travel.activities.MainActivity
 import com.example.travel.data.PhotoRepository
 import com.example.travel.interfaces.Refresh
 import com.example.travel.models.Photo
+import com.example.travel.utils.GeocodingUtils
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -40,6 +42,9 @@ import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 import kotlinx.coroutines.launch
+import androidx.core.graphics.toColorInt
+import android.widget.ImageView
+import android.widget.TextView
 
 // Fragment that displays a Google Map and centers it on user's location
 class MapFragment : Fragment(), OnMapReadyCallback, Refresh {
@@ -87,6 +92,14 @@ class MapFragment : Fragment(), OnMapReadyCallback, Refresh {
     // Callback triggered when GoogleMap is ready to use - check permissions and enable location
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
+
+        map.setOnMarkerClickListener { marker ->
+            val photo = photoMarkers.find { it.first == marker }?.second
+            if (photo != null) {
+                showPhotoDialog(photo)
+            }
+            true
+        }
 
         // Check if we already have location permission
         if (ContextCompat.checkSelfPermission(
@@ -191,8 +204,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, Refresh {
         // Sort by timestamp and create path
         val sortedPhotos = photos.sortedBy { it.timestamp }
         val points = sortedPhotos.map {LatLng(it.latitude, it.longitude)}
-        val lineColor = Color.parseColor("#51B946")
-        val arrowColor = Color.parseColor("#BF2C2B")
+        val lineColor = "#51B946".toColorInt()
+        val arrowColor = "#BF2C2B".toColorInt()
         // Draw line segment
         val polylineOptions = PolylineOptions()
             .addAll(points)
@@ -341,5 +354,29 @@ class MapFragment : Fragment(), OnMapReadyCallback, Refresh {
         map.clear()
         photoMarkers.clear()
         loadPhotosOnMap()
+    }
+
+    // Shows a popup dialog with the full photo
+    private fun showPhotoDialog(photo: Photo) {
+        val dialogView = layoutInflater.inflate(R.layout.popup_photo, null)
+        val imageView = dialogView.findViewById<ImageView>(R.id.dialogPhotoImage)
+        val dateText = dialogView.findViewById<TextView>(R.id.dialogPhotoDate)
+        val locationText = dialogView.findViewById<TextView>(R.id.dialogPhotoLocation)
+
+        Glide.with(this)
+            .load(photo.imageUrl)
+            .into(imageView)
+
+        dateText.text = photo.date
+        locationText.text = GeocodingUtils.getAddressFromCoordinates(
+            requireContext(),
+            photo.latitude,
+            photo.longitude
+        )
+
+        AlertDialog.Builder(requireContext())
+            .setView(dialogView)
+            .setPositiveButton("Close", null)
+            .show()
     }
 }
