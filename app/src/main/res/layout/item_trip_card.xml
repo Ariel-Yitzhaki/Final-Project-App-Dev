@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
+<com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -7,8 +7,10 @@
     android:layout_marginHorizontal="12dp"
     android:layout_marginVertical="8dp"
     app:cardCornerRadius="16dp"
-    app:cardElevation="4dp"
-    app:cardBackgroundColor="@color/white">
+    app:cardElevation="0dp"
+    app:cardBackgroundColor="#F4F4F5"
+    app:strokeColor="#E4E4E7"
+    app:strokeWidth="1dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -19,9 +21,9 @@
             android:id="@+id/tripName"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:textColor="#262626"
+            android:textSize="18sp"
+            android:textColor="#18181B"
+            android:fontFamily="@font/mont_heavy"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@id/optionsButton" />
@@ -34,6 +36,7 @@
             android:scaleType="centerInside"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Options"
+            app:tint="#71717A"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
@@ -43,7 +46,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:textSize="12sp"
-            android:textColor="#8E8E8E"
+            android:textColor="#A1A1AA"
+            android:fontFamily="@font/mont_bold"
             app:layout_constraintTop_toBottomOf="@id/tripName"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
@@ -54,8 +58,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:textSize="14sp"
-            android:textStyle="bold"
-            android:textColor="#262626"
+            android:textColor="#71717A"
+            android:fontFamily="@font/mont_bold"
             app:layout_constraintTop_toBottomOf="@id/tripDate"
             app:layout_constraintStart_toStartOf="parent" />
 
@@ -68,12 +72,14 @@
             android:textSize="12sp"
             android:textAllCaps="false"
             android:visibility="gone"
-            android:backgroundTint="#0095F6"
-            android:textColor="@color/white"
-            app:cornerRadius="8dp"
+            android:backgroundTint="#18181B"
+            android:textColor="#FFFFFF"
+            android:fontFamily="@font/mont_bold"
+            app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Circle"
             app:layout_constraintTop_toBottomOf="@id/likesCount"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-</androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>
