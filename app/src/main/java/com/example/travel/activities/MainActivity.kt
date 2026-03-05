@@ -212,8 +212,9 @@ class MainActivity : AppCompatActivity(), TripEndListener {
             currentFragmentTag = tag
         }
 
-        // Only show trip button on map screen
+        // Only show trip button on map screen and hero section on map screen
         tripButton.visibility = if (tag == "map") View.VISIBLE else View.GONE
+        findViewById<View>(R.id.hero_section).visibility = if (tag == "map") View.VISIBLE else View.GONE
 
         lifecycleScope.launch { tripManager.checkActiveTrip() }
         updateNavigationIconColors(tag)

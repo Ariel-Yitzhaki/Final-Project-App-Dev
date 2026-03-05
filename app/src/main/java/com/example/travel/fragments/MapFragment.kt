@@ -45,6 +45,7 @@ import kotlinx.coroutines.launch
 import androidx.core.graphics.toColorInt
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.FrameLayout
 
 // Fragment that displays a Google Map and centers it on user's location
 class MapFragment : Fragment(), OnMapReadyCallback, Refresh {
@@ -92,6 +93,25 @@ class MapFragment : Fragment(), OnMapReadyCallback, Refresh {
     // Callback triggered when GoogleMap is ready to use - check permissions and enable location
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
+
+        // Move My Location button to bottom-right
+        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
+        mapFragment.view?.let { mapView ->
+            val locationButton = mapView.findViewWithTag("GoogleMapMyLocationButton")
+                ?: mapView.findViewById<View>(2)
+            locationButton?.let {
+                val parent = it.parent as ViewGroup
+                parent.removeView(it)
+                val params = FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.WRAP_CONTENT,
+                    FrameLayout.LayoutParams.WRAP_CONTENT
+                )
+                params.gravity = android.view.Gravity.BOTTOM or android.view.Gravity.END
+                params.bottomMargin = 32
+                params.rightMargin = 16
+                (mapView as ViewGroup).addView(it, params)
+            }
+        }
 
         map.setOnMarkerClickListener { marker ->
             val photo = photoMarkers.find { it.first == marker }?.second

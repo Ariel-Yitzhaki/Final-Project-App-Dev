@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_dialog"
+    android:padding="24dp">
+
+    <TextView
+        android:id="@+id/dialogTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Name Your Trip"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="#18181B"
+        android:letterSpacing="-0.025" />
+
+    <EditText
+        android:id="@+id/tripNameInput"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="16dp"
+        android:hint="Enter trip name"
+        android:textSize="16sp"
+        android:textColor="#18181B"
+        android:textColorHint="#A1A1AA"
+        android:inputType="text"
+        android:background="@drawable/bg_edit_text"
+        android:paddingHorizontal="16dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="24dp"
+        android:gravity="end">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/dialogNegativeButton"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="Cancel"
+            android:textColor="#71717A"
+            android:textSize="14sp"
+            android:textAllCaps="false"
+            android:letterSpacing="0" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/dialogPositiveButton"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_marginStart="8dp"
+            android:text="Start"
+            android:backgroundTint="#18181B"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:textAllCaps="false"
+            android:letterSpacing="0"
+            app:cornerRadius="9999dp" />
+
+    </LinearLayout>
+
+</LinearLayout>
