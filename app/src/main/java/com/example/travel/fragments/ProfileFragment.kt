@@ -32,6 +32,7 @@ import com.bumptech.glide.Glide
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import com.example.travel.utils.setDebouncedClickListener
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
 
@@ -99,14 +100,9 @@ class ProfileFragment : Fragment(), Refresh {
         }
         profileImage = view.findViewById(R.id.profileImage)
 
-        // Opens gallery to pick a profile picture when clicked
-        var isPickerOpen = false
-        profileImage.setOnClickListener {
-            if (!isPickerOpen) {
-                isPickerOpen = true
-                pickImageLauncher.launch("image/*")
-                it.postDelayed({ isPickerOpen = false }, 1000)
-            }
+        // Opens gallery to pick a profile picture
+        profileImage.setDebouncedClickListener {
+            pickImageLauncher.launch("image/*")
         }
 
         tripsRecyclerView.layoutManager = LinearLayoutManager(requireContext())

@@ -77,17 +77,24 @@ class TripPhotoAdapter(
         }
     }
 
-    // Toggles like state and updates UI
+    // Toggles like state and updates UI (ignores taps while pending)
     private fun toggleLike(holder: PhotoViewHolder, photo: Photo) {
+        if (photo.id in likePending) return
+        likePending.add(photo.id)
+
         lifecycleScope.launch {
-            val nowLiked = likeRepository.toggleLike(photo.id, currentUserId)
-            val currentCount = likeCounts[photo.id] ?: 0
-            val newCount = if (nowLiked) currentCount + 1 else currentCount - 1
+            try{
+                val nowLiked = likeRepository.toggleLike(photo.id, currentUserId)
+                val currentCount = likeCounts[photo.id] ?: 0
+                val newCount = if (nowLiked) currentCount + 1 else currentCount - 1
 
-            likeStates[photo.id] = nowLiked
-            likeCounts[photo.id] = newCount
+                likeStates[photo.id] = nowLiked
+                likeCounts[photo.id] = newCount
 
-            updateLikeUI(holder, nowLiked, newCount)
+                updateLikeUI(holder, nowLiked, newCount)
+            } finally {
+                likePending.remove(photo.id)
+            }
         }
     }
 
@@ -107,6 +114,7 @@ class TripPhotoAdapter(
         addresses.putAll(newAddresses)
         likeStates.clear()
         likeCounts.clear()
+        likePending.clear()
         notifyDataSetChanged()
     }
 
