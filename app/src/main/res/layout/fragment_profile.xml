@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/white">
 
-    <ImageView
+    <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/profileImage"
         android:layout_width="56dp"
         android:layout_height="56dp"
@@ -14,6 +14,10 @@
         android:layout_marginTop="16dp"
         android:src="@drawable/ic_profile"
         android:scaleType="centerCrop"
+        android:padding="1dp"
+        app:strokeColor="#D4D4D8"
+        app:strokeWidth="1dp"
+        app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Circle"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 

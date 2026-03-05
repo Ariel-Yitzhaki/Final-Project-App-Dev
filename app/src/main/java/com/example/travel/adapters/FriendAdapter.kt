@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.travel.R
 import com.example.travel.models.User
+import com.example.travel.utils.setDebouncedClickListener
 
 // Adapter for displaying friends list
 class FriendAdapter(
@@ -32,7 +33,7 @@ class FriendAdapter(
         val friend = friends[position]
         holder.displayNameText.text = friend.displayName
         holder.usernameText.text = "@${friend.username}"
-        holder.actionButton.setOnClickListener { onRemoveClick(friend) }
+        holder.actionButton.setDebouncedClickListener { onRemoveClick(friend) }
         holder.itemView.setOnClickListener { onFriendClick(friend) }
     }
 

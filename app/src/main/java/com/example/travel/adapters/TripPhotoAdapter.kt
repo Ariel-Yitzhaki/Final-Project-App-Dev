@@ -26,6 +26,9 @@ class TripPhotoAdapter(
     private val likeStates = mutableMapOf<String, Boolean>()
     private val likeCounts = mutableMapOf<String, Int>()
 
+    // Tracks photos with a like toggle in progress to prevent double-taps
+    private val likePending = mutableSetOf<String>()
+
     // ViewHolder for each photo item
     class PhotoViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val photoImage: ImageView = itemView.findViewById(R.id.photoImage)

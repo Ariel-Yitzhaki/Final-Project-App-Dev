@@ -27,8 +27,13 @@ import com.example.travel.interfaces.Refresh
 import com.example.travel.interfaces.TripEndListener
 import java.text.SimpleDateFormat
 import java.util.Locale
-import android.widget.ImageView
+import com.google.android.material.imageview.ShapeableImageView
 import com.bumptech.glide.Glide
+import android.net.Uri
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.tasks.await
 
 class ProfileFragment : Fragment(), Refresh {
 
@@ -43,7 +48,15 @@ class ProfileFragment : Fragment(), Refresh {
     private lateinit var emptyText: TextView
     private lateinit var progressBar: ProgressBar
     private lateinit var swipeRefresh: SwipeRefreshLayout
-    private lateinit var profileImage: ImageView
+    private lateinit var profileImage: ShapeableImageView
+
+    // Opens gallery to pick a profile picture
+    private val pickImageLauncher = registerForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let { uploadProfilePicture(it) }
+    }
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -85,6 +98,16 @@ class ProfileFragment : Fragment(), Refresh {
             loadProfile()
         }
         profileImage = view.findViewById(R.id.profileImage)
+
+        // Opens gallery to pick a profile picture when clicked
+        var isPickerOpen = false
+        profileImage.setOnClickListener {
+            if (!isPickerOpen) {
+                isPickerOpen = true
+                pickImageLauncher.launch("image/*")
+                it.postDelayed({ isPickerOpen = false }, 1000)
+            }
+        }
 
         tripsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
 
@@ -235,5 +258,37 @@ class ProfileFragment : Fragment(), Refresh {
 
     override fun refresh() {
         loadProfile()
+    }
+
+    // Uploads selected image to Firebase Storage and updates user profile
+    private fun uploadProfilePicture(imageUri: Uri) {
+        val userId = authRepository.getCurrentUser()?.uid ?: return
+
+        progressBar.visibility = View.VISIBLE
+
+        lifecycleScope.launch {
+            try {
+                // Upload image to Storage under profile_pictures folder
+                val storageRef = FirebaseStorage.getInstance().reference
+                val imageRef = storageRef.child("profile_pictures/$userId.jpg")
+                imageRef.putFile(imageUri).await()
+
+                // Get download URL and save to user profile in Firestore
+                val downloadUrl = imageRef.downloadUrl.await().toString()
+                authRepository.updateProfilePicture(userId, downloadUrl)
+
+                // Display the new profile picture
+                Glide.with(requireContext())
+                    .load(downloadUrl)
+                    .circleCrop()
+                    .placeholder(R.drawable.ic_profile)
+                    .into(profileImage)
+            } catch (_: Exception) {
+                Toast.makeText(requireContext(), "Failed to upload picture", Toast.LENGTH_SHORT)
+                    .show()
+            } finally {
+                progressBar.visibility = View.GONE
+            }
+        }
     }
 }

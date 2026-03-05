@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.travel.R
 import com.example.travel.models.User
+import com.example.travel.utils.setDebouncedClickListener
 
 // Adapter for user search results with dynamic button states
 class UserSearchAdapter(
@@ -47,7 +48,7 @@ class UserSearchAdapter(
             else -> {
                 holder.actionButton.text = "Add"
                 holder.actionButton.isEnabled = true
-                holder.actionButton.setOnClickListener { onAddClick(user) }
+                holder.actionButton.setDebouncedClickListener { onAddClick(user) }
             }
         }
     }

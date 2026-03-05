@@ -28,6 +28,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.launch
 import com.google.android.gms.location.FusedLocationProviderClient
 import kotlinx.coroutines.tasks.await
+import com.example.travel.utils.setDebouncedClickListener
 
 class MainActivity : AppCompatActivity(), TripEndListener {
 
@@ -101,7 +102,7 @@ class MainActivity : AppCompatActivity(), TripEndListener {
 
     // Sets up trip button click listener
     private fun setupTripButton() {
-        tripButton.setOnClickListener {
+        tripButton.setDebouncedClickListener  {
             tripManager.showTripMenu()
         }
     }
@@ -109,7 +110,7 @@ class MainActivity : AppCompatActivity(), TripEndListener {
     // Sets up FAB click listener
     private fun setupFab() {
         fab.hide()
-        fab.setOnClickListener {
+        fab.setDebouncedClickListener  {
             val activeTripId = tripManager.activeTrip?.id
 
             if (activeTripId == null) {

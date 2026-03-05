@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.travel.R
 import com.example.travel.models.FriendRequest
 import com.example.travel.models.User
+import com.example.travel.utils.setDebouncedClickListener
 
 // Adapter for displaying pending friend requests
 class FriendRequestAdapter(
@@ -34,8 +35,8 @@ class FriendRequestAdapter(
         val (request, sender) = requests[position]
         holder.displayNameText.text = sender.displayName
         holder.usernameText.text = "@${sender.username}"
-        holder.acceptButton.setOnClickListener { onAcceptClick(request) }
-        holder.declineButton.setOnClickListener { onDeclineClick(request) }
+        holder.acceptButton.setDebouncedClickListener { onAcceptClick(request) }
+        holder.declineButton.setDebouncedClickListener { onDeclineClick(request) }
     }
 
     override fun getItemCount() = requests.size

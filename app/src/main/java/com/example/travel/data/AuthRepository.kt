@@ -61,4 +61,9 @@ class AuthRepository {
             null
         }
     }
+
+    // Updates user's profile picture URL in Firestore
+    suspend fun updateProfilePicture(uid: String, url: String) {
+        usersCollection.document(uid).update("profilePictureUrl", url).await()
+    }
 }
