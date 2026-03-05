@@ -27,6 +27,7 @@
         android:layout_marginTop="8dp"
         android:textSize="14sp"
         android:textColor="#71717A"
+        android:fontFamily="@font/mont_bold"
         app:layout_constraintTop_toBottomOf="@id/dialogTitle"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -44,6 +45,7 @@
         android:letterSpacing="0"
         app:strokeColor="#D4D4D8"
         app:strokeWidth="1dp"
+        android:fontFamily="@font/mont_bold"
         app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Circle"
         app:layout_constraintTop_toBottomOf="@id/dialogMessage"
         app:layout_constraintStart_toStartOf="parent"
@@ -61,6 +63,7 @@
         android:textSize="14sp"
         android:textAllCaps="false"
         android:letterSpacing="0"
+        android:fontFamily="@font/mont_bold"
         app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Circle"
         app:layout_constraintTop_toBottomOf="@id/dialogMessage"
         app:layout_constraintStart_toEndOf="@id/dialogNegativeButton"

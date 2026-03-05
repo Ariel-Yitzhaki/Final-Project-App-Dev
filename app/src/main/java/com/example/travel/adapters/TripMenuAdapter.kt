@@ -39,6 +39,7 @@ class TripMenuAdapter(
             holder.activeIndicator.visibility = if (activeTripId == null) View.VISIBLE else View.GONE
             holder.card.strokeColor = 0x00000000
             holder.card.strokeWidth = 0
+            holder.card.foreground = null
         }
         // "New Trip" option - starts trip name dialog
         else if (trip.id.isEmpty()) {
@@ -48,15 +49,24 @@ class TripMenuAdapter(
             holder.activeIndicator.visibility = View.GONE
             holder.card.strokeColor = 0x00000000
             holder.card.strokeWidth = 0
+            holder.card.foreground = null
         }
         // Regular trip - can be reactivated
         else {
             holder.tripName.text = trip.name
-            holder.card.setCardBackgroundColor(0xFFF4F4F5.toInt())
-            holder.tripName.setTextColor(0xFF27272A.toInt())
             holder.activeIndicator.visibility = if (trip.id == activeTripId) View.VISIBLE else View.GONE
+            holder.card.setCardBackgroundColor(0xFFF4F4F5.toInt())
             holder.card.strokeColor = if (trip.id == activeTripId) 0xFFC7C7C7.toInt() else 0x00000000
             holder.card.strokeWidth = if (trip.id == activeTripId) 1 else 0
+            if (trip.id == activeTripId) {
+                // Active trip: gradient overlay fading from black at top to transparent
+                holder.card.foreground = holder.itemView.context.getDrawable(R.drawable.bg_active_trip)
+                holder.tripName.setTextColor(0xFFFFFFFF.toInt())
+            } else {
+                // Inactive trip: no overlay
+                holder.card.foreground = null
+                holder.tripName.setTextColor(0xFF27272A.toInt())
+            }
         }
         holder.card.setOnClickListener { onItemClick(trip) }
     }

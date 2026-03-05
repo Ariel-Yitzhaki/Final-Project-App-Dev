@@ -22,13 +22,15 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:textSize="18sp"
-            android:textColor="#27272A" />
+            android:textColor="#27272A"
+            android:fontFamily="@font/mont_bold"/>
 
         <TextView
             android:id="@+id/tripMenuActive"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="ACTIVE"
+            android:fontFamily="sans-serif-medium"
             android:textSize="12sp"
             android:textColor="#A1A1AA"
             android:letterSpacing="0.025"
