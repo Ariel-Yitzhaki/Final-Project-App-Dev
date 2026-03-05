@@ -6,32 +6,49 @@
     android:layout_height="match_parent"
     android:background="@color/white">
 
+    <ImageView
+        android:id="@+id/profileImage"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:src="@drawable/ic_profile"
+        android:scaleType="centerCrop"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
     <TextView
         android:id="@+id/displayNameText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="8dp"
         android:textSize="24sp"
         android:textColor="#18181B"
         android:fontFamily="@font/mont_heavy"
         android:letterSpacing="0"
         android:lineHeight="32dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:maxLines="1"
+        android:ellipsize="end"
+        app:layout_constraintTop_toTopOf="@id/profileImage"
+        app:layout_constraintStart_toEndOf="@id/profileImage"
         app:layout_constraintEnd_toStartOf="@id/signOutButton" />
 
     <TextView
         android:id="@+id/usernameText"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="12dp"
         android:layout_marginTop="4dp"
+        android:layout_marginEnd="8dp"
         android:textSize="14sp"
         android:textColor="#A1A1AA"
         android:fontFamily="@font/mont_bold"
+        android:maxLines="1"
+        android:ellipsize="end"
         app:layout_constraintTop_toBottomOf="@id/displayNameText"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toEndOf="@id/profileImage"
+        app:layout_constraintEnd_toStartOf="@id/signOutButton" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/signOutButton"

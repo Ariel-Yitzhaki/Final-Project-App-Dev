@@ -88,6 +88,11 @@ class LoginActivity : AppCompatActivity() {
                 return
             }
 
+            if (displayName.length > 25) {
+                Toast.makeText(this, "Display name must be 25 characters or less", Toast.LENGTH_SHORT).show()
+                return
+            }
+
             signUp(email, password, username, displayName)
         } else {
             signIn(email, password)

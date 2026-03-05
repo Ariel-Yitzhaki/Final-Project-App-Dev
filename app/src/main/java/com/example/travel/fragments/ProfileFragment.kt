@@ -27,6 +27,8 @@ import com.example.travel.interfaces.Refresh
 import com.example.travel.interfaces.TripEndListener
 import java.text.SimpleDateFormat
 import java.util.Locale
+import android.widget.ImageView
+import com.bumptech.glide.Glide
 
 class ProfileFragment : Fragment(), Refresh {
 
@@ -41,6 +43,7 @@ class ProfileFragment : Fragment(), Refresh {
     private lateinit var emptyText: TextView
     private lateinit var progressBar: ProgressBar
     private lateinit var swipeRefresh: SwipeRefreshLayout
+    private lateinit var profileImage: ImageView
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -81,6 +84,7 @@ class ProfileFragment : Fragment(), Refresh {
         swipeRefresh.setOnRefreshListener {
             loadProfile()
         }
+        profileImage = view.findViewById(R.id.profileImage)
 
         tripsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
 
@@ -105,6 +109,15 @@ class ProfileFragment : Fragment(), Refresh {
             user?.let {
                 displayNameText.text = it.displayName
                 usernameText.text = "@${it.username}"
+                if (it.profilePictureUrl.isNotEmpty()) {
+                    Glide.with(requireContext())
+                        .load(it.profilePictureUrl)
+                        .circleCrop()
+                        .placeholder(R.drawable.ic_profile)
+                        .into(profileImage)
+                } else {
+                    profileImage.setImageResource(R.drawable.ic_profile)
+                }
             }
 
             // Load completed trips
@@ -186,14 +199,29 @@ class ProfileFragment : Fragment(), Refresh {
 
     // Confirms before deleting a trip
     private fun confirmDeleteTrip(trip: Trip) {
-        android.app.AlertDialog.Builder(requireContext())
-            .setTitle("Delete Trip")
-            .setMessage("Are you sure you want to delete '${trip.name}'? This cannot be undone.")
-            .setPositiveButton("Delete") { _, _ ->
+        val dialogView = layoutInflater.inflate(R.layout.dialog_confirm, null)
+        dialogView.findViewById<TextView>(R.id.dialogTitle).text = "Delete Trip"
+        dialogView.findViewById<TextView>(R.id.dialogMessage).text = "Are you sure you want to delete '${trip.name}'? This cannot be undone."
+
+        val dialog = android.app.AlertDialog.Builder(requireContext())
+            .setView(dialogView)
+            .create()
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.dialogPositiveButton).apply {
+            text = "Delete"
+            setOnClickListener {
+                dialog.dismiss()
                 deleteTrip(trip)
             }
-            .setNegativeButton("Cancel", null)
-            .show()
+        }
+        dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.dialogNegativeButton).apply {
+            text = "Cancel"
+            setOnClickListener { dialog.dismiss() }
+        }
+
+        dialog.show()
     }
 
     // Deletes trip and its photos
