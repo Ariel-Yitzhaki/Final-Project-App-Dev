@@ -1,57 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
     android:background="@drawable/bg_dialog"
     android:padding="24dp">
 
     <TextView
         android:id="@+id/dialogTitle"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:textColor="#18181B"
-        android:letterSpacing="-0.025" />
+        android:textSize="24sp"
+        android:textStyle="normal"
+        android:textColor="#000000"
+        android:letterSpacing="0"
+        android:lineHeight="32dp"
+        android:fontFamily="@font/mont_heavy"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <TextView
         android:id="@+id/dialogMessage"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:textSize="14sp"
-        android:textColor="#71717A" />
+        android:textColor="#71717A"
+        app:layout_constraintTop_toBottomOf="@id/dialogTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/dialogNegativeButton"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="0dp"
+        android:layout_height="44dp"
         android:layout_marginTop="24dp"
-        android:gravity="end">
+        android:layout_marginEnd="8dp"
+        android:textColor="#71717A"
+        android:textSize="14sp"
+        android:textAllCaps="false"
+        android:letterSpacing="0"
+        app:strokeColor="#D4D4D8"
+        app:strokeWidth="1dp"
+        app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Circle"
+        app:layout_constraintTop_toBottomOf="@id/dialogMessage"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/dialogPositiveButton"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/dialogNegativeButton"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:textColor="#71717A"
-            android:textSize="14sp"
-            android:textAllCaps="false"
-            android:letterSpacing="0" />
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/dialogPositiveButton"
+        android:layout_width="0dp"
+        android:layout_height="44dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginStart="8dp"
+        android:backgroundTint="#18181B"
+        android:textColor="#FFFFFF"
+        android:textSize="14sp"
+        android:textAllCaps="false"
+        android:letterSpacing="0"
+        app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Circle"
+        app:layout_constraintTop_toBottomOf="@id/dialogMessage"
+        app:layout_constraintStart_toEndOf="@id/dialogNegativeButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/dialogPositiveButton"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:layout_marginStart="8dp"
-            android:backgroundTint="#18181B"
-            android:textColor="#FFFFFF"
-            android:textSize="14sp"
-            android:textAllCaps="false"
-            android:letterSpacing="0"
-            app:cornerRadius="9999dp" />
-
-    </LinearLayout>
-
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

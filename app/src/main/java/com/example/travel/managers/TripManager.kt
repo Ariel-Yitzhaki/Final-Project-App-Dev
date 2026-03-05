@@ -1,7 +1,6 @@
 package com.example.travel.managers
 
 import android.app.AlertDialog
-import android.text.InputType
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -119,19 +118,33 @@ class TripManager(
 
     // Shows dialog warning user that empty trip will be discarded
     private fun showDiscardEmptyTripDialog(selectedTrip: Trip?, emptyTrip: Trip) {
-        AlertDialog.Builder(activity)
-            .setTitle("Discard Empty Trip?")
-            .setMessage("'${emptyTrip.name}' has no photos and will be discarded.")
-            .setPositiveButton("Discard") { _, _ ->
+        val dialogView = activity.layoutInflater.inflate(R.layout.dialog_confirm, null)
+        dialogView.findViewById<android.widget.TextView>(R.id.dialogTitle).text = "Discard Empty Trip?"
+        dialogView.findViewById<android.widget.TextView>(R.id.dialogMessage).text = "'${emptyTrip.name}' has no photos and will be discarded."
+
+        val dialog = AlertDialog.Builder(activity)
+            .setView(dialogView)
+            .create()
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.dialogPositiveButton).apply {
+            text = "Discard"
+            setOnClickListener {
+                dialog.dismiss()
                 activity.lifecycleScope.launch {
                     tripRepository.deleteTrip(emptyTrip.id)
                     activeTrip = null
-                    // Sending null as currentActive because emptyTrip is being deleted
                     applyTripSelection(selectedTrip, null)
                 }
             }
-            .setNegativeButton("Cancel", null)
-            .show()
+        }
+        dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.dialogNegativeButton).apply {
+            text = "Cancel"
+            setOnClickListener { dialog.dismiss() }
+        }
+
+        dialog.show()
     }
 
     // Applies the trip selection (view only, no activation)
@@ -170,31 +183,35 @@ class TripManager(
 
     // Shows dialog to name a new trip
     fun showTripNameDialog(openCameraAfter: Boolean = false) {
-        val input = EditText(activity).apply {
-            hint = "Enter trip name"
-            inputType = InputType.TYPE_CLASS_TEXT
-            setPadding(48, 32, 48, 32)
+        val dialogView = activity.layoutInflater.inflate(R.layout.dialog_trip_name, null)
+        val input = dialogView.findViewById<EditText>(R.id.tripNameInput)
+
+        val dialog = AlertDialog.Builder(activity)
+            .setView(dialogView)
+            .create()
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.dialogPositiveButton).setOnClickListener {
+            val name = input.text.toString().trim()
+            if (name.isNotEmpty()) {
+                dialog.dismiss()
+                activity.lifecycleScope.launch {
+                    startNewTrip(name)
+                    if (openCameraAfter) {
+                        onOpenCamera?.invoke()
+                    }
+                }
+            } else {
+                Toast.makeText(activity, "Please enter trip name",
+                    Toast.LENGTH_SHORT).show()
+            }
+        }
+        dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.dialogNegativeButton).setOnClickListener {
+            dialog.dismiss()
         }
 
-        AlertDialog.Builder(activity)
-            .setTitle("Name Your Trip")
-            .setView(input)
-            .setPositiveButton("Start") { _, _ ->
-                val name = input.text.toString().trim()
-                if (name.isNotEmpty()) {
-                    activity.lifecycleScope.launch {
-                        startNewTrip(name)
-                        if (openCameraAfter) {
-                            onOpenCamera?.invoke()
-                        }
-                    }
-                } else {
-                    Toast.makeText(activity, "Please enter trip name",
-                        Toast.LENGTH_SHORT).show()
-                }
-            }
-            .setNegativeButton("Cancel", null)
-            .show()
+        dialog.show()
     }
 
     // Creates and saves a new trip

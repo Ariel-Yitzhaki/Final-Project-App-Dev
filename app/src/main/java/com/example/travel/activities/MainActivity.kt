@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.ImageButton
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -161,14 +162,29 @@ class MainActivity : AppCompatActivity(), TripEndListener {
     }
 
     private fun promptStartNewTrip() {
-        AlertDialog.Builder(this)
-            .setTitle("No Active Trip")
-            .setMessage("Start a new trip?")
-            .setPositiveButton("Yes") { _, _ ->
+        val dialogView = layoutInflater.inflate(R.layout.dialog_confirm, null)
+        dialogView.findViewById<TextView>(R.id.dialogTitle).text = "No Active Trip"
+        dialogView.findViewById<TextView>(R.id.dialogMessage).text = "Start a new trip?"
+
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .create()
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.dialogPositiveButton).apply {
+            text = "Yes"
+            setOnClickListener {
+                dialog.dismiss()
                 tripManager.showTripNameDialog(openCameraAfter = true)
             }
-            .setNegativeButton("Cancel", null)
-            .show()
+        }
+        dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.dialogNegativeButton).apply {
+            text = "Cancel"
+            setOnClickListener { dialog.dismiss() }
+        }
+
+        dialog.show()
     }
 
     fun getActiveTripId(): String? {
