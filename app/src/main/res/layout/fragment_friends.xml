@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:text="Friends"
         android:textSize="22sp"
-        android:textStyle="bold"
+        android:fontFamily="@font/mont_heavy"
         android:textColor="#262626"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
@@ -74,7 +74,7 @@
         android:layout_marginTop="16dp"
         android:text="My Friends"
         android:textSize="14sp"
-        android:textStyle="bold"
+        android:fontFamily="@font/mont_bold"
         android:textColor="#262626"
         app:layout_constraintTop_toBottomOf="@id/requestsRecyclerView"
         app:layout_constraintStart_toStartOf="parent" />
