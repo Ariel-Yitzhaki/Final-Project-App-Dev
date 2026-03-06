@@ -5,7 +5,7 @@
     android:fitsSystemWindows="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#18181B">
+    android:background="@color/surface_dark">
 
     <ImageButton
         android:id="@+id/backButton"
@@ -17,7 +17,7 @@
         android:contentDescription="discard photo"
         android:scaleType="centerInside"
         android:src="@drawable/ic_back"
-        app:tint="#FFFFFF"
+        app:tint="@color/text_white"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -28,9 +28,8 @@
         android:text="Preview"
         android:textSize="20sp"
         android:textStyle="normal"
-        android:textColor="#FFFFFF"
-        android:fontFamily="@font/mont_heavy"
-        android:letterSpacing="-0.025"
+        android:textColor="@color/text_white"
+        android:fontFamily="@font/mont_bold"
         app:layout_constraintTop_toTopOf="@id/backButton"
         app:layout_constraintBottom_toBottomOf="@id/backButton"
         app:layout_constraintStart_toStartOf="parent"
@@ -41,7 +40,7 @@
         android:layout_width="0dp"
         android:layout_height="0.5dp"
         android:layout_marginTop="16dp"
-        android:background="#3F3F46"
+        android:background="@color/surface_dark_secondary"
         app:layout_constraintTop_toBottomOf="@id/backButton"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -73,7 +72,7 @@
         android:layout_height="16dp"
         android:layout_marginEnd="4dp"
         android:src="@drawable/ic_location"
-        app:tint="#A1A1AA"
+        app:tint="@color/text_secondary"
         app:layout_constraintTop_toTopOf="@id/locationText"
         app:layout_constraintBottom_toBottomOf="@id/locationText"
         app:layout_constraintEnd_toStartOf="@id/locationText" />
@@ -85,7 +84,7 @@
         android:layout_marginBottom="16dp"
         android:text="Loading location..."
         android:textSize="12sp"
-        android:textColor="#A1A1AA"
+        android:textColor="@color/text_secondary"
         android:fontFamily="@font/mont_bold"
         app:layout_constraintBottom_toTopOf="@id/uploadButton"
         app:layout_constraintStart_toStartOf="parent"
@@ -101,8 +100,8 @@
         android:text="Upload Photo"
         android:textSize="14sp"
         android:textAllCaps="false"
-        android:backgroundTint="#FFFFFF"
-        android:textColor="#18181B"
+        android:backgroundTint="@color/button_secondary"
+        android:textColor="@color/button_secondary_text"
         android:fontFamily="@font/mont_bold"
         app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Circle"
         app:layout_constraintBottom_toTopOf="@id/retakeText"
@@ -116,8 +115,7 @@
         android:layout_marginBottom="24dp"
         android:text="Retake"
         android:textSize="14sp"
-        android:textStyle="normal"
-        android:textColor="#A1A1AA"
+        android:textColor="@color/text_secondary"
         android:fontFamily="@font/mont_bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -128,7 +126,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        android:indeterminateTint="#FFFFFF"
+        android:indeterminateTint="@color/text_white"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"

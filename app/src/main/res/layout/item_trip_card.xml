@@ -38,7 +38,7 @@
             android:scaleType="centerInside"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Options"
-            app:tint="#71717A"
+            app:tint="@color/text_muted"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
@@ -48,7 +48,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:textSize="12sp"
-            android:textColor="#A1A1AA"
+            android:textColor="@color/text_secondary"
             android:fontFamily="@font/mont_bold"
             app:layout_constraintTop_toBottomOf="@id/tripName"
             app:layout_constraintStart_toStartOf="parent"
@@ -60,7 +60,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:textSize="14sp"
-            android:textColor="#71717A"
+            android:textColor="@color/text_muted"
             android:fontFamily="@font/mont_bold"
             app:layout_constraintTop_toBottomOf="@id/tripDate"
             app:layout_constraintStart_toStartOf="parent" />
