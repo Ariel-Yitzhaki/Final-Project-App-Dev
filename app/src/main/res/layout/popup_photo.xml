@@ -22,6 +22,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
+        android:maxLines="1"
+        android:ellipsize="end"
         android:textSize="14sp"
         android:textColor="#262626"
         android:fontFamily="@font/mont_semibold"
@@ -35,6 +37,8 @@
         android:layout_marginTop="4dp"
         android:textSize="12sp"
         android:textColor="#666666"
+        android:maxLines="1"
+        android:ellipsize="end"
         android:fontFamily="@font/mont_semibold"
         app:layout_constraintTop_toBottomOf="@id/dialogPhotoDate"
         app:layout_constraintStart_toStartOf="parent" />

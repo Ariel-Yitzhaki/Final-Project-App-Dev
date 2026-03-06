@@ -23,6 +23,8 @@
             android:layout_weight="1"
             android:textSize="18sp"
             android:textColor="#27272A"
+            android:maxLines="1"
+            android:ellipsize="end"
             android:fontFamily="@font/mont_bold"/>
 
         <TextView
@@ -30,7 +32,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="ACTIVE"
-            android:fontFamily="sans-serif-medium"
+            android:fontFamily="@font/mont_regular"
             android:textSize="12sp"
             android:textColor="#A1A1AA"
             android:letterSpacing="0.025"
