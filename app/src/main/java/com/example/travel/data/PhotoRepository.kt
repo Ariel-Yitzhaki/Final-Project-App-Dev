@@ -56,4 +56,8 @@ class PhotoRepository {
             null
         }
     }
+
+    suspend fun deletePhoto(photoId: String) {
+        photosCollection.document(photoId).delete().await()
+    }
 }

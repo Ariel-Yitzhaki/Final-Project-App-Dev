@@ -23,6 +23,8 @@
             android:layout_height="wrap_content"
             android:textSize="18sp"
             android:textColor="#18181B"
+            android:maxLines="1"
+            android:ellipsize="end"
             android:fontFamily="@font/mont_heavy"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"

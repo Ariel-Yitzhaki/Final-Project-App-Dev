@@ -59,4 +59,5 @@
     <color name="black_logo">#050A27</color>
     <color name="button">#000000</color>
     <color name="button_background">#EFEFEF</color>
+    <color name="photo_info_bg">#F0F4F8</color>
 </resources>

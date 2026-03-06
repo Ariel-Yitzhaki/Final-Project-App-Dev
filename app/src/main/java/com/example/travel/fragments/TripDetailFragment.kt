@@ -34,6 +34,7 @@ class TripDetailFragment : Fragment() {
     private lateinit var swipeRefresh: SwipeRefreshLayout
     private var tripId: String = ""
     private var photoAdapter: TripPhotoAdapter? = null
+    private var isOwner = false
 
     companion object {
         private const val ARG_TRIP_ID = "tripId"
@@ -105,6 +106,7 @@ class TripDetailFragment : Fragment() {
             }
 
             tripNameText.text = trip.name
+            isOwner = trip.userId == AuthRepository().getCurrentUser()?.uid
 
             val photos = photoRepository.getPhotosForTrip(tripId).sortedBy { it.timestamp }
 
@@ -133,8 +135,21 @@ class TripDetailFragment : Fragment() {
                 addresses.toMutableMap(),
                 currentUserId,
                 lifecycleScope,
-                likeRepository
-            )
+                likeRepository,
+                isOwner
+            ) { photo ->
+                android.app.AlertDialog.Builder(requireContext())
+                    .setTitle("Delete Photo From Trip")
+                    .setMessage("Are you sure you want to delete this photo from the trip?")
+                    .setPositiveButton("Delete") { _, _ ->
+                        lifecycleScope.launch {
+                            photoRepository.deletePhoto(photo.id)
+                            loadTripDetails()
+                        }
+                    }
+                    .setNegativeButton("Cancel", null)
+                    .show()
+            }
             photosRecyclerView.adapter = photoAdapter
         } else {
             photoAdapter?.updatePhotos(photos.toMutableList(), addresses.toMutableMap())

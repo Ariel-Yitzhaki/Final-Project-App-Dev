@@ -13,6 +13,8 @@ import com.example.travel.R
 import com.example.travel.data.LikeRepository
 import com.example.travel.models.Photo
 import kotlinx.coroutines.launch
+import kotlin.math.PI
+
 
 // Adapter for displaying trip photos in a vertical scrollable list
 class TripPhotoAdapter(
@@ -20,7 +22,9 @@ class TripPhotoAdapter(
     private val addresses: MutableMap<String, String>,
     private val currentUserId: String,
     private val lifecycleScope: LifecycleCoroutineScope,
-    private val likeRepository: LikeRepository
+    private val likeRepository: LikeRepository,
+    private val isOwner: Boolean,
+    private val onDeletePhoto: (Photo) -> Unit
 ) : RecyclerView.Adapter<TripPhotoAdapter.PhotoViewHolder>() {
 
     private val likeStates = mutableMapOf<String, Boolean>()
@@ -35,6 +39,8 @@ class TripPhotoAdapter(
         val likeButton: ImageButton = itemView.findViewById(R.id.likeButton)
         val likeCountText: TextView = itemView.findViewById(R.id.likeCountText)
         val locationText: TextView = itemView.findViewById(R.id.locationText)
+        val dateText: TextView = itemView.findViewById(R.id.dateText)
+        val menuButton: ImageButton = itemView.findViewById(R.id.menuButton)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoViewHolder {
@@ -52,15 +58,34 @@ class TripPhotoAdapter(
             .centerCrop()
             .into(holder.photoImage)
 
-        // Shows coordinates for now, need to turn to geocoding later
         // Shows geocoded address or coordinates as fallback
         holder.locationText.text = addresses[photo.id] ?: "%.4f, %.4f"
             .format(photo.latitude, photo.longitude)
 
+        holder.dateText.text = photo.date.toString()
+
         // Like button placeholder
         loadLikeState(holder, photo)
+
         holder.likeButton.setOnClickListener {
             toggleLike(holder, photo)
+        }
+
+        // Delete button
+        if (isOwner) {
+            holder.menuButton.visibility = View.VISIBLE
+            holder.menuButton.setOnClickListener {
+                val builder = android.app.AlertDialog.Builder(holder.itemView.context)
+                builder.setTitle("Options")
+                builder.setItems(arrayOf("Delete From Trip")) { _, which ->
+                    when (which) {
+                        0 -> onDeletePhoto(photo)
+                    }
+                }
+                builder.show()
+            }
+        } else {
+            holder.menuButton.visibility = View.GONE
         }
     }
 

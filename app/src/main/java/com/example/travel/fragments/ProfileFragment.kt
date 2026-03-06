@@ -19,7 +19,6 @@ import com.example.travel.data.AuthRepository
 import com.example.travel.data.TripRepository
 import kotlinx.coroutines.launch
 import com.example.travel.models.Trip
-import android.widget.PopupMenu
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.travel.data.LikeRepository
 import com.example.travel.data.PhotoRepository
@@ -202,18 +201,31 @@ class ProfileFragment : Fragment(), Refresh {
 
     // Shows popup menu with trip options
     private fun showOptionsMenu(trip: Trip, anchor: View) {
-        val popup = PopupMenu(requireContext(), anchor)
-        popup.menu.add("Delete Trip")
+        val dialogView = layoutInflater.inflate(R.layout.dialog_confirm, null)
+        dialogView.findViewById<TextView>(R.id.dialogTitle).text = trip.name
+        dialogView.findViewById<TextView>(R.id.dialogMessage).text = "Delete This Trip?"
 
-        popup.setOnMenuItemClickListener { item ->
-            if (item.title == "Delete Trip") {
+        val dialog = android.app.AlertDialog.Builder(requireContext())
+            .setView(dialogView)
+            .create()
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.dialogPositiveButton).apply {
+            text = "Delete"
+            setBackgroundColor(0xFFDC2626.toInt())
+            setOnClickListener {
+                dialog.dismiss()
                 confirmDeleteTrip(trip)
-                true
-            } else {
-                false
             }
         }
-        popup.show()
+
+        dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.dialogNegativeButton).apply {
+            text = "Cancel"
+            setOnClickListener { dialog.dismiss() }
+        }
+
+        dialog.show()
     }
 
     // Confirms before deleting a trip

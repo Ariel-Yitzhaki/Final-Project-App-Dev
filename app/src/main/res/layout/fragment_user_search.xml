@@ -44,6 +44,7 @@
         android:padding="10dp"
         app:cornerRadius="6dp"
         android:textColor="@color/button"
+        android:fontFamily="@font/mont_semibold"
         android:backgroundTint="@color/button_background"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
