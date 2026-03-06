@@ -13,7 +13,7 @@ import com.example.travel.R
 import com.example.travel.data.LikeRepository
 import com.example.travel.models.Photo
 import kotlinx.coroutines.launch
-import kotlin.math.PI
+
 
 
 // Adapter for displaying trip photos in a vertical scrollable list
@@ -62,7 +62,7 @@ class TripPhotoAdapter(
         holder.locationText.text = addresses[photo.id] ?: "%.4f, %.4f"
             .format(photo.latitude, photo.longitude)
 
-        holder.dateText.text = photo.date.toString()
+        holder.dateText.text = photo.date
 
         // Like button placeholder
         loadLikeState(holder, photo)

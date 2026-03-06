@@ -151,7 +151,7 @@ class TripDetailFragment : Fragment() {
 
                 dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.dialogPositiveButton).apply {
                     text = "Delete"
-                    backgroundTintList = resources.getColorStateList(android.graphics.Color.parseColor("#F44336"), null)
+                    backgroundTintList = android.content.res.ColorStateList.valueOf(resources.getColor(R.color.button_destructive, null))
 
                     setOnClickListener {
                         lifecycleScope.launch {
