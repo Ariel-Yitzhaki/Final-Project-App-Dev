@@ -52,8 +52,8 @@
         android:textAllCaps="false"
         android:padding="10dp"
         android:fontFamily="@font/mont_bold"
-        android:textColor="@color/button"
-        android:backgroundTint="@color/button_background"
+        android:textColor="@color/button_primary_text"
+        android:backgroundTint="@color/button_primary"
         app:cornerRadius="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

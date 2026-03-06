@@ -138,18 +138,40 @@ class TripDetailFragment : Fragment() {
                 likeRepository,
                 isOwner
             ) { photo ->
-                android.app.AlertDialog.Builder(requireContext())
-                    .setTitle("Delete Photo From Trip")
-                    .setMessage("Are you sure you want to delete this photo from the trip?")
-                    .setPositiveButton("Delete") { _, _ ->
+                val dialogView = layoutInflater.inflate(R.layout.dialog_confirm, null)
+                dialogView.findViewById<TextView>(R.id.dialogTitle).text = "Delete Photo"
+                dialogView.findViewById<TextView>(R.id.dialogMessage).text = "Are you sure you want to delete this photo from the trip?"
+
+                val dialog = android.app.AlertDialog.Builder(requireContext())
+                    .setView(dialogView)
+                    .setCancelable(true)
+                    .create()
+
+                dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+                dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.dialogPositiveButton).apply {
+                    text = "Delete"
+                    backgroundTintList = resources.getColorStateList(android.graphics.Color.parseColor("#F44336"), null)
+
+                    setOnClickListener {
                         lifecycleScope.launch {
                             photoRepository.deletePhoto(photo.id)
                             loadTripDetails()
                         }
+                        dialog.dismiss()
                     }
-                    .setNegativeButton("Cancel", null)
-                    .show()
+                }
+
+                dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.dialogNegativeButton).apply {
+                    text = "Cancel"
+                    setOnClickListener {
+                        dialog.dismiss()
+                    }
+                }
+
+                dialog.show()
             }
+
             photosRecyclerView.adapter = photoAdapter
         } else {
             photoAdapter?.updatePhotos(photos.toMutableList(), addresses.toMutableMap())

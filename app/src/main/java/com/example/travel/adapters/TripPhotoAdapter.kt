@@ -75,14 +75,7 @@ class TripPhotoAdapter(
         if (isOwner) {
             holder.menuButton.visibility = View.VISIBLE
             holder.menuButton.setOnClickListener {
-                val builder = android.app.AlertDialog.Builder(holder.itemView.context)
-                builder.setTitle("Options")
-                builder.setItems(arrayOf("Delete From Trip")) { _, which ->
-                    when (which) {
-                        0 -> onDeletePhoto(photo)
-                    }
-                }
-                builder.show()
+                onDeletePhoto(photo)
             }
         } else {
             holder.menuButton.visibility = View.GONE

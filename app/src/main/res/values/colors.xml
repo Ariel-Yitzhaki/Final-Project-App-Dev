@@ -57,7 +57,13 @@
     <color name="light_blue">#28A8E5</color>
     <color name="Winter">#EEF9FA</color>
     <color name="black_logo">#050A27</color>
-    <color name="button">#000000</color>
-    <color name="button_background">#EFEFEF</color>
     <color name="photo_info_bg">#F0F4F8</color>
+    <color name="button_primary">#FF18181B</color>
+    <color name="button_primary_text">#FFFFFFFF</color>
+    <color name="button_accent">#FF0095F6</color>
+    <color name="button_accent_text">#FFFFFFFF</color>
+    <color name="button_secondary">#FFEFEFEF</color>
+    <color name="button_secondary_text">#FF000000</color>
+    <color name="button_destructive">#FFDC2626</color>
+    <color name="button_destructive_text">#FFFFFFFF</color>
 </resources>
