@@ -49,6 +49,8 @@
             android:ellipsize="end"
             android:textColor="@color/text_primary"
             android:fontFamily="@font/mont_heavy"
+            app:layout_constraintWidth_percent="0.9"
+            app:layout_constraintHorizontal_bias="0"
             app:layout_constraintTop_toBottomOf="@id/profilePicture"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
@@ -59,6 +61,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:textSize="12sp"
+            app:layout_constraintWidth_percent="0.9"
+            app:layout_constraintHorizontal_bias="0"
             android:textColor="@color/text_secondary"
             android:fontFamily="@font/mont_bold"
             app:layout_constraintTop_toBottomOf="@id/tripName"
@@ -81,13 +85,15 @@
             android:id="@+id/mapButton"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:src="@drawable/ic_location"
-            android:scaleType="centerInside"
+            android:tint="@color/Azur"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="View on map"
-            app:layout_constraintTop_toTopOf="@id/likesCount"
-            app:layout_constraintBottom_toBottomOf="@id/likesCount"
-            app:layout_constraintEnd_toEndOf="parent" />
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_location"
+
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/tripDate"
+            app:layout_constraintTop_toBottomOf="@+id/tripName" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
