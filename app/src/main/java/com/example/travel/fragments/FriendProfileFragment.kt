@@ -118,6 +118,7 @@ class FriendProfileFragment : Fragment() {
                     onEndTripClick = {},
                     onCardClick = {trip -> openTripDetail(trip)},
                     onOptionsClick = {_,_ ->},
+                    onMapClick = { trip -> onTripMap(trip) },
                     showOptions = false,
                     showEndButton = false
                 )
@@ -133,5 +134,12 @@ class FriendProfileFragment : Fragment() {
             .replace(R.id.fragment_container, TripDetailFragment.newInstance(trip.id))
             .addToBackStack(null)
             .commit()
+    }
+
+    // Opens the trip map dialog
+    private fun openTripMap(trip: Trip) {
+        TripMapDialogFragment.newInstance(trip.id)
+            .show(parentFragmentManager, "tripMap")
+
     }
 }

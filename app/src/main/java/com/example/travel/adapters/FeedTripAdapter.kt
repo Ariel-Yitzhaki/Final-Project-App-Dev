@@ -14,12 +14,14 @@ import android.graphics.Typeface
 import android.widget.ImageView
 import com.example.travel.models.User
 import com.bumptech.glide.Glide
+import android.widget.ImageButton
 
 // Adapter for displaying friends' trips in the home feed
 class FeedTripAdapter(
     private val trips: List<Pair<Trip, User>>,  // Pair of Trip and username
     private val tripLikes: Map<String, Int>,
-    private val onTripClick: (Trip) -> Unit
+    private val onTripClick: (Trip) -> Unit,
+    private val onMapClick: (Trip) -> Unit
 ) : RecyclerView.Adapter<FeedTripAdapter.FeedTripViewHolder>() {
 
     class FeedTripViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -28,6 +30,7 @@ class FeedTripAdapter(
         val tripName: TextView = view.findViewById(R.id.tripName)
         val tripDate: TextView = view.findViewById(R.id.tripDate)
         val likesCount: TextView = view.findViewById(R.id.likesCount)
+        val mapButton: ImageButton = view.findViewById(R.id.mapButton)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FeedTripViewHolder {
@@ -54,6 +57,10 @@ class FeedTripAdapter(
 
         holder.itemView.setOnClickListener {
             onTripClick.invoke(trip)
+        }
+
+        holder.mapButton.setOnClickListener {
+            onMapClick.invoke(trip)
         }
     }
 

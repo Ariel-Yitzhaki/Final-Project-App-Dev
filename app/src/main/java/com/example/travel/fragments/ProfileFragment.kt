@@ -34,6 +34,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import com.example.travel.utils.setDebouncedClickListener
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
+import com.example.travel.fragments.TripMapDialogFragment
 
 class ProfileFragment : Fragment(), Refresh {
 
@@ -165,7 +166,8 @@ class ProfileFragment : Fragment(), Refresh {
                     tripLikes,
                     onEndTripClick = { trip -> onEndTripClicked(trip) },
                     onCardClick = { trip -> openTripDetail(trip) },
-                    onOptionsClick = { trip, view -> showOptionsMenu(trip, view) }
+                    onOptionsClick = { trip, view -> showOptionsMenu(trip, view) },
+                    onMapClick = { trip -> openTripMap(trip) }
                 )
             } else {
                 emptyText.visibility = View.VISIBLE
@@ -197,6 +199,12 @@ class ProfileFragment : Fragment(), Refresh {
             .replace(R.id.fragment_container, TripDetailFragment.newInstance(trip.id))
             .addToBackStack(null)
             .commit()
+    }
+
+    // Opens the trip map dialog
+    private fun openTripMap(trip: Trip) {
+        TripMapDialogFragment.newInstance(trip.id)
+            .show(parentFragmentManager, "tripMap")
     }
 
     // Shows popup menu with trip options
