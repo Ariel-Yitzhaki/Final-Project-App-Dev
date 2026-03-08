@@ -18,6 +18,8 @@ import com.example.travel.data.LikeRepository
 import com.example.travel.data.PhotoRepository
 import com.example.travel.data.TripRepository
 import com.example.travel.models.Trip
+import com.example.travel.utils.openTripDetail
+import com.example.travel.utils.openTripMap
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -116,9 +118,9 @@ class FriendProfileFragment : Fragment() {
                     allTrips.toMutableList(),
                     tripLikes,
                     onEndTripClick = {},
-                    onCardClick = {trip -> openTripDetail(trip)},
+                    onCardClick = {trip -> openTripDetail(trip.id)},
                     onOptionsClick = {_,_ ->},
-                    onMapClick = { trip -> onTripMap(trip) },
+                    onMapClick = { trip -> openTripMap(trip.id) },
                     showOptions = false,
                     showEndButton = false
                 )
@@ -126,20 +128,5 @@ class FriendProfileFragment : Fragment() {
                 emptyText.visibility = View.VISIBLE
             }
         }
-    }
-
-    // Opens the trip detail view
-    private fun openTripDetail(trip: Trip) {
-        parentFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, TripDetailFragment.newInstance(trip.id))
-            .addToBackStack(null)
-            .commit()
-    }
-
-    // Opens the trip map dialog
-    private fun openTripMap(trip: Trip) {
-        TripMapDialogFragment.newInstance(trip.id)
-            .show(parentFragmentManager, "tripMap")
-
     }
 }

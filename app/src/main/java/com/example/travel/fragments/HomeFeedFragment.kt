@@ -21,7 +21,9 @@ import com.example.travel.data.TripRepository
 import com.example.travel.interfaces.Refresh
 import com.example.travel.models.Trip
 import com.example.travel.models.User
+import com.example.travel.utils.openTripDetail
 import kotlinx.coroutines.launch
+import com.example.travel.utils.openTripMap
 
 // Displays friends' completed trips in a feed
 class HomeFeedFragment : Fragment(), Refresh {
@@ -112,22 +114,20 @@ class HomeFeedFragment : Fragment(), Refresh {
         if (tripsWithUsers.isNotEmpty()) {
             feedRecyclerView.adapter = FeedTripAdapter(
                 tripsWithUsers,
-                tripLikes
-            ) { trip ->
-                openTripDetail(trip)
-            }
+                tripLikes,
+                onTripClick = { trip ->
+                    openTripDetail(trip.id)
+                },
+                onMapClick = { trip ->
+                    openTripMap(trip.id)
+                }
+            )
         } else {
             emptyText.visibility = View.VISIBLE
         }
     }
 
-    // Opens trip detail view
-    private fun openTripDetail(trip: Trip) {
-        parentFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, TripDetailFragment.newInstance(trip.id))
-            .addToBackStack(null)
-            .commit()
-    }
+    // Opens the trip map
 
     override fun refresh() {
         loadFeed()
