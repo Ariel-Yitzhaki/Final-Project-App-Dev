@@ -1,47 +1,23 @@
 package com.example.travel.fragments
 
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.Path
-import android.graphics.RectF
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
-import androidx.core.graphics.createBitmap
-import androidx.core.graphics.toColorInt
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
 import com.example.travel.R
 import com.example.travel.data.PhotoRepository
 import com.example.travel.models.Photo
-import com.example.travel.utils.GeocodingUtils
-import com.google.android.gms.maps.CameraUpdateFactory
+import com.example.travel.utils.MapRenderingUtils
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.Dash
-import com.google.android.gms.maps.model.Gap
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.maps.model.PolylineOptions
 import kotlinx.coroutines.launch
-import android.app.AlertDialog
-import android.app.Dialog
 
 // Full-screen dialog that displays a trip's photos on a Google Map
-class TripMapDialogFragment: DialogFragment(), OnMapReadyCallback {
+class TripMapDialogFragment : DialogFragment(), OnMapReadyCallback {
 
     private lateinit var map: GoogleMap
     private lateinit var photoRepository: PhotoRepository
@@ -76,21 +52,59 @@ class TripMapDialogFragment: DialogFragment(), OnMapReadyCallback {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         photoRepository = PhotoRepository()
-
         val mapFragment = childFragmentManager.findFragmentById(R.id.dialogMap) as SupportMapFragment
         mapFragment.getMapAsync(this)
     }
 
+    // Callback triggered when GoogleMap is ready to use
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
 
+        // Show photo popup when marker is clicked
         map.setOnMarkerClickListener { marker ->
             val photo = photoMarkers.find { it.first == marker }?.second
             if (photo != null) {
-                showPhotoDialog(photo)
+                MapRenderingUtils.showPhotoDialog(this, photo)
             }
+            true
         }
+
+        // Update marker sizes when zoom changes
+        map.setOnCameraMoveListener {
+            MapRenderingUtils.updateMarkerSizes(this, map, photoMarkers)
+        }
+
+        loadPhotosOnMap()
+    }
+
+    // Loads photos for the trip and displays them on the map
+    private fun loadPhotosOnMap() {
+        if (tripId.isEmpty()) return
+
+        lifecycleScope.launch {
+            val photos = photoRepository.getPhotosForTrip(tripId)
+            if (photos.isEmpty()) return@launch
+
+            MapRenderingUtils.drawTravelPath(map, photos)
+
+            for (photo in photos) {
+                MapRenderingUtils.addPhotoMarker(
+                    this@TripMapDialogFragment,
+                    map,
+                    photo,
+                    photoMarkers
+                )
+            }
+            MapRenderingUtils.fitCameraToPhotos(map, photos)
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        if (::map.isInitialized) {
+            map.setOnCameraMoveListener(null)
+        }
+        photoMarkers.clear()
     }
 }
