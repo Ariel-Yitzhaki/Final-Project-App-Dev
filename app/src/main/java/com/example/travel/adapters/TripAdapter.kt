@@ -19,6 +19,7 @@ class TripAdapter(
     // onCardClick: called when the card itself is clicked (to view trip details)
     private val onCardClick: (Trip) -> Unit,
     private val onOptionsClick: (Trip, View) -> Unit,
+    private val onMapClick: (Trip) -> Unit,
     private val showOptions: Boolean = true,
     private val showEndButton: Boolean = true
 ) : RecyclerView.Adapter<TripAdapter.TripViewHolder>() {
@@ -29,6 +30,7 @@ class TripAdapter(
         val likesCount: TextView = view.findViewById(R.id.likesCount)
         val endTripButton: Button = view.findViewById(R.id.endTripButton)
         val optionsButton: ImageButton = view.findViewById(R.id.optionsButton)
+        val mapButton: ImageButton = view.findViewById(R.id.mapButton)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TripViewHolder {
@@ -79,6 +81,11 @@ class TripAdapter(
 
         // Hide options button if not allowed
         holder.optionsButton.visibility = if (showOptions) View.VISIBLE else View.GONE
+
+        // Map button click
+        holder.mapButton.setOnClickListener {
+            onMapClick.invoke(trip)
+        }
     }
 
     override fun getItemCount() = trips.size

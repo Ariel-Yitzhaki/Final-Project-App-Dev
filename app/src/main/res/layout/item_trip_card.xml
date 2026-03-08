@@ -31,6 +31,19 @@
             app:layout_constraintEnd_toStartOf="@id/optionsButton" />
 
         <ImageButton
+            android:id="@+id/mapButton"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginTop="24dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="View on map"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_location"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/optionsButton"
+            app:layout_constraintTop_toBottomOf="@+id/optionsButton" />
+
+        <ImageButton
             android:id="@+id/optionsButton"
             android:layout_width="24dp"
             android:layout_height="24dp"
