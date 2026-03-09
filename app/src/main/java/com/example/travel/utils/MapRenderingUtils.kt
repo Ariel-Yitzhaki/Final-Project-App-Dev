@@ -171,9 +171,7 @@ object MapRenderingUtils {
 
     // Adds an arrow marker at the midpoint between two locations
     private fun addDirectionArrow(map: GoogleMap, start: LatLng, end: LatLng, color: Int) {
-        val midLat = (start.latitude + end.latitude) / 2
-        val midLng = (start.longitude + end.longitude) / 2
-        val midpoint = LatLng(midLat, midLng)
+        val midpoint = com.google.maps.android.SphericalUtil.interpolate(start, end, 0.5)
 
         // Use Location class to calculate bearing
         val results = FloatArray(2)

@@ -106,6 +106,12 @@ class FriendsFragment : Fragment(), Refresh {
                 onRemoveClick = { friend -> removeFriend(friend) },
                 onFriendClick = { friend -> openFriendProfile(friend) }
             )
+
+            if (friends.isEmpty()) {
+                emptyText.visibility = View.VISIBLE
+            } else {
+                emptyText.visibility = View.GONE
+            }
         }
     }
 

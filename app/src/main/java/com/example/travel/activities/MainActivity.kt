@@ -267,7 +267,11 @@ class MainActivity : AppCompatActivity(), TripEndListener {
     private fun updateTripButtonUI() {
         val active = tripManager.activeTrip
         if (active != null) {
-            tripButton.text = active.name
+            tripButton.text = if (active.name.length > 13) {
+                active.name.take(13) + "..."
+            } else {
+                active.name
+            }
         } else {
             tripButton.text = "Trips"
         }
