@@ -63,4 +63,14 @@ class LikeRepository {
         return tripLikes
     }
 
+    suspend fun deleteLikesForPhoto(photoId: String) {
+        val snapshot = likesCollection
+            .whereEqualTo("photoId", photoId)
+            .get()
+            .await()
+
+        for (doc in snapshot.documents) {
+            likesCollection.document(doc.id).delete().await()
+        }
+    }
 }

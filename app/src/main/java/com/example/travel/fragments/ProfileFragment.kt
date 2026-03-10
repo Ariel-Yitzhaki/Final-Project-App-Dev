@@ -119,9 +119,8 @@ class ProfileFragment : Fragment(), Refresh {
         loadProfile()
     }
 
-    private fun loadProfile() {
+    private fun loadProfile(excludeTripId: String? = null) {
         val userId = authRepository.getCurrentUser()?.uid ?: return
-
         progressBar.visibility = View.VISIBLE
 
         lifecycleScope.launch {
@@ -143,7 +142,9 @@ class ProfileFragment : Fragment(), Refresh {
 
             // Load completed trips
             val activeTrip = tripRepository.getActiveTrip(userId)
+                ?.takeIf { it.id != excludeTripId }
             val completedTrips = tripRepository.getCompletedTrips(userId)
+                .filter {it.id != excludeTripId}
 
             // Active trip first, then completed trips sorted by date (newest first)
             val allTrips = mutableListOf<Trip>()
@@ -183,14 +184,16 @@ class ProfileFragment : Fragment(), Refresh {
             if (trip.photoCount == 0) {
                 // Delete empty trip
                 tripRepository.deleteTrip(trip.id)
+                // Refresh the list
+                loadProfile(excludeTripId = trip.id)
             } else {
                 // Mark trip as completed with today's date
                 val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
                 val today = dateFormat.format(java.util.Date())
                 tripRepository.deactivateTrip(trip.id, today)
+                // Refresh the list
+                loadProfile()
             }
-            // Refresh the list
-            loadProfile()
             tripEndListener?.onTripEnded()
         }
     }
@@ -255,7 +258,7 @@ class ProfileFragment : Fragment(), Refresh {
     private fun deleteTrip(trip: Trip) {
         lifecycleScope.launch {
             tripRepository.deleteTrip(trip.id)
-            loadProfile()
+            loadProfile(excludeTripId = trip.id)
             tripEndListener?.onTripEnded()
         }
     }
