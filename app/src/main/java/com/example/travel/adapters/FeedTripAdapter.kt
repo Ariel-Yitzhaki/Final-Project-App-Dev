@@ -1,5 +1,6 @@
 package com.example.travel.adapters
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,12 +9,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.travel.R
 import com.example.travel.models.Trip
 import android.text.SpannableString
-import android.text.Spanned
-import android.text.style.StyleSpan
-import android.graphics.Typeface
+import android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+import android.text.style.TypefaceSpan
 import android.widget.ImageView
 import com.example.travel.models.User
 import android.widget.ImageButton
+import androidx.core.content.res.ResourcesCompat
 import com.example.travel.utils.loadProfilePicture
 
 // Adapter for displaying friends' trips in the home feed
@@ -42,10 +43,12 @@ class FeedTripAdapter(
     override fun onBindViewHolder(holder: FeedTripViewHolder, position: Int) {
         val (trip, user) = trips[position]
 
-        holder.activityText.text = createActivityText(user.username)
+        holder.activityText.text = createActivityText(holder.itemView.context, user.username)
         holder.profilePicture.loadProfilePicture(user.profilePictureUrl)
         holder.tripName.text = trip.name
         holder.tripDate.text = trip.startDate
+
+
         val likes = tripLikes[trip.id] ?: 0
         holder.likesCount.text = if (likes == 1) "1 like" else "$likes likes"
 
@@ -59,15 +62,18 @@ class FeedTripAdapter(
     }
 
     // Creates "username started a new trip!" with bold username
-    private fun createActivityText(username: String): SpannableString {
+    private fun createActivityText(context: Context, username: String): SpannableString {
         val text = "$username started a new trip!"
         val spannable = SpannableString(text)
-        spannable.setSpan(
-            StyleSpan(Typeface.BOLD),
-            0,
-            username.length,
-            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-        )
+        val typeface = ResourcesCompat.getFont(context, R.font.mont_bold)
+        typeface?.let {
+            spannable.setSpan(
+                TypefaceSpan(it),
+                0,
+                username.length,
+                SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
         return spannable
     }
 
