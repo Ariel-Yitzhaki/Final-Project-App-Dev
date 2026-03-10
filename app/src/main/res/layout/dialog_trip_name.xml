@@ -12,7 +12,6 @@
         android:layout_height="wrap_content"
         android:text="Name Your Trip"
         android:textSize="24sp"
-        android:textStyle="normal"
         android:textColor="@color/text_primary"
         android:letterSpacing="0"
         android:lineHeight="32dp"

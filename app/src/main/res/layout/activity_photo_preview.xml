@@ -27,7 +27,6 @@
         android:layout_height="wrap_content"
         android:text="Preview"
         android:textSize="20sp"
-        android:textStyle="normal"
         android:textColor="@color/text_white"
         android:fontFamily="@font/mont_bold"
         app:layout_constraintTop_toTopOf="@id/backButton"

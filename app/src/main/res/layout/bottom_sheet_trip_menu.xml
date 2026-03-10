@@ -24,7 +24,6 @@
         android:layout_marginTop="24dp"
         android:text="Select Trip"
         android:textSize="24sp"
-        android:textStyle="normal"
         android:textColor="@color/text_primary"
         android:maxLines="1"
         android:ellipsize="end"
