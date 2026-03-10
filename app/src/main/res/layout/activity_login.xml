@@ -23,8 +23,8 @@
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textStyle="bold"
         android:text="T R A V E L"
+        android:fontFamily="@font/mont_bold"
         android:textColor="@color/black_logo"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -78,22 +78,26 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/primaryButton"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Sign In"
-        android:background="@color/light_blue"
+        android:layout_height="50dp"
+        android:text="Login"
+        android:textSize="18sp"
+        android:fontFamily="@font/mont_bold"
+        android:backgroundTint="@color/Azur"
         app:layout_constraintTop_toBottomOf="@id/passwordInput"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:cornerRadius="8dp"
         android:layout_marginTop="32dp" />
 
     <TextView
         android:id="@+id/switchModeText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Don't have an account? Sign Up"
+        android:fontFamily="@font/mont_semibold"
+        android:text="Don't have an account? Register"
         android:textColor="@color/light_blue"
         app:layout_constraintTop_toBottomOf="@id/primaryButton"
         app:layout_constraintStart_toStartOf="parent"

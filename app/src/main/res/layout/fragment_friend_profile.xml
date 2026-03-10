@@ -34,6 +34,8 @@
         android:ellipsize="end"
         android:fontFamily="@font/mont_bold"
         android:maxLines="1"
+        android:layout_marginEnd="12dp"
+        android:layout_marginStart="8dp"
         android:textColor="@color/text_primary"
         android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="@+id/profilePicture"
@@ -63,8 +65,7 @@
         android:text="Trips"
         android:fontFamily="@font/mont_heavy"
         android:textColor="@color/text_primary"
-        android:textSize="18sp"
-        android:textStyle="bold"
+        android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/usernameText" />
