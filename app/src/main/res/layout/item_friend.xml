@@ -2,6 +2,7 @@
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="12dp"
@@ -15,47 +16,57 @@
         android:layout_height="wrap_content"
         android:padding="16dp">
 
+        <ImageView
+            android:id="@+id/profilePicture"
+            android:layout_width="52dp"
+            android:layout_height="48dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_profile"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <TextView
             android:id="@+id/displayNameText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:textColor="@color/text_primary"
+            android:layout_marginEnd="12dp"
+            android:ellipsize="end"
             android:fontFamily="@font/mont_bold"
             android:maxLines="1"
-            android:ellipsize="end"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            android:textColor="@color/text_primary"
+            android:textSize="16sp"
             app:layout_constraintEnd_toStartOf="@id/actionButton"
-            android:layout_marginEnd="12dp" />
+            app:layout_constraintStart_toEndOf="@+id/profilePicture"
+            app:layout_constraintTop_toTopOf="@+id/profilePicture" />
 
         <TextView
             android:id="@+id/usernameText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            android:textSize="12sp"
-            android:textColor="@color/text_secondary"
+            android:layout_marginEnd="12dp"
+            android:ellipsize="end"
             android:fontFamily="@font/mont_regular"
             android:maxLines="1"
-            android:ellipsize="end"
-            app:layout_constraintTop_toBottomOf="@id/displayNameText"
-            app:layout_constraintStart_toStartOf="parent"
+            android:textColor="@color/text_secondary"
+            android:textSize="12sp"
             app:layout_constraintEnd_toStartOf="@id/actionButton"
-            android:layout_marginEnd="12dp" />
+            app:layout_constraintStart_toEndOf="@+id/profilePicture"
+            app:layout_constraintTop_toBottomOf="@id/displayNameText" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/actionButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Remove"
-            android:textSize="12sp"
+            android:textSize="9sp"
             android:textAllCaps="false"
             android:backgroundTint="@color/button_primary"
             android:textColor="@color/button_primary_text"
             android:fontFamily="@font/mont_bold"
             android:minWidth="0dp"
-            android:paddingHorizontal="16dp"
+            android:paddingHorizontal="10dp"
             app:cornerRadius="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"

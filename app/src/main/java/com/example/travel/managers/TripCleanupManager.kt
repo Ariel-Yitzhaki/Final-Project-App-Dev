@@ -33,4 +33,19 @@ class TripCleanupManager(
             storageRef.child("photos/${photoId}.jpg").delete().await()
         } catch (_: Exception) {}
     }
+
+    // Deletes a single photo and all associated data (likes, storage, Firestore)
+    suspend fun deletePhoto(photoId: String, tripId: String) {
+        deleteLikesForPhoto(photoId)
+        deleteStorageFile(photoId)
+        photoRepository.deletePhoto(photoId)
+        decrementPhotoCount(tripId)
+    }
+
+    // Decrements trip's photo count after a photo deletion
+    private suspend fun decrementPhotoCount(tripId: String) {
+        val trip = tripRepository.getTripById(tripId) ?: return
+        val newCount = (trip.photoCount - 1).coerceAtLeast(0)
+        tripRepository.updatePhotoCount(tripId, newCount)
+    }
 }

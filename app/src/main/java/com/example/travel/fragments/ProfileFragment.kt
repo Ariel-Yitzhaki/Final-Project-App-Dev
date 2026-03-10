@@ -35,6 +35,7 @@ import com.example.travel.utils.setDebouncedClickListener
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
 import com.example.travel.fragments.TripMapDialogFragment
+import com.example.travel.managers.TripCleanupManager
 import com.example.travel.utils.openTripDetail
 import com.example.travel.utils.openTripMap
 
@@ -52,6 +53,7 @@ class ProfileFragment : Fragment(), Refresh {
     private lateinit var progressBar: ProgressBar
     private lateinit var swipeRefresh: SwipeRefreshLayout
     private lateinit var profileImage: ShapeableImageView
+    private lateinit var tripCleanupManager: TripCleanupManager
 
     // Opens gallery to pick a profile picture
     private val pickImageLauncher = registerForActivityResult(
@@ -89,6 +91,7 @@ class ProfileFragment : Fragment(), Refresh {
         tripRepository = TripRepository()
         photoRepository = PhotoRepository()
         likeRepository = LikeRepository()
+        tripCleanupManager = TripCleanupManager(tripRepository, photoRepository, likeRepository)
 
         // Bind views
         displayNameText = view.findViewById(R.id.displayNameText)
@@ -183,7 +186,7 @@ class ProfileFragment : Fragment(), Refresh {
         lifecycleScope.launch {
             if (trip.photoCount == 0) {
                 // Delete empty trip
-                tripRepository.deleteTrip(trip.id)
+                tripCleanupManager.deleteTrip(trip.id)
                 // Refresh the list
                 loadProfile(excludeTripId = trip.id)
             } else {
@@ -257,7 +260,7 @@ class ProfileFragment : Fragment(), Refresh {
     // Deletes trip and its photos
     private fun deleteTrip(trip: Trip) {
         lifecycleScope.launch {
-            tripRepository.deleteTrip(trip.id)
+            tripCleanupManager.deleteTrip(trip.id)
             loadProfile(excludeTripId = trip.id)
             tripEndListener?.onTripEnded()
         }

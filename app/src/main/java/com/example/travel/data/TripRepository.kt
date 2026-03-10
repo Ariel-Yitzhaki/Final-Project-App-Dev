@@ -107,4 +107,9 @@ class TripRepository {
     suspend fun deleteTrip(tripId: String) {
         tripsCollection.document(tripId).delete().await()
     }
+
+    // Updates photo count for a trip
+    suspend fun updatePhotoCount(tripId: String, count: Int) {
+        tripsCollection.document(tripId).update("photoCount", count).await()
+    }
 }

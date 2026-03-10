@@ -18,6 +18,7 @@ import com.example.travel.data.AuthRepository
 import com.example.travel.data.LikeRepository
 import com.example.travel.data.PhotoRepository
 import com.example.travel.data.TripRepository
+import com.example.travel.managers.TripCleanupManager
 import com.example.travel.models.Photo
 import com.example.travel.utils.GeocodingUtils
 import kotlinx.coroutines.launch
@@ -35,6 +36,8 @@ class TripDetailFragment : Fragment() {
     private var tripId: String = ""
     private var photoAdapter: TripPhotoAdapter? = null
     private var isOwner = false
+    private lateinit var tripCleanupManager: TripCleanupManager
+
 
     companion object {
         private const val ARG_TRIP_ID = "tripId"
@@ -67,6 +70,8 @@ class TripDetailFragment : Fragment() {
 
         photoRepository = PhotoRepository()
         tripRepository = TripRepository()
+        // Handles cleanup of photos and their associated data
+        tripCleanupManager = TripCleanupManager(tripRepository, photoRepository, LikeRepository())
 
         // Bind views
         tripNameText = view.findViewById(R.id.tripNameText)
@@ -155,7 +160,7 @@ class TripDetailFragment : Fragment() {
 
                     setOnClickListener {
                         lifecycleScope.launch {
-                            photoRepository.deletePhoto(photo.id)
+                            tripCleanupManager.deletePhoto(photo.id, tripId)
                             loadTripDetails()
                         }
                         dialog.dismiss()
