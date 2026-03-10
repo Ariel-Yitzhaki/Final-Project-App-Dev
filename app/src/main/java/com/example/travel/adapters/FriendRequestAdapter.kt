@@ -4,11 +4,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.travel.R
 import com.example.travel.models.FriendRequest
 import com.example.travel.models.User
+import com.example.travel.utils.loadProfilePicture
 import com.example.travel.utils.setDebouncedClickListener
 
 // Adapter for displaying pending friend requests
@@ -19,6 +21,7 @@ class FriendRequestAdapter(
 ) : RecyclerView.Adapter<FriendRequestAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val profilePicture: ImageView = view.findViewById(R.id.profilePicture)
         val displayNameText: TextView = view.findViewById(R.id.displayNameText)
         val usernameText: TextView = view.findViewById(R.id.usernameText)
         val acceptButton: Button = view.findViewById(R.id.acceptButton)
@@ -33,6 +36,7 @@ class FriendRequestAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val (request, sender) = requests[position]
+        holder.profilePicture.loadProfilePicture(sender.profilePictureUrl)
         holder.displayNameText.text = sender.displayName
         holder.usernameText.text = "@${sender.username}"
         holder.acceptButton.setDebouncedClickListener { onAcceptClick(request) }

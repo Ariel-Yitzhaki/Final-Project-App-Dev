@@ -27,15 +27,14 @@ import com.example.travel.interfaces.TripEndListener
 import java.text.SimpleDateFormat
 import java.util.Locale
 import com.google.android.material.imageview.ShapeableImageView
-import com.bumptech.glide.Glide
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import com.example.travel.utils.setDebouncedClickListener
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
-import com.example.travel.fragments.TripMapDialogFragment
 import com.example.travel.managers.TripCleanupManager
+import com.example.travel.utils.loadProfilePicture
 import com.example.travel.utils.openTripDetail
 import com.example.travel.utils.openTripMap
 
@@ -132,15 +131,7 @@ class ProfileFragment : Fragment(), Refresh {
             user?.let {
                 displayNameText.text = it.displayName
                 usernameText.text = "@${it.username}"
-                if (it.profilePictureUrl.isNotEmpty()) {
-                    Glide.with(requireContext())
-                        .load(it.profilePictureUrl)
-                        .circleCrop()
-                        .placeholder(R.drawable.ic_profile)
-                        .into(profileImage)
-                } else {
-                    profileImage.setImageResource(R.drawable.ic_profile)
-                }
+                profileImage.loadProfilePicture(it.profilePictureUrl)
             }
 
             // Load completed trips
@@ -172,7 +163,7 @@ class ProfileFragment : Fragment(), Refresh {
                     tripLikes,
                     onEndTripClick = { trip -> onEndTripClicked(trip) },
                     onCardClick = { trip -> openTripDetail(trip.id) },
-                    onOptionsClick = { trip, view -> showOptionsMenu(trip, view) },
+                    onOptionsClick = { trip, _-> showOptionsMenu(trip) },
                     onMapClick = { trip -> openTripMap(trip.id) }
                 )
             } else {
@@ -202,7 +193,7 @@ class ProfileFragment : Fragment(), Refresh {
     }
 
     // Shows popup menu with trip options
-    private fun showOptionsMenu(trip: Trip, anchor: View) {
+    private fun showOptionsMenu(trip: Trip) {
         val dialogView = layoutInflater.inflate(R.layout.dialog_confirm, null)
         dialogView.findViewById<TextView>(R.id.dialogTitle).text = trip.name
         dialogView.findViewById<TextView>(R.id.dialogMessage).text = "Delete This Trip?"
@@ -288,11 +279,7 @@ class ProfileFragment : Fragment(), Refresh {
                 authRepository.updateProfilePicture(userId, downloadUrl)
 
                 // Display the new profile picture
-                Glide.with(requireContext())
-                    .load(downloadUrl)
-                    .circleCrop()
-                    .placeholder(R.drawable.ic_profile)
-                    .into(profileImage)
+                profileImage.loadProfilePicture(downloadUrl)
             } catch (_: Exception) {
                 Toast.makeText(requireContext(), "Failed to upload picture", Toast.LENGTH_SHORT)
                     .show()

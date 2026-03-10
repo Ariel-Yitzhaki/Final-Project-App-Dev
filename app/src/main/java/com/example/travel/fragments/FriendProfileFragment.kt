@@ -18,8 +18,10 @@ import com.example.travel.data.LikeRepository
 import com.example.travel.data.PhotoRepository
 import com.example.travel.data.TripRepository
 import com.example.travel.models.Trip
+import com.example.travel.utils.loadProfilePicture
 import com.example.travel.utils.openTripDetail
 import com.example.travel.utils.openTripMap
+import com.google.android.material.imageview.ShapeableImageView
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -30,7 +32,7 @@ class FriendProfileFragment : Fragment() {
     private lateinit var tripRepository: TripRepository
     private lateinit var photoRepository: PhotoRepository
     private lateinit var likeRepository: LikeRepository
-
+    private lateinit var profileImage: ShapeableImageView
     private lateinit var displayNameText: TextView
     private lateinit var usernameText: TextView
     private lateinit var tripsRecyclerView: RecyclerView
@@ -72,6 +74,7 @@ class FriendProfileFragment : Fragment() {
         tripsRecyclerView = view.findViewById(R.id.tripsRecyclerView)
         emptyText = view.findViewById(R.id.emptyText)
         progressBar = view.findViewById(R.id.progressBar)
+        profileImage = view.findViewById(R.id.profileImage)
 
         tripsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
 
@@ -90,6 +93,7 @@ class FriendProfileFragment : Fragment() {
             // Load friend's info
             val user = authRepository.getUserProfile(friendId)
             user?.let {
+                profileImage.loadProfilePicture(it.profilePictureUrl)
                 displayNameText.text = it.displayName
                 usernameText.text = "@${it.username}"
             }

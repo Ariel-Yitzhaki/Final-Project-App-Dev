@@ -13,8 +13,8 @@ import android.text.style.StyleSpan
 import android.graphics.Typeface
 import android.widget.ImageView
 import com.example.travel.models.User
-import com.bumptech.glide.Glide
 import android.widget.ImageButton
+import com.example.travel.utils.loadProfilePicture
 
 // Adapter for displaying friends' trips in the home feed
 class FeedTripAdapter(
@@ -43,13 +43,7 @@ class FeedTripAdapter(
         val (trip, user) = trips[position]
 
         holder.activityText.text = createActivityText(user.username)
-        if (user.profilePictureUrl.isNotEmpty()) {
-            Glide.with(holder.itemView.context)
-                .load(user.profilePictureUrl)
-                .circleCrop()
-                .into(holder.profilePicture)
-        }
-
+        holder.profilePicture.loadProfilePicture(user.profilePictureUrl)
         holder.tripName.text = trip.name
         holder.tripDate.text = trip.startDate
         val likes = tripLikes[trip.id] ?: 0

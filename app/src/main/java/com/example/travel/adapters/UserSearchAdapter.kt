@@ -4,10 +4,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.travel.R
 import com.example.travel.models.User
+import com.example.travel.utils.loadProfilePicture
 import com.example.travel.utils.setDebouncedClickListener
 
 // Adapter for user search results with dynamic button states
@@ -18,6 +20,7 @@ class UserSearchAdapter(
 ) : RecyclerView.Adapter<UserSearchAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val profilePicture: ImageView = view.findViewById(R.id.profilePicture)
         val displayNameText: TextView = view.findViewById(R.id.displayNameText)
         val usernameText: TextView = view.findViewById(R.id.usernameText)
         val actionButton: Button = view.findViewById(R.id.actionButton)
@@ -33,6 +36,7 @@ class UserSearchAdapter(
         val user = users[position]
         holder.displayNameText.text = user.displayName
         holder.usernameText.text = "@${user.username}"
+        holder.profilePicture.loadProfilePicture(user.profilePictureUrl)
 
         // Set button state based on relationship status
         val status = statusMap[user.id]
