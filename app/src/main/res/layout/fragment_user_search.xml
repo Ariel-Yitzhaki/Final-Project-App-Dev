@@ -45,13 +45,13 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/searchButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="90dp"
+        android:layout_height="40dp"
         android:text="Search"
-        android:textSize="11sp"
+        android:textSize="12sp"
         android:textAllCaps="false"
         android:minWidth="0dp"
-        android:paddingHorizontal="10dp"
+        android:paddingHorizontal="0dp"
         android:fontFamily="@font/mont_bold"
         android:textColor="@color/button_primary_text"
         android:backgroundTint="@color/button_primary"
