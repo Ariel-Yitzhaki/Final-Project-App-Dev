@@ -37,6 +37,7 @@ class HomeFeedFragment : Fragment(), Refresh {
     private lateinit var emptyText: TextView
     private lateinit var progressBar: ProgressBar
     private lateinit var swipeRefresh: SwipeRefreshLayout
+    private lateinit var feedAdapter: FeedTripAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -65,6 +66,13 @@ class HomeFeedFragment : Fragment(), Refresh {
         }
 
         feedRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+        // Create adapter once to avoid "No adapter attached" warning
+        feedAdapter = FeedTripAdapter(
+            onTripClick = { trip -> openTripDetail(trip.id) },
+            onMapClick = { trip -> openTripMap(trip.id) }
+        )
+        feedRecyclerView.adapter = feedAdapter
 
         loadFeed()
     }
@@ -112,16 +120,7 @@ class HomeFeedFragment : Fragment(), Refresh {
     // Displays feed or empty state
     private fun displayFeed(tripsWithUsers: List<Pair<Trip, User>>, tripLikes: Map<String, Int>) {
         if (tripsWithUsers.isNotEmpty()) {
-            feedRecyclerView.adapter = FeedTripAdapter(
-                tripsWithUsers,
-                tripLikes,
-                onTripClick = { trip ->
-                    openTripDetail(trip.id)
-                },
-                onMapClick = { trip ->
-                    openTripMap(trip.id)
-                }
-            )
+            feedAdapter.updateData(tripsWithUsers, tripLikes)
         } else {
             emptyText.visibility = View.VISIBLE
         }

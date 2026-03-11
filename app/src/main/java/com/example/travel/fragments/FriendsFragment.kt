@@ -31,6 +31,8 @@ class FriendsFragment : Fragment(), Refresh {
     private lateinit var friendsRecyclerView: RecyclerView
     private lateinit var emptyText: TextView
     private lateinit var progressBar: ProgressBar
+    private lateinit var requestsAdapter: FriendRequestAdapter
+    private lateinit var friendsAdapter: FriendAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -55,6 +57,19 @@ class FriendsFragment : Fragment(), Refresh {
 
         requestsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         friendsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+        // Create adapters once to avoid "No adapter attached" warning
+        requestsAdapter = FriendRequestAdapter(
+            onAcceptClick = { acceptRequest(it) },
+            onDeclineClick = { declineRequest(it) }
+        )
+        requestsRecyclerView.adapter = requestsAdapter
+
+        friendsAdapter = FriendAdapter(
+            onRemoveClick = { friend -> removeFriend(friend) },
+            onFriendClick = { friend -> openFriendProfile(friend) }
+        )
+        friendsRecyclerView.adapter = friendsAdapter
 
         // Search button opens user search
         view.findViewById<ImageButton>(R.id.searchButton).setOnClickListener {
@@ -90,22 +105,14 @@ class FriendsFragment : Fragment(), Refresh {
             if (requestsWithUsers.isNotEmpty()) {
                 requestsLabel.visibility = View.VISIBLE
                 requestsRecyclerView.visibility = View.VISIBLE
-                requestsRecyclerView.adapter = FriendRequestAdapter(
-                    requestsWithUsers,
-                    onAcceptClick = { acceptRequest(it) },
-                    onDeclineClick = { declineRequest(it) }
-                )
+                requestsAdapter.updateData(requestsWithUsers)
             } else {
                 requestsLabel.visibility = View.GONE
                 requestsRecyclerView.visibility = View.GONE
             }
 
             // Show friends or empty state
-            friendsRecyclerView.adapter = FriendAdapter(
-                friends,
-                onRemoveClick = { friend -> removeFriend(friend) },
-                onFriendClick = { friend -> openFriendProfile(friend) }
-            )
+            friendsAdapter.updateData(friends)
 
             if (friends.isEmpty()) {
                 emptyText.visibility = View.VISIBLE

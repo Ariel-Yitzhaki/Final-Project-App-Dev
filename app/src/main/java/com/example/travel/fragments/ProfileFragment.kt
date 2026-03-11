@@ -53,6 +53,7 @@ class ProfileFragment : Fragment(), Refresh {
     private lateinit var swipeRefresh: SwipeRefreshLayout
     private lateinit var profileImage: ShapeableImageView
     private lateinit var tripCleanupManager: TripCleanupManager
+    private lateinit var tripAdapter: TripAdapter
 
     // Opens gallery to pick a profile picture
     private val pickImageLauncher = registerForActivityResult(
@@ -111,6 +112,15 @@ class ProfileFragment : Fragment(), Refresh {
 
         tripsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
 
+        // Create adapter once to avoid "No adapter attached" warning
+        tripAdapter = TripAdapter(
+            onEndTripClick = { trip -> onEndTripClicked(trip) },
+            onCardClick = { trip -> openTripDetail(trip.id) },
+            onOptionsClick = { trip, _-> showOptionsMenu(trip) },
+            onMapClick = { trip -> openTripMap(trip.id) }
+        )
+        tripsRecyclerView.adapter = tripAdapter
+
         // Log out button
         view.findViewById<Button>(R.id.logOutButton).setOnClickListener {
             authRepository.logOut()
@@ -158,14 +168,7 @@ class ProfileFragment : Fragment(), Refresh {
 
                 val tripLikes = likeRepository.getLikesForTrips(allTrips, photoRepository)
 
-                tripsRecyclerView.adapter = TripAdapter(
-                    allTrips.toMutableList(),
-                    tripLikes,
-                    onEndTripClick = { trip -> onEndTripClicked(trip) },
-                    onCardClick = { trip -> openTripDetail(trip.id) },
-                    onOptionsClick = { trip, _-> showOptionsMenu(trip) },
-                    onMapClick = { trip -> openTripMap(trip.id) }
-                )
+                tripAdapter.updateData(allTrips, tripLikes)
             } else {
                 emptyText.visibility = View.VISIBLE
             }

@@ -15,10 +15,12 @@ import com.example.travel.utils.setDebouncedClickListener
 
 // Adapter for displaying pending friend requests
 class FriendRequestAdapter(
-    private val requests: List<Pair<FriendRequest, User>>,
     private val onAcceptClick: (FriendRequest) -> Unit,
     private val onDeclineClick: (FriendRequest) -> Unit
 ) : RecyclerView.Adapter<FriendRequestAdapter.ViewHolder>() {
+
+    private var requests: List<Pair<FriendRequest, User>> = emptyList()
+
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val profilePicture: ImageView = view.findViewById(R.id.profilePicture)
@@ -41,6 +43,12 @@ class FriendRequestAdapter(
         holder.usernameText.text = "@${sender.username}"
         holder.acceptButton.setDebouncedClickListener { onAcceptClick(request) }
         holder.declineButton.setDebouncedClickListener { onDeclineClick(request) }
+    }
+
+    // Updates adapter data and refreshes the list
+    fun updateData(newRequests: List<Pair<FriendRequest, User>>) {
+        requests = newRequests
+        notifyDataSetChanged()
     }
 
     override fun getItemCount() = requests.size

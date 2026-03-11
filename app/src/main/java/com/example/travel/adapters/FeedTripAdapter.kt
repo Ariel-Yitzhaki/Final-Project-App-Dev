@@ -19,11 +19,12 @@ import com.example.travel.utils.loadProfilePicture
 
 // Adapter for displaying friends' trips in the home feed
 class FeedTripAdapter(
-    private val trips: List<Pair<Trip, User>>,  // Pair of Trip and username
-    private val tripLikes: Map<String, Int>,
     private val onTripClick: (Trip) -> Unit,
     private val onMapClick: (Trip) -> Unit
 ) : RecyclerView.Adapter<FeedTripAdapter.FeedTripViewHolder>() {
+
+    private var trips: List<Pair<Trip, User>> = emptyList()
+    private var tripLikes: Map<String, Int> = emptyMap()
 
     class FeedTripViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val profilePicture: ImageView = view.findViewById(R.id.profilePicture)
@@ -75,6 +76,13 @@ class FeedTripAdapter(
             )
         }
         return spannable
+    }
+
+    // Updates adapter data and refreshes the list
+    fun updateData(newTrips: List<Pair<Trip, User>>, newTripLikes: Map<String, Int>) {
+        trips = newTrips
+        tripLikes = newTripLikes
+        notifyDataSetChanged()
     }
 
     override fun getItemCount() = trips.size

@@ -14,10 +14,11 @@ import com.example.travel.utils.setDebouncedClickListener
 
 // Adapter for user search results with dynamic button states
 class UserSearchAdapter(
-    private val users: List<User>,
-    private val statusMap: Map<String, String>,  // Maps user ID to status: "friend", "pending", "none"
     private val onAddClick: (User) -> Unit
 ) : RecyclerView.Adapter<UserSearchAdapter.ViewHolder>() {
+
+    private var users: List<User> = emptyList()
+    private var statusMap: Map<String, String> = emptyMap() // Maps user ID to status: "friend", "pending", "none"
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val profilePicture: ImageView = view.findViewById(R.id.profilePicture)
@@ -55,6 +56,13 @@ class UserSearchAdapter(
                 holder.actionButton.setDebouncedClickListener { onAddClick(user) }
             }
         }
+    }
+
+    // Updates adapter data and refreshes the list
+    fun updateData(newUsers: List<User>, newStatusMap: Map<String, String>) {
+        users = newUsers
+        statusMap = newStatusMap
+        notifyDataSetChanged()
     }
 
     override fun getItemCount() = users.size

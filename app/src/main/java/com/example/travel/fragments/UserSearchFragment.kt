@@ -31,6 +31,7 @@ class UserSearchFragment : Fragment() {
     private lateinit var resultsRecyclerView: RecyclerView
     private lateinit var emptyText: TextView
     private lateinit var progressBar: ProgressBar
+    private lateinit var searchAdapter: UserSearchAdapter
 
     private var currentUserId: String = ""
 
@@ -58,6 +59,12 @@ class UserSearchFragment : Fragment() {
 
         resultsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
 
+        // Create adapter once to avoid "No adapter attached" warning
+        searchAdapter = UserSearchAdapter(
+            onAddClick = { user -> sendFriendRequest(user) }
+        )
+        resultsRecyclerView.adapter = searchAdapter
+
         // Back button returns to friends list
         view.findViewById<ImageButton>(R.id.backButton).setOnClickListener {
             parentFragmentManager.popBackStack()
@@ -82,8 +89,8 @@ class UserSearchFragment : Fragment() {
 
             if (users.isEmpty()) {
                 progressBar.visibility = View.GONE
+                searchAdapter.updateData(emptyList(), emptyMap())
                 emptyText.visibility = View.VISIBLE
-                resultsRecyclerView.adapter = null
                 return@launch
             }
 
@@ -99,9 +106,7 @@ class UserSearchFragment : Fragment() {
 
             progressBar.visibility = View.GONE
 
-            resultsRecyclerView.adapter = UserSearchAdapter(users, statusMap) { user ->
-                sendFriendRequest(user)
-            }
+            searchAdapter.updateData(users, statusMap)
         }
     }
 

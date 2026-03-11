@@ -38,6 +38,7 @@ class FriendProfileFragment : Fragment() {
     private lateinit var tripsRecyclerView: RecyclerView
     private lateinit var emptyText: TextView
     private lateinit var progressBar: ProgressBar
+    private lateinit var tripAdapter: TripAdapter
 
     private var friendId: String = ""
 
@@ -77,6 +78,15 @@ class FriendProfileFragment : Fragment() {
         profileImage = view.findViewById(R.id.profilePicture)
 
         tripsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        tripAdapter = TripAdapter(
+            onEndTripClick = {},
+            onCardClick = { trip -> openTripDetail(trip.id) },
+            onOptionsClick = { _, _ -> },
+            onMapClick = { trip -> openTripMap(trip.id) },
+            showOptions = false,
+            showEndButton = false
+        )
+        tripsRecyclerView.adapter = tripAdapter
 
         // Back button
         view.findViewById<ImageButton>(R.id.backButton).setOnClickListener {
@@ -118,16 +128,7 @@ class FriendProfileFragment : Fragment() {
 
                 val tripLikes = likeRepository.getLikesForTrips(allTrips, photoRepository)
 
-                tripsRecyclerView.adapter = TripAdapter(
-                    allTrips.toMutableList(),
-                    tripLikes,
-                    onEndTripClick = {},
-                    onCardClick = {trip -> openTripDetail(trip.id)},
-                    onOptionsClick = {_,_ ->},
-                    onMapClick = { trip -> openTripMap(trip.id) },
-                    showOptions = false,
-                    showEndButton = false
-                )
+                tripAdapter.updateData(allTrips, tripLikes)
             } else {
                 emptyText.visibility = View.VISIBLE
             }

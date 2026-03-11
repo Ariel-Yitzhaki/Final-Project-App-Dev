@@ -12,8 +12,6 @@ import com.example.travel.models.Trip
 
 // Adapter for displaying trip cards
 class TripAdapter(
-    private val trips: MutableList<Trip>,
-    private val tripLikes: Map<String, Int>,
     // onEndTripClick: called when End Trip button is clicked (active trips only)
     private val onEndTripClick: (Trip) -> Unit,
     // onCardClick: called when the card itself is clicked (to view trip details)
@@ -23,6 +21,10 @@ class TripAdapter(
     private val showOptions: Boolean = true,
     private val showEndButton: Boolean = true
 ) : RecyclerView.Adapter<TripAdapter.TripViewHolder>() {
+
+    private var trips: MutableList<Trip> = mutableListOf()
+    private var tripLikes: Map<String, Int> = emptyMap()
+
 
     class TripViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tripName: TextView = view.findViewById(R.id.tripName)
@@ -86,6 +88,13 @@ class TripAdapter(
         holder.mapButton.setOnClickListener {
             onMapClick.invoke(trip)
         }
+    }
+
+    // Updates adapter data and refreshes the list
+    fun updateData(newTrips: List<Trip>, newTripLikes: Map<String, Int>) {
+        trips = newTrips.toMutableList()
+        tripLikes = newTripLikes
+        notifyDataSetChanged()
     }
 
     override fun getItemCount() = trips.size

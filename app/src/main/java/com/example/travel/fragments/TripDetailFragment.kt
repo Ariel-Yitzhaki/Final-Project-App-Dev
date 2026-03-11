@@ -84,6 +84,16 @@ class TripDetailFragment : Fragment() {
         }
 
         photosRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        // Create adapter once to avoid "No adapter attached" warning
+        photoAdapter = TripPhotoAdapter(
+            mutableListOf(),
+            mutableMapOf(),
+            AuthRepository().getCurrentUser()?.uid ?: "",
+            lifecycleScope,
+            LikeRepository(),
+            isOwner
+        ) { photo -> showDeletePhotoDialog(photo) }
+        photosRecyclerView.adapter = photoAdapter
 
         // Back button returns to previous fragment
         view.findViewById<ImageButton>(R.id.backButton).setOnClickListener {
@@ -112,6 +122,7 @@ class TripDetailFragment : Fragment() {
 
             tripNameText.text = trip.name
             isOwner = trip.userId == AuthRepository().getCurrentUser()?.uid
+            photoAdapter?.setOwner(isOwner)
 
             val photos = photoRepository.getPhotosForTrip(tripId).sortedBy { it.timestamp }
 
@@ -127,60 +138,10 @@ class TripDetailFragment : Fragment() {
         }
     }
 
-    // Sets up adapter with photos and their addresses
+    // Updates adapter with photos and their addresses
     private fun displayPhotos(photos: List<Photo>) {
         val addresses = getAddressesForPhotos(photos)
-
-        if (photoAdapter == null) {
-            val currentUserId = AuthRepository().getCurrentUser()?.uid ?: ""
-            val likeRepository = LikeRepository()
-
-            photoAdapter = TripPhotoAdapter(
-                photos.toMutableList(),
-                addresses.toMutableMap(),
-                currentUserId,
-                lifecycleScope,
-                likeRepository,
-                isOwner
-            ) { photo ->
-                val dialogView = layoutInflater.inflate(R.layout.dialog_confirm, null)
-                dialogView.findViewById<TextView>(R.id.dialogTitle).text = "Delete Photo"
-                dialogView.findViewById<TextView>(R.id.dialogMessage).text = "Are you sure you want to delete this photo from the trip?"
-
-                val dialog = android.app.AlertDialog.Builder(requireContext())
-                    .setView(dialogView)
-                    .setCancelable(true)
-                    .create()
-
-                dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
-
-                dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.dialogPositiveButton).apply {
-                    text = "Delete"
-                    backgroundTintList = android.content.res.ColorStateList.valueOf(resources.getColor(R.color.button_destructive, null))
-
-                    setOnClickListener {
-                        lifecycleScope.launch {
-                            tripCleanupManager.deletePhoto(photo.id, tripId)
-                            loadTripDetails()
-                        }
-                        dialog.dismiss()
-                    }
-                }
-
-                dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.dialogNegativeButton).apply {
-                    text = "Cancel"
-                    setOnClickListener {
-                        dialog.dismiss()
-                    }
-                }
-
-                dialog.show()
-            }
-
-            photosRecyclerView.adapter = photoAdapter
-        } else {
-            photoAdapter?.updatePhotos(photos.toMutableList(), addresses.toMutableMap())
-        }
+        photoAdapter?.updatePhotos(photos.toMutableList(), addresses.toMutableMap())
     }
 
     // Converts photo coordinates to readable addresses
@@ -196,5 +157,41 @@ class TripDetailFragment : Fragment() {
         }
 
         return addresses
+    }
+
+    // Shows confirmation dialog before deleting a photo
+    private fun showDeletePhotoDialog(photo: Photo) {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_confirm, null)
+        dialogView.findViewById<TextView>(R.id.dialogTitle).text = "Delete Photo"
+        dialogView.findViewById<TextView>(R.id.dialogMessage).text =
+            "Are you sure you want to delete this photo from the trip?"
+
+        val dialog = android.app.AlertDialog.Builder(requireContext())
+            .setView(dialogView)
+            .setCancelable(true)
+            .create()
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.dialogPositiveButton).apply {
+            text = "Delete"
+            backgroundTintList = android.content.res.ColorStateList.valueOf(
+                resources.getColor(R.color.button_destructive, null)
+            )
+            setOnClickListener {
+                lifecycleScope.launch {
+                    tripCleanupManager.deletePhoto(photo.id, tripId)
+                    loadTripDetails()
+                }
+                dialog.dismiss()
+            }
+        }
+
+        dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.dialogNegativeButton).apply {
+            text = "Cancel"
+            setOnClickListener { dialog.dismiss() }
+        }
+
+        dialog.show()
     }
 }

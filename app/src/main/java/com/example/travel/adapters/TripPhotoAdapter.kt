@@ -23,7 +23,7 @@ class TripPhotoAdapter(
     private val currentUserId: String,
     private val lifecycleScope: LifecycleCoroutineScope,
     private val likeRepository: LikeRepository,
-    private val isOwner: Boolean,
+    private var isOwner: Boolean,
     private val onDeletePhoto: (Photo) -> Unit
 ) : RecyclerView.Adapter<TripPhotoAdapter.PhotoViewHolder>() {
 
@@ -133,6 +133,12 @@ class TripPhotoAdapter(
         likeStates.clear()
         likeCounts.clear()
         likePending.clear()
+        notifyDataSetChanged()
+    }
+
+    // Updates the owner flag and refreshes the list
+    fun setOwner(owner: Boolean) {
+        isOwner = owner
         notifyDataSetChanged()
     }
 

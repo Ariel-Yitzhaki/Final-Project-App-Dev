@@ -14,10 +14,11 @@ import com.example.travel.utils.setDebouncedClickListener
 
 // Adapter for displaying friends list
 class FriendAdapter(
-    private val friends: List<User>,
     private val onRemoveClick: (User) -> Unit,
     private val onFriendClick: (User) -> Unit
 ) : RecyclerView.Adapter<FriendAdapter.ViewHolder>() {
+
+    private var friends: List<User> = emptyList()
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val profilePicture: ImageView = view.findViewById(R.id.profilePicture)
@@ -39,6 +40,12 @@ class FriendAdapter(
         holder.usernameText.text = "@${friend.username}"
         holder.actionButton.setDebouncedClickListener { onRemoveClick(friend) }
         holder.itemView.setOnClickListener { onFriendClick(friend) }
+    }
+
+    // Updates adapter data and refreshes the list
+    fun updateData(newFriends: List<User>) {
+        friends = newFriends
+        notifyDataSetChanged()
     }
 
     override fun getItemCount() = friends.size

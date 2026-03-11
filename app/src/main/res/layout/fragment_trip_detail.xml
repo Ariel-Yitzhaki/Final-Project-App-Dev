@@ -27,16 +27,16 @@
         android:id="@+id/tripNameText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textSize="24sp"
+        android:ellipsize="end"
         android:fontFamily="@font/mont_heavy"
         android:maxLines="1"
-        android:ellipsize="end"
-        android:textColor="@android:color/black"
         android:textAlignment="center"
-        app:layout_constraintTop_toTopOf="@id/backButton"
+        android:textColor="@android:color/black"
+        android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="@id/backButton"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/backButton"
+        app:layout_constraintTop_toTopOf="@id/backButton" />
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefresh"
