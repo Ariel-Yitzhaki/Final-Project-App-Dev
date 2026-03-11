@@ -243,12 +243,15 @@ class TripManager(
         }
     }
 
-    // Restores active trip from saved ID without a full Firestore query
-    suspend fun restoreActiveTrip(tripId: String) {
-        val trip = tripRepository.getTripById(tripId)
-        if (trip != null && trip.active) {
-            activeTrip = trip
-            onTripStateChanged?.invoke(activeTrip)
-        }
+    // Restores active trip immediately from saved bundle data (no Firestore fetch needed)
+    fun restoreTripFromBundle(id: String, name: String, photoCount: Int, startDate: String) {
+        activeTrip = Trip(
+            id = id,
+            name = name,
+            photoCount = photoCount,
+            startDate = startDate,
+            active = true
+        )
+        onTripStateChanged?.invoke(activeTrip)
     }
 }

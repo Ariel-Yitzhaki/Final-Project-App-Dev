@@ -76,9 +76,13 @@ class MainActivity : AppCompatActivity(), TripEndListener {
         lifecycleScope.launch {
             val savedTripId = savedInstanceState?.getString("activeTripId")
             if (savedTripId != null) {
-                tripManager.restoreActiveTrip(savedTripId)
-            } else {
-                tripManager.checkActiveTrip()
+                // Restore synchronously so activeTrip is never null during UI interaction
+                tripManager.restoreTripFromBundle(
+                    id = savedTripId,
+                    name = savedInstanceState.getString("activeTripName", ""),
+                    photoCount = savedInstanceState.getInt("activeTripPhotoCount", 0),
+                    startDate = savedInstanceState.getString("activeTripStartDate", "")
+                )
             }
         }
 
@@ -321,8 +325,12 @@ class MainActivity : AppCompatActivity(), TripEndListener {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putString("currentFragmentTag", currentFragmentTag)
-        // Saving active trip ID to reduce Firestore fetches
-        outState.putString("activeTripId", tripManager.activeTrip?.id)
+        // Saving full active trip data to restore synchronously
+        val active = tripManager.activeTrip
+        outState.putString("activeTripId", active?.id)
+        outState.putString("activeTripName", active?.name)
+        outState.putInt("activeTripPhotoCount", active?.photoCount ?: 0)
+        outState.putString("activeTripStartDate", active?.startDate)
         cameraManager.saveState(outState)
     }
 }
