@@ -15,7 +15,7 @@
         android:layout_height="wrap_content"
         android:padding="16dp">
 
-        <ImageView
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/profilePicture"
             android:layout_width="48dp"
             android:layout_height="48dp"

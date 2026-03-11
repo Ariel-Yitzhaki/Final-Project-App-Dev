@@ -35,31 +35,33 @@
         android:id="@+id/displayNameText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="12dp"
         android:ellipsize="end"
         android:fontFamily="@font/mont_bold"
         android:maxLines="1"
-        android:layout_marginEnd="12dp"
-        android:layout_marginStart="8dp"
         android:textColor="@color/text_primary"
         android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="@+id/profilePicture"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/profilePicture"
-        app:layout_constraintTop_toTopOf="@id/backButton"
-        app:layout_constraintVertical_bias="0.4" />
+        app:layout_constraintTop_toTopOf="@+id/profilePicture" />
 
     <TextView
         android:id="@+id/usernameText"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:maxLines="1"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="-5dp"
         android:ellipsize="end"
-        android:fontFamily="@font/mont_bold"
+        android:fontFamily="@font/mont_regular"
+        android:maxLines="1"
         android:textColor="@color/text_secondary"
-        android:textSize="12sp"
-        app:layout_constraintStart_toStartOf="@+id/displayNameText"
-        app:layout_constraintTop_toBottomOf="@+id/displayNameText" />
+        android:textSize="11sp"
+        app:layout_constraintEnd_toEndOf="@+id/displayNameText"
+        app:layout_constraintStart_toEndOf="@+id/profilePicture"
+        app:layout_constraintTop_toBottomOf="@id/displayNameText" />
 
     <TextView
         android:id="@+id/tripsLabel"
