@@ -55,17 +55,20 @@ class MainActivity : AppCompatActivity(), TripEndListener {
         }
 
         // Bind all views before any method that references them
-        val restoredTag = currentFragmentTag ?: "home"
         tripButton = findViewById(R.id.tripButton)
         fab = findViewById(R.id.fab_add_picture)
         heroSection = findViewById(R.id.hero_section)
 
-        if (restoredTag == "map") fab.show() else fab.hide()
-        updateNavigationIconColors(restoredTag)
+        syncUIWithCurrentFragment()
 
         setupTripButton()
         setupFab()
         setupNavigation()
+
+        // Sync UI controls whenever a fragment is popped from the back stack
+        supportFragmentManager.addOnBackStackChangedListener {
+            syncUIWithCurrentFragment()
+        }
 
         // Load home fragment only on first launch
         if (savedInstanceState == null) {
@@ -218,22 +221,18 @@ class MainActivity : AppCompatActivity(), TripEndListener {
     private fun setupNavigation() {
         findViewById<ImageButton>(R.id.nav_home).setOnClickListener {
             switchToFragment(HomeFeedFragment(), "home")
-            fab.hide()
         }
 
         findViewById<ImageButton>(R.id.nav_friends).setOnClickListener {
             switchToFragment(FriendsFragment(), "friends")
-            fab.hide()
         }
 
         findViewById<ImageButton>(R.id.nav_map).setOnClickListener {
             switchToFragment(MapFragment(), "map")
-            fab.show()
         }
 
         findViewById<ImageButton>(R.id.nav_profile).setOnClickListener {
             switchToFragment(ProfileFragment(), "profile")
-            fab.hide()
         }
     }
 
@@ -251,12 +250,9 @@ class MainActivity : AppCompatActivity(), TripEndListener {
             currentFragmentTag = tag
         }
 
-        // Only show trip button on map screen and hero section on map screen
-        tripButton.visibility = if (tag == "map") View.VISIBLE else View.GONE
-        heroSection.visibility = if (tag == "map") View.VISIBLE else View.GONE
+        syncUIWithCurrentFragment(tag)
 
         lifecycleScope.launch { tripManager.checkActiveTrip() }
-        updateNavigationIconColors(tag)
     }
 
     // Clears all fragments from back stack
@@ -287,6 +283,22 @@ class MainActivity : AppCompatActivity(), TripEndListener {
         )
     }
 
+    // Updates UI controls (tripButton, heroSection, fab, nav colors) based on the actual visible
+    // fragment
+    private fun syncUIWithCurrentFragment(tagOverride: String? = null) {
+        val tag = tagOverride
+            ?: supportFragmentManager.findFragmentById(R.id.fragment_container)?.tag
+            ?: currentFragmentTag
+            ?: "home"
+
+        tripButton.visibility = if (tag == "map") View.VISIBLE else View.GONE
+        heroSection.visibility = if (tag == "map") View.VISIBLE else View.GONE
+
+        if (tag == "map") fab.show() else fab.hide()
+
+        updateNavigationIconColors(tag)
+    }
+
     // Updates trip button text based on trip selected
     private fun updateTripButtonUI() {
         val active = tripManager.activeTrip
@@ -310,15 +322,7 @@ class MainActivity : AppCompatActivity(), TripEndListener {
     // Restores correct UI visibility when returning to the activity
     override fun onResume() {
         super.onResume()
-        val currentFragment = supportFragmentManager.findFragmentById(R.id.fragment_container)
-        val tag = currentFragment?.tag ?: "home"
-
-        tripButton.visibility = if (tag == "map") View.VISIBLE else View.GONE
-        heroSection.visibility = if (tag == "map") View.VISIBLE else View.GONE
-
-        if (tag == "map") fab.show() else fab.hide()
-
-        updateNavigationIconColors(tag)
+        syncUIWithCurrentFragment()
     }
 
     // Saves UI state before activity destruction (rotation, system kill, etc...)
