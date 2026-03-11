@@ -51,6 +51,7 @@ class MainActivity : AppCompatActivity(), TripEndListener {
         // Load last fragment state if this isn't the first launch
         if (savedInstanceState != null) {
             currentFragmentTag = savedInstanceState.getString("currentFragmentTag", "home")
+            cameraManager.restoreState(savedInstanceState)
         }
 
         // Bind all views before any method that references them
@@ -257,7 +258,9 @@ class MainActivity : AppCompatActivity(), TripEndListener {
     // Clears all fragments from back stack
     private fun clearBackStack() {
         repeat(supportFragmentManager.backStackEntryCount) {
-            supportFragmentManager.popBackStack()
+            // This version of popBackStack can't be called inside another fragment!!
+            // And also doesn't work well when the back stack is deep (maybe 5+)
+            supportFragmentManager.popBackStackImmediate()
         }
     }
 
@@ -320,5 +323,6 @@ class MainActivity : AppCompatActivity(), TripEndListener {
         outState.putString("currentFragmentTag", currentFragmentTag)
         // Saving active trip ID to reduce Firestore fetches
         outState.putString("activeTripId", tripManager.activeTrip?.id)
+        cameraManager.saveState(outState)
     }
 }
