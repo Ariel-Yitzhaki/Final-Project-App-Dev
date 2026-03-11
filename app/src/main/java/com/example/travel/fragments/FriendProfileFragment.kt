@@ -74,7 +74,7 @@ class FriendProfileFragment : Fragment() {
         tripsRecyclerView = view.findViewById(R.id.tripsRecyclerView)
         emptyText = view.findViewById(R.id.emptyText)
         progressBar = view.findViewById(R.id.progressBar)
-        profileImage = view.findViewById(R.id.profileImage)
+        profileImage = view.findViewById(R.id.profilePicture)
 
         tripsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
 

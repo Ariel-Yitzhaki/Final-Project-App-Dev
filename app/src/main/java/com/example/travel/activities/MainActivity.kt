@@ -47,6 +47,12 @@ class MainActivity : AppCompatActivity(), TripEndListener {
 
         setContentView(R.layout.activity_main)
 
+        if (savedInstanceState == null) {
+            switchToFragment(HomeFeedFragment(), "home")
+        } else {
+            currentFragmentTag = savedInstanceState.getString("currentFragmentTag", "home")
+        }
+
         tripButton = findViewById(R.id.tripButton)
         fab = findViewById(R.id.fab_add_picture)
 
@@ -281,5 +287,12 @@ class MainActivity : AppCompatActivity(), TripEndListener {
     // Called by ProfileFragment when user ends a trip
     override fun onTripEnded() {
         tripManager.clearActiveTrip()
+    }
+
+
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString("currentFragmentTag", currentFragmentTag)
     }
 }
