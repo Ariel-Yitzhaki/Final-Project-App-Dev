@@ -38,6 +38,7 @@ class MainActivity : AppCompatActivity(), TripEndListener {
     private lateinit var cameraManager: CameraManager
     private var currentFragmentTag: String? = null
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var heroSection: View
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,27 +48,33 @@ class MainActivity : AppCompatActivity(), TripEndListener {
 
         setContentView(R.layout.activity_main)
 
-        if (savedInstanceState == null) {
-            switchToFragment(HomeFeedFragment(), "home")
-        } else {
+        // Load last fragment state if this isn't the first launch
+        if (savedInstanceState != null) {
             currentFragmentTag = savedInstanceState.getString("currentFragmentTag", "home")
         }
 
+        // Bind all views before any method that references them
         tripButton = findViewById(R.id.tripButton)
         fab = findViewById(R.id.fab_add_picture)
+        heroSection = findViewById(R.id.hero_section)
 
         setupTripButton()
         setupFab()
         setupNavigation()
 
-        // Load home fragment on startup
+        // Load home fragment only on first launch
         if (savedInstanceState == null) {
             switchToFragment(HomeFeedFragment(), "home")
         }
 
         // Check for active trip
         lifecycleScope.launch {
-            tripManager.checkActiveTrip()
+            val savedTripId = savedInstanceState?.getString("activeTripId")
+            if (savedTripId != null) {
+                tripManager.restoreActiveTrip(savedTripId)
+            } else {
+                tripManager.checkActiveTrip()
+            }
         }
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
@@ -237,7 +244,7 @@ class MainActivity : AppCompatActivity(), TripEndListener {
 
         // Only show trip button on map screen and hero section on map screen
         tripButton.visibility = if (tag == "map") View.VISIBLE else View.GONE
-        findViewById<View>(R.id.hero_section).visibility = if (tag == "map") View.VISIBLE else View.GONE
+        heroSection.visibility = if (tag == "map") View.VISIBLE else View.GONE
 
         lifecycleScope.launch { tripManager.checkActiveTrip() }
         updateNavigationIconColors(tag)
@@ -289,10 +296,25 @@ class MainActivity : AppCompatActivity(), TripEndListener {
         tripManager.clearActiveTrip()
     }
 
+    // Restores correct UI visibility when returning to the activity
+    override fun onResume() {
+        super.onResume()
+        val currentFragment = supportFragmentManager.findFragmentById(R.id.fragment_container)
+        val tag = currentFragment?.tag ?: "home"
 
+        tripButton.visibility = if (tag == "map") View.VISIBLE else View.GONE
+        heroSection.visibility = if (tag == "map") View.VISIBLE else View.GONE
 
+        if (tag == "map") fab.show() else fab.hide()
+
+        updateNavigationIconColors(tag)
+    }
+
+    // Saves UI state before activity destruction (rotation, system kill, etc...)
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putString("currentFragmentTag", currentFragmentTag)
+        // Saving active trip ID to reduce Firestore fetches
+        outState.putString("activeTripId", tripManager.activeTrip?.id)
     }
 }

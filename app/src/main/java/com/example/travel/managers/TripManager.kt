@@ -242,4 +242,13 @@ class TripManager(
             activeTrip = current.copy(photoCount = current.photoCount + 1)
         }
     }
+
+    // Restores active trip from saved ID without a full Firestore query
+    suspend fun restoreActiveTrip(tripId: String) {
+        val trip = tripRepository.getTripById(tripId)
+        if (trip != null && trip.active) {
+            activeTrip = trip
+            onTripStateChanged?.invoke(activeTrip)
+        }
+    }
 }
