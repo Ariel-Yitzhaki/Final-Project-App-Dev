@@ -23,7 +23,11 @@
             android:src="@drawable/ic_profile"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:padding="1dp"
+            app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Circle"
+            app:strokeColor="@color/black"
+            app:strokeWidth="1dp"/>
 
         <TextView
             android:id="@+id/displayNameText"

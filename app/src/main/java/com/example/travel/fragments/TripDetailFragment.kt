@@ -124,7 +124,7 @@ class TripDetailFragment : Fragment() {
             isOwner = trip.userId == AuthRepository().getCurrentUser()?.uid
             photoAdapter?.setOwner(isOwner)
 
-            val photos = photoRepository.getPhotosForTrip(tripId).sortedBy { it.timestamp }
+            val photos = photoRepository.getPhotosForTrip(tripId).sortedByDescending { it.timestamp }
 
             progressBar.visibility = View.GONE
             swipeRefresh.isRefreshing = false

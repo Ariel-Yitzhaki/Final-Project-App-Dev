@@ -62,7 +62,7 @@ class FeedTripAdapter(
         }
     }
 
-    // Creates "username started a new trip!" with bold username
+    // Creates "username started a new trip!" with bold username font
     private fun createActivityText(context: Context, username: String): SpannableString {
         val text = "$username started a new trip!"
         val spannable = SpannableString(text)

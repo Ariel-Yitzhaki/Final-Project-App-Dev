@@ -25,7 +25,11 @@
         android:scaleType="centerCrop"
         android:src="@drawable/ic_profile"
         app:layout_constraintStart_toEndOf="@+id/backButton"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Circle"
+        app:strokeColor="@color/black"
+        app:strokeWidth="1dp"
+        android:padding="1dp"/>
 
     <TextView
         android:id="@+id/displayNameText"
