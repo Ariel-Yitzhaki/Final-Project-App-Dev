@@ -22,6 +22,8 @@ import com.example.travel.managers.TripCleanupManager
 import com.example.travel.models.Photo
 import com.example.travel.utils.GeocodingUtils
 import kotlinx.coroutines.launch
+import com.example.travel.utils.loadProfilePicture
+import com.google.android.material.imageview.ShapeableImageView
 
 // Displays photos from a single trip in a vertical scrollable list
 class TripDetailFragment : Fragment() {
@@ -33,10 +35,11 @@ class TripDetailFragment : Fragment() {
     private lateinit var emptyText: TextView
     private lateinit var progressBar: ProgressBar
     private lateinit var swipeRefresh: SwipeRefreshLayout
+    private lateinit var tripCleanupManager: TripCleanupManager
+    private lateinit var profileImage: ShapeableImageView
     private var tripId: String = ""
     private var photoAdapter: TripPhotoAdapter? = null
     private var isOwner = false
-    private lateinit var tripCleanupManager: TripCleanupManager
 
 
     companion object {
@@ -75,6 +78,7 @@ class TripDetailFragment : Fragment() {
 
         // Bind views
         tripNameText = view.findViewById(R.id.tripNameText)
+        profileImage = view.findViewById(R.id.profileImage)
         photosRecyclerView = view.findViewById(R.id.photosRecyclerView)
         emptyText = view.findViewById(R.id.emptyText)
         progressBar = view.findViewById(R.id.progressBar)
@@ -121,6 +125,11 @@ class TripDetailFragment : Fragment() {
             }
 
             tripNameText.text = trip.name
+            // Load trip owner's profile picture
+            val owner = AuthRepository().getUserProfile(trip.userId)
+            owner?.let { profileImage.loadProfilePicture(it.profilePictureUrl) }
+
+            // Set owner flag
             isOwner = trip.userId == AuthRepository().getCurrentUser()?.uid
             photoAdapter?.setOwner(isOwner)
 

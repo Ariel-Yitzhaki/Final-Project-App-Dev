@@ -11,12 +11,11 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="28dp"
         android:padding="1dp"
         android:scaleType="centerCrop"
         android:src="@drawable/ic_profile"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/logOutButton"
         app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Circle"
         app:strokeColor="@color/black"
         app:strokeWidth="1dp" />
