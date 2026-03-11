@@ -9,27 +9,20 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.addCallback
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.example.travel.R
-import com.example.travel.data.AuthRepository
-import com.example.travel.data.PhotoRepository
-import com.example.travel.data.TripRepository
-import com.example.travel.models.Photo
 import com.example.travel.utils.GeocodingUtils
-import kotlinx.coroutines.launch
+import com.example.travel.viewmodels.UploadState
+import com.example.travel.viewmodels.PhotoPreviewViewModel
 import java.io.File
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
-import java.util.UUID
 
 // Loads the screen to display photo and location after taking a picture
 class PhotoPreviewActivity : AppCompatActivity() {
 
-    private lateinit var authRepository: AuthRepository
-    private lateinit var photoRepository: PhotoRepository
+    // Survives activity recreation
+    private val viewModel: PhotoPreviewViewModel by viewModels()
 
     private lateinit var photoPreview: ImageView
     private lateinit var locationText: TextView
@@ -40,7 +33,6 @@ class PhotoPreviewActivity : AppCompatActivity() {
     private var photoPath: String = ""
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
-    private lateinit var tripRepository: TripRepository
     private var tripId: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,12 +44,8 @@ class PhotoPreviewActivity : AppCompatActivity() {
             discardAndFinish()
         }
 
-        authRepository = AuthRepository()
-        photoRepository = PhotoRepository()
-        tripRepository = TripRepository()
-        tripId = intent.getStringExtra("tripId") ?: ""
-
         // Get data from intent
+        tripId = intent.getStringExtra("tripId") ?: ""
         photoPath = intent.getStringExtra("photoPath") ?: ""
         latitude = intent.getDoubleExtra("latitude", 0.0)
         longitude = intent.getDoubleExtra("longitude", 0.0)
@@ -84,7 +72,7 @@ class PhotoPreviewActivity : AppCompatActivity() {
 
         // Upload button
         uploadButton.setOnClickListener {
-            uploadPhoto()
+            viewModel.uploadPhoto(photoPath, latitude, longitude, tripId)
         }
 
         // Retake - return to camera
@@ -92,45 +80,38 @@ class PhotoPreviewActivity : AppCompatActivity() {
             setResult(RESULT_FIRST_USER)  // Signal to retake
             finish()
         }
+
+        // Observe upload state - re-attaches after recreation
+        viewModel.uploadState.observe(this) { state ->
+            when (state) {
+                is UploadState.Idle -> {
+                    progressBar.visibility = View.GONE
+                    uploadButton.isEnabled = true
+                }
+
+                is UploadState.Uploading -> {
+                    progressBar.visibility = View.VISIBLE
+                    uploadButton.isEnabled = false
+                }
+
+                is UploadState.Success -> {
+                    Toast.makeText(this, "Photo uploaded!", Toast.LENGTH_SHORT).show()
+                    setResult(RESULT_OK)
+                    finish()
+                }
+
+                is UploadState.Error -> {
+                    Toast.makeText(this, state.message, Toast.LENGTH_SHORT).show()
+                    progressBar.visibility = View.GONE
+                    uploadButton.isEnabled = true
+                }
+            }
+        }
     }
 
     // Convert coordinates to address
     private fun loadAddress() {
         locationText.text = GeocodingUtils.getAddressFromCoordinates(this, latitude, longitude)
-    }
-
-    private fun uploadPhoto() {
-        val userId = authRepository.getCurrentUser()?.uid ?: return
-
-        progressBar.visibility = View.VISIBLE
-        uploadButton.isEnabled = false
-
-        val photo = Photo(
-            id = UUID.randomUUID().toString(),
-            userId = userId,
-            imageUrl = "", // Will be set by repository after upload
-            latitude = latitude,
-            longitude = longitude,
-            date = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date()),
-            timestamp = System.currentTimeMillis(),
-            tripId = tripId
-        )
-
-        lifecycleScope.launch {
-            try {
-                photoRepository.savePhoto(photo, photoPath)
-                if (tripId.isNotEmpty()) {
-                    tripRepository.incrementPhotoCount(tripId)
-                }
-                Toast.makeText(this@PhotoPreviewActivity, "Photo uploaded!", Toast.LENGTH_SHORT).show()
-                setResult(RESULT_OK)
-                finish()
-            } catch (_: Exception) {
-                Toast.makeText(this@PhotoPreviewActivity, "Upload failed", Toast.LENGTH_SHORT).show()
-                progressBar.visibility = View.GONE
-                uploadButton.isEnabled = true
-            }
-        }
     }
 
     private fun discardAndFinish() {
