@@ -111,9 +111,9 @@ class ProfileFragment : Fragment(), Refresh {
 
         tripsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        // Sign out button
-        view.findViewById<Button>(R.id.signOutButton).setOnClickListener {
-            authRepository.signOut()
+        // Log out button
+        view.findViewById<Button>(R.id.logOutButton).setOnClickListener {
+            authRepository.logOut()
             startActivity(Intent(requireContext(), LoginActivity::class.java))
             requireActivity().finish()
         }

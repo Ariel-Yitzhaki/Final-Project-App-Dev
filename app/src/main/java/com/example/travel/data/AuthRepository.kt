@@ -14,8 +14,8 @@ class AuthRepository {
     // Returns currently logged in user, or null
     fun getCurrentUser(): FirebaseUser? = auth.currentUser
 
-    // Sign up with email/password, then create user profile in Firestore
-    suspend fun signUp(email: String, password: String, username: String, displayName: String): Result<User> {
+    // Register with email/password, then create user profile in Firestore
+    suspend fun register(email: String, password: String, username: String, displayName: String): Result<User> {
         return try {
             val usernameQuery = usersCollection
                 .whereEqualTo("username", username)
@@ -38,8 +38,8 @@ class AuthRepository {
         }
     }
 
-    // Sign in with email and password
-    suspend fun signIn(email: String, password: String): Result<FirebaseUser> {
+    // Login with email and password
+    suspend fun login(email: String, password: String): Result<FirebaseUser> {
         return try {
             val result = auth.signInWithEmailAndPassword(email, password).await()
             Result.success(result.user!!)
@@ -48,8 +48,8 @@ class AuthRepository {
         }
     }
 
-    // Sign out
-    fun signOut() {
+    // Log out
+    fun logOut() {
         auth.signOut()
     }
 

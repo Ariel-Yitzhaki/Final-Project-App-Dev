@@ -24,7 +24,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var primaryButton: Button
     private lateinit var switchModeText: TextView
     private lateinit var progressBar: ProgressBar
-    private var isSignUpMode = false
+    private var isRegisterMode = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,26 +50,37 @@ class LoginActivity : AppCompatActivity() {
 
         primaryButton.setOnClickListener { handlePrimaryAction() }
         switchModeText.setOnClickListener { toggleMode() }
-    }
 
-    // Switch between Sign In and Sign Up modes
-    private fun toggleMode() {
-        isSignUpMode = !isSignUpMode
-
-        if (isSignUpMode) {
-            usernameInput.visibility = View.VISIBLE
-            displayNameInput.visibility = View.VISIBLE
-            primaryButton.text = "Sign Up"
-            switchModeText.text = "Already have an account? Sign In"
-        } else {
-            usernameInput.visibility = View.GONE
-            displayNameInput.visibility = View.GONE
-            primaryButton.text = "Sign In"
-            switchModeText.text = "Don't have an account? Sign Up"
+        // Restore register mode after recreation
+        if (savedInstanceState != null) {
+            isRegisterMode = savedInstanceState.getBoolean("isRegisterMode")
+            if (isRegisterMode) {
+                usernameInput.visibility = View.VISIBLE
+                displayNameInput.visibility = View.VISIBLE
+                primaryButton.text = "Register"
+                switchModeText.text = "Already have an account? Login"
+            }
         }
     }
 
-    // Handle sign in or sign up based on current mode
+    // Switch between Login and Register modes
+    private fun toggleMode() {
+        isRegisterMode = !isRegisterMode
+
+        if (isRegisterMode) {
+            usernameInput.visibility = View.VISIBLE
+            displayNameInput.visibility = View.VISIBLE
+            primaryButton.text = "Register"
+            switchModeText.text = "Already have an account? Login"
+        } else {
+            usernameInput.visibility = View.GONE
+            displayNameInput.visibility = View.GONE
+            primaryButton.text = "Login"
+            switchModeText.text = "Don't have an account? Register"
+        }
+    }
+
+    // Handle login or register based on current mode
     private fun handlePrimaryAction() {
         val email = emailInput.text.toString().trim()
         val password = passwordInput.text.toString().trim()
@@ -79,7 +90,7 @@ class LoginActivity : AppCompatActivity() {
             return
         }
 
-        if (isSignUpMode) {
+        if (isRegisterMode) {
             val username = usernameInput.text.toString().trim()
             val displayName = displayNameInput.text.toString().trim()
 
@@ -93,39 +104,39 @@ class LoginActivity : AppCompatActivity() {
                 return
             }
 
-            signUp(email, password, username, displayName)
+            register(email, password, username, displayName)
         } else {
-            signIn(email, password)
+            login(email, password)
         }
     }
 
-    private fun signIn(email: String, password: String) {
+    private fun login(email: String, password: String) {
         showLoading(true)
 
         lifecycleScope.launch {
-            val result = authRepository.signIn(email, password)
+            val result = authRepository.login(email, password)
             showLoading(false)
 
             result.fold(
                 onSuccess = { goToMain() },
                 onFailure = { e ->
-                    Toast.makeText(this@LoginActivity, e.message ?: "Sign in failed", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@LoginActivity, e.message ?: "Register in failed", Toast.LENGTH_SHORT).show()
                 }
             )
         }
     }
 
-    private fun signUp(email: String, password: String, username: String, displayName: String) {
+    private fun register(email: String, password: String, username: String, displayName: String) {
         showLoading(true)
 
         lifecycleScope.launch {
-            val result = authRepository.signUp(email, password, username, displayName)
+            val result = authRepository.register(email, password, username, displayName)
             showLoading(false)
 
             result.fold(
                 onSuccess = { goToMain() },
                 onFailure = { e ->
-                    Toast.makeText(this@LoginActivity, e.message ?: "Sign up failed", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@LoginActivity, e.message ?: "Register failed", Toast.LENGTH_SHORT).show()
                 }
             )
         }
@@ -139,5 +150,11 @@ class LoginActivity : AppCompatActivity() {
     private fun goToMain() {
         startActivity(Intent(this, MainActivity::class.java))
         finish()
+    }
+
+    // Saves register mode so it survives rotation/recreation
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean("isRegisterMode", isRegisterMode)
     }
 }

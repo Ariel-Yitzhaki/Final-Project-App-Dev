@@ -54,9 +54,13 @@ class MainActivity : AppCompatActivity(), TripEndListener {
         }
 
         // Bind all views before any method that references them
+        val restoredTag = currentFragmentTag ?: "home"
         tripButton = findViewById(R.id.tripButton)
         fab = findViewById(R.id.fab_add_picture)
         heroSection = findViewById(R.id.hero_section)
+
+        if (restoredTag == "map") fab.show() else fab.hide()
+        updateNavigationIconColors(restoredTag)
 
         setupTripButton()
         setupFab()
