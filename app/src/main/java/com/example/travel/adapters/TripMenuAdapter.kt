@@ -30,10 +30,11 @@ class TripMenuAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val trip = trips[position]
+        val context = holder.itemView.context
 
         // "None" option - deselect active trip
         if (trip == null) {
-            holder.tripName.text = "None"
+            holder.tripName.text = context.getString(R.string.trip_menu_none)
             holder.card.setCardBackgroundColor(0xFFF4F4F5.toInt())
             holder.tripName.setTextColor(0xFF71717A.toInt())
             holder.activeIndicator.visibility = if (activeTripId == null) View.VISIBLE else View.GONE
@@ -42,7 +43,7 @@ class TripMenuAdapter(
         }
         // "New Trip" option - starts trip name dialog
         else if (trip.id.isEmpty()) {
-            holder.tripName.text = "New Trip"
+            holder.tripName.text = context.getString(R.string.trip_menu_new)
             holder.card.setCardBackgroundColor(0x00000000)
             holder.tripName.setTextColor(0xFF000000.toInt())
             holder.activeIndicator.visibility = View.GONE

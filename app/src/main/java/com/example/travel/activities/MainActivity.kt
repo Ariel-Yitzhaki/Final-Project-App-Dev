@@ -189,8 +189,9 @@ class MainActivity : AppCompatActivity(), TripEndListener {
 
     private fun promptStartNewTrip() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_confirm, null)
-        dialogView.findViewById<TextView>(R.id.dialogTitle).text = "No Active Trip"
-        dialogView.findViewById<TextView>(R.id.dialogMessage).text = "Start a new trip?"
+        dialogView.findViewById<TextView>(R.id.dialogTitle).text =
+            getString(R.string.dialog_no_active_trip_title)
+        dialogView.findViewById<TextView>(R.id.dialogMessage).text = getString(R.string.dialog_no_active_trip_message)
 
         val dialog = AlertDialog.Builder(this)
             .setView(dialogView)
@@ -199,14 +200,14 @@ class MainActivity : AppCompatActivity(), TripEndListener {
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
         dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.dialogPositiveButton).apply {
-            text = "Yes"
+            text = getString(R.string.dialog_yes)
             setOnClickListener {
                 dialog.dismiss()
                 tripManager.showTripNameDialog(openCameraAfter = true)
             }
         }
         dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.dialogNegativeButton).apply {
-            text = "Cancel"
+            text = getString(R.string.label_cancel)
             setOnClickListener { dialog.dismiss() }
         }
 
@@ -309,7 +310,7 @@ class MainActivity : AppCompatActivity(), TripEndListener {
                 active.name
             }
         } else {
-            tripButton.text = "Trips"
+            tripButton.text = getString(R.string.label_trips)
         }
         tripButton.isEnabled = true
     }

@@ -57,8 +57,8 @@ class LoginActivity : AppCompatActivity() {
             if (isRegisterMode) {
                 usernameInput.visibility = View.VISIBLE
                 displayNameInput.visibility = View.VISIBLE
-                primaryButton.text = "Register"
-                switchModeText.text = "Already have an account? Login"
+                primaryButton.text = getString(R.string.login_register)
+                switchModeText.text = getString(R.string.login_switch_to_login)
             }
         }
     }
@@ -70,13 +70,13 @@ class LoginActivity : AppCompatActivity() {
         if (isRegisterMode) {
             usernameInput.visibility = View.VISIBLE
             displayNameInput.visibility = View.VISIBLE
-            primaryButton.text = "Register"
-            switchModeText.text = "Already have an account? Login"
+            primaryButton.text = getString(R.string.login_register)
+            switchModeText.text = getString(R.string.login_switch_to_login)
         } else {
             usernameInput.visibility = View.GONE
             displayNameInput.visibility = View.GONE
-            primaryButton.text = "Login"
-            switchModeText.text = "Don't have an account? Register"
+            primaryButton.text = getString(R.string.login_title)
+            switchModeText.text = getString(R.string.login_register_prompt)
         }
     }
 
@@ -95,12 +95,12 @@ class LoginActivity : AppCompatActivity() {
             val displayName = displayNameInput.text.toString().trim()
 
             if (username.isEmpty() || displayName.isEmpty()) {
-                Toast.makeText(this, "All fields required", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.toast_email_password_required), Toast.LENGTH_SHORT).show()
                 return
             }
 
             if (displayName.length > 25) {
-                Toast.makeText(this, "Display name must be 25 characters or less", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.toast_display_name_too_long), Toast.LENGTH_SHORT).show()
                 return
             }
 
@@ -120,7 +120,7 @@ class LoginActivity : AppCompatActivity() {
             result.fold(
                 onSuccess = { goToMain() },
                 onFailure = { e ->
-                    Toast.makeText(this@LoginActivity, e.message ?: "Register in failed", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@LoginActivity, e.message ?: getString(R.string.toast_login_failed), Toast.LENGTH_SHORT).show()
                 }
             )
         }
@@ -136,7 +136,7 @@ class LoginActivity : AppCompatActivity() {
             result.fold(
                 onSuccess = { goToMain() },
                 onFailure = { e ->
-                    Toast.makeText(this@LoginActivity, e.message ?: "Register failed", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@LoginActivity, e.message ?: getString(R.string.toast_login_failed), Toast.LENGTH_SHORT).show()
                 }
             )
         }

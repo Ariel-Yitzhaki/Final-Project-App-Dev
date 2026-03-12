@@ -65,6 +65,72 @@
     <string name="action_accept">Accept</string>
     <string name="action_decline">Decline</string>
 
+    <!-- Login (Kotlin) -->
+    <string name="login_register">Register</string>
+    <string name="login_switch_to_login">Already have an account? Login</string>
+    <string name="toast_email_password_required">Email and password required</string>
+    <string name="toast_all_fields_required">All fields required</string>
+    <string name="toast_display_name_too_long">Display name must be 25 characters or less</string>
+    <string name="toast_register_failed">Register failed</string>
+    <string name="toast_login_failed">Register in failed</string>
+
+    <!-- Photo (Kotlin) -->
+    <string name="toast_photo_uploaded">Photo uploaded!</string>
+    <string name="toast_upload_failed">Upload failed</string>
+    <string name="toast_upload_picture_failed">Failed to upload picture</string>
+
+    <!-- Location (Kotlin) -->
+    <string name="toast_could_not_get_location">Could not get location</string>
+    <string name="toast_too_close_to_previous">Less than 200m from a previous photo</string>
+
+    <!-- Dialog: No Active Trip -->
+    <string name="dialog_no_active_trip_title">No Active Trip</string>
+    <string name="dialog_no_active_trip_message">Start a new trip?</string>
+    <string name="dialog_yes">Yes</string>
+
+    <!-- Dialog: Delete Photo -->
+    <string name="dialog_delete_photo_title">Delete Photo</string>
+    <string name="dialog_delete_photo_message">Are you sure you want to delete this photo from the trip?</string>
+    <string name="action_delete">Delete</string>
+
+    <!-- Dialog: Delete Trip -->
+    <string name="dialog_delete_trip_title">Delete Trip</string>
+    <string name="dialog_delete_trip_message">Delete This Trip?</string>
+    <string name="dialog_delete_trip_confirm">Are you sure you want to delete \'%s\'? This cannot be undone.</string>
+
+    <!-- Dialog: Discard Empty Trip -->
+    <string name="dialog_discard_trip_title">Discard Empty Trip?</string>
+    <string name="dialog_discard_trip_message">\'%s\' has no photos and will be discarded.</string>
+    <string name="action_discard">Discard</string>
+
+    <!-- Trip (Kotlin) -->
+    <string name="trip_unavailable">Trip unavailable</string>
+    <string name="trip_no_longer_available">This trip is no longer available</string>
+    <string name="trip_started">Started: %s</string>
+    <string name="toast_enter_trip_name">Please enter trip name</string>
+    <string name="trip_menu_none">None</string>
+    <string name="trip_menu_new">New Trip</string>
+
+    <!-- Friends (Kotlin) -->
+    <string name="toast_friend_added">Friend added!</string>
+    <string name="toast_accept_failed">Failed to accept</string>
+    <string name="toast_decline_failed">Failed to decline</string>
+    <string name="toast_friend_removed">Friend removed</string>
+    <string name="toast_remove_failed">Failed to remove</string>
+    <string name="toast_request_sent">Request sent!</string>
+    <string name="toast_request_failed">Failed to send request</string>
+
+    <!-- User Search Status (Kotlin) -->
+    <string name="search_status_friends">Friends</string>
+    <string name="search_status_pending">Pending</string>
+
+    <!-- Dynamic Format Strings -->
+    <string name="format_username">\@%s</string>
+    <string name="format_date_range">%s - %s</string>
+    <string name="format_like_singular">%d like</string>
+    <string name="format_like_plural">%d likes</string>
+    <string name="format_activity_new_trip">%s started a new trip!</string>
+
     <!-- Content Descriptions -->
     <string name="cd_search_users">Search users</string>
     <string name="cd_view_on_map">View on map</string>
@@ -73,4 +139,5 @@
     <string name="cd_menu">Menu</string>
     <string name="cd_trip_photo">Trip photo</string>
     <string name="cd_user_profile_picture">User profile picture</string>
+
 </resources>

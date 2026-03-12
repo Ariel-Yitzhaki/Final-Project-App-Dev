@@ -42,13 +42,14 @@ class TripAdapter(
     }
 
     override fun onBindViewHolder(holder: TripViewHolder, position: Int) {
+        val context = holder.itemView.context
         val trip = trips[position]
 
         holder.tripName.text = trip.name
 
         // Show date range for completed trips, just start date for active card
         if (trip.active) {
-            holder.tripDate.text = "Started: ${trip.startDate}"
+            holder.tripDate.text = context.getString(R.string.trip_started, trip.startDate)
         } else {
             holder.tripDate.text = "${trip.startDate} - ${trip.endDate}"
         }
@@ -58,9 +59,11 @@ class TripAdapter(
         if (trip.active) {
             holder.likesCount.visibility = View.GONE
         } else {
-            holder.likesCount.visibility = View.VISIBLE
-            if (likes == 1) holder.likesCount.text = "1 like" else holder.likesCount.text =
-                "$likes likes"
+            val context = holder.itemView.context
+            holder.likesCount.text = if (likes == 1)
+                context.getString(R.string.format_like_singular, likes)
+            else
+                context.getString(R.string.format_like_plural, likes)
         }
 
         // Show End Trip button only for active trips

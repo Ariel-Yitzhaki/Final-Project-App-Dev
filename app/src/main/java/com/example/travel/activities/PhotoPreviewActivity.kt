@@ -95,7 +95,7 @@ class PhotoPreviewActivity : AppCompatActivity() {
                 }
 
                 is UploadState.Success -> {
-                    Toast.makeText(this, "Photo uploaded!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.toast_photo_uploaded), Toast.LENGTH_SHORT).show()
                     setResult(RESULT_OK)
                     finish()
                 }

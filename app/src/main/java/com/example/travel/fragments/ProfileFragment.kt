@@ -140,7 +140,7 @@ class ProfileFragment : Fragment(), Refresh {
             val user = authRepository.getUserProfile(userId)
             user?.let {
                 displayNameText.text = it.displayName
-                usernameText.text = "@${it.username}"
+                usernameText.text = getString(R.string.format_username, it.username)
                 profileImage.loadProfilePicture(it.profilePictureUrl)
             }
 
@@ -199,7 +199,7 @@ class ProfileFragment : Fragment(), Refresh {
     private fun showOptionsMenu(trip: Trip) {
         val dialogView = layoutInflater.inflate(R.layout.dialog_confirm, null)
         dialogView.findViewById<TextView>(R.id.dialogTitle).text = trip.name
-        dialogView.findViewById<TextView>(R.id.dialogMessage).text = "Delete This Trip?"
+        dialogView.findViewById<TextView>(R.id.dialogMessage).text = getString(R.string.dialog_delete_trip_message)
 
         val dialog = android.app.AlertDialog.Builder(requireContext())
             .setView(dialogView)
@@ -208,7 +208,7 @@ class ProfileFragment : Fragment(), Refresh {
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
         dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.dialogPositiveButton).apply {
-            text = "Delete"
+            text = getString(R.string.action_delete)
             setBackgroundColor(0xFFDC2626.toInt())
             setOnClickListener {
                 dialog.dismiss()
@@ -217,7 +217,7 @@ class ProfileFragment : Fragment(), Refresh {
         }
 
         dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.dialogNegativeButton).apply {
-            text = "Cancel"
+            text = getString(R.string.label_cancel)
             setOnClickListener { dialog.dismiss() }
         }
 
@@ -227,7 +227,7 @@ class ProfileFragment : Fragment(), Refresh {
     // Confirms before deleting a trip
     private fun confirmDeleteTrip(trip: Trip) {
         val dialogView = layoutInflater.inflate(R.layout.dialog_confirm, null)
-        dialogView.findViewById<TextView>(R.id.dialogTitle).text = "Delete Trip"
+        dialogView.findViewById<TextView>(R.id.dialogTitle).text = getString(R.string.dialog_delete_trip_title)
         dialogView.findViewById<TextView>(R.id.dialogMessage).text = "Are you sure you want to delete '${trip.name}'? This cannot be undone."
 
         val dialog = android.app.AlertDialog.Builder(requireContext())
@@ -237,7 +237,7 @@ class ProfileFragment : Fragment(), Refresh {
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
         dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.dialogPositiveButton).apply {
-            text = "Delete"
+            text = getString(R.string.action_delete)
             setOnClickListener {
                 dialog.dismiss()
                 deleteTrip(trip)

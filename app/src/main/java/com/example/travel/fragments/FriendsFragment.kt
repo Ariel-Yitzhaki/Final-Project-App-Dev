@@ -127,11 +127,11 @@ class FriendsFragment : Fragment(), Refresh {
             val result = friendsRepository.acceptFriendRequest(request)
             result.fold(
                 onSuccess = {
-                    Toast.makeText(requireContext(), "Friend added!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), getString(R.string.toast_friend_added), Toast.LENGTH_SHORT).show()
                     loadData()
                 },
                 onFailure = {
-                    Toast.makeText(requireContext(), "Failed to accept", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), getString(R.string.toast_accept_failed), Toast.LENGTH_SHORT).show()
                 }
             )
         }
@@ -143,7 +143,7 @@ class FriendsFragment : Fragment(), Refresh {
             result.fold(
                 onSuccess = { loadData() },
                 onFailure = {
-                    Toast.makeText(requireContext(), "Failed to decline", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), getString(R.string.toast_decline_failed), Toast.LENGTH_SHORT).show()
                 }
             )
         }
@@ -156,11 +156,11 @@ class FriendsFragment : Fragment(), Refresh {
             val result = friendsRepository.removeFriend(currentUserId, friend.id)
             result.fold(
                 onSuccess = {
-                    Toast.makeText(requireContext(), "Friend removed", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), getString(R.string.toast_friend_removed), Toast.LENGTH_SHORT).show()
                     loadData()
                 },
                 onFailure = {
-                    Toast.makeText(requireContext(), "Failed to remove", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), getString(R.string.toast_remove_failed), Toast.LENGTH_SHORT).show()
                 }
             )
         }

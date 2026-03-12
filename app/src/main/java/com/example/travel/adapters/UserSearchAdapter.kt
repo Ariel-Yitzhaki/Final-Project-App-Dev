@@ -35,23 +35,25 @@ class UserSearchAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val user = users[position]
+        val context = holder.itemView.context
+
         holder.displayNameText.text = user.displayName
-        holder.usernameText.text = "@${user.username}"
+        holder.usernameText.text = context.getString(R.string.format_username, user.username)
         holder.profilePicture.loadProfilePicture(user.profilePictureUrl)
 
         // Set button state based on relationship status
         val status = statusMap[user.id]
         when (status) {
             "friend" -> {
-                holder.actionButton.text = "Friends"
+                holder.actionButton.text = context.getString(R.string.label_friends)
                 holder.actionButton.isEnabled = false
             }
             "pending" -> {
-                holder.actionButton.text = "Pending"
+                holder.actionButton.text = context.getString(R.string.search_status_pending)
                 holder.actionButton.isEnabled = false
             }
             else -> {
-                holder.actionButton.text = "Add"
+                holder.actionButton.text = context.getString(R.string.label_add)
                 holder.actionButton.isEnabled = true
                 holder.actionButton.setDebouncedClickListener { onAddClick(user) }
             }

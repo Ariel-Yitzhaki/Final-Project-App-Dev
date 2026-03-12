@@ -51,7 +51,11 @@ class FeedTripAdapter(
 
 
         val likes = tripLikes[trip.id] ?: 0
-        holder.likesCount.text = if (likes == 1) "1 like" else "$likes likes"
+        val context = holder.itemView.context
+        holder.likesCount.text = if (likes == 1)
+            context.getString(R.string.format_like_singular, likes)
+        else
+            context.getString(R.string.format_like_plural, likes)
 
         holder.itemView.setOnClickListener {
             onTripClick.invoke(trip)

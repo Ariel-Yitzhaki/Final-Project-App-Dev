@@ -77,7 +77,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, Refresh {
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.view?.let { mapView ->
             val locationButton = mapView.findViewWithTag("GoogleMapMyLocationButton")
-                ?: mapView.findViewById<View>(2)
+                ?: mapView.findViewById<View>(0x2)
             locationButton?.let {
                 val parent = it.parent as ViewGroup
                 parent.removeView(it)
