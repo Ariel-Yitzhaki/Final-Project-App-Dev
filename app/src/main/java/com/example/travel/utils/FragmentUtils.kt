@@ -28,8 +28,8 @@ fun ImageView.loadProfilePicture(url: String) {
         Glide.with(this.context)
             .load(url)
             .circleCrop()
-            .placeholder(R.drawable.ic_profile)
             // Smooth transition so the image fades in instead of popping
+            // So it doesn't look so bad :')
             .transition(DrawableTransitionOptions.withCrossFade(200))
             .into(this)
     } else {

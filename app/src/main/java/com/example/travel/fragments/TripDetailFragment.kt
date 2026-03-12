@@ -87,6 +87,12 @@ class TripDetailFragment : Fragment() {
         emptyText = view.findViewById(R.id.emptyText)
         progressBar = view.findViewById(R.id.progressBar)
         swipeRefresh = view.findViewById(R.id.swipeRefresh)
+
+        // Hide content until data is ready to avoid showing default placeholders
+        profileImage.visibility = View.INVISIBLE
+        tripNameText.visibility = View.INVISIBLE
+        photosRecyclerView.visibility = View.INVISIBLE
+
         swipeRefresh.setOnRefreshListener {
             loadTripDetails()
         }
@@ -111,7 +117,7 @@ class TripDetailFragment : Fragment() {
         loadTripDetails()
     }
 
-    // Loads trip info and photos from repositories
+    // Loads trip info and photos from repositories asynchronously
     private fun loadTripDetails() {
         if (tripId.isEmpty()) return
 
@@ -120,6 +126,11 @@ class TripDetailFragment : Fragment() {
         val cachedPhotos = photoRepository.getCachedPhotosForTrip(tripId)
 
         if (cachedTrip != null && cachedPhotos != null) {
+            // Content is ready, make everything visible
+            profileImage.visibility = View.VISIBLE
+            tripNameText.visibility = View.VISIBLE
+            photosRecyclerView.visibility = View.VISIBLE
+
             tripNameText.text = cachedTrip.name
             val cachedOwner = authRepository.getCachedUserProfile(cachedTrip.userId)
             cachedOwner?.let { profileImage.loadProfilePicture(it.profilePictureUrl) }
@@ -147,6 +158,11 @@ class TripDetailFragment : Fragment() {
                 emptyText.visibility = View.VISIBLE
                 return@launch
             }
+
+            // Content is ready, make everything visible
+            profileImage.visibility = View.VISIBLE
+            tripNameText.visibility = View.VISIBLE
+            photosRecyclerView.visibility = View.VISIBLE
 
             tripNameText.text = trip.name
 
