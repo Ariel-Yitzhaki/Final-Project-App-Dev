@@ -20,6 +20,7 @@ import com.example.travel.data.FriendsRepository
 import com.example.travel.interfaces.Refresh
 import com.example.travel.models.FriendRequest
 import com.example.travel.models.User
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 class FriendsFragment : Fragment(), Refresh {
@@ -85,41 +86,64 @@ class FriendsFragment : Fragment(), Refresh {
     private fun loadData() {
         val currentUserId = authRepository.getCurrentUser()?.uid ?: return
 
-        progressBar.visibility = View.VISIBLE
+        // Show cached data immediately so the screen isn't empty while fetching
+        val cachedFriends = friendsRepository.getCachedFriends(currentUserId)
+        val cachedRequests = friendsRepository.getCachedRequests(currentUserId)
 
+        if (cachedFriends != null) {
+            displayFriends(cachedFriends)
+        }
+        if (cachedRequests != null) {
+            displayRequests(cachedRequests)
+        }
+
+        if (cachedFriends == null) {
+            progressBar.visibility = View.VISIBLE
+        }
+
+        // Fetch fresh data from Firestore in the background
         lifecycleScope.launch {
-            // Load pending requests
-            val requests = friendsRepository.getPendingRequests(currentUserId)
-            val requestsWithUsers = requests.mapNotNull { request ->
-                authRepository.getUserProfile(request.senderId)?.let { user ->
-                    Pair(request, user)
-                }
-            }
+            val requestsDeferred = async { loadRequestsWithUsers(currentUserId) }
+            val friendsDeferred = async { friendsRepository.getFriends(currentUserId) }
 
-            // Load friends
-            val friends = friendsRepository.getFriends(currentUserId)
+            val requestsWithUsers = requestsDeferred.await()
+            val friends = friendsDeferred.await()
 
+            // Cache the requests with users for instant display on next visit
+            friendsRepository.cacheRequests(currentUserId, requestsWithUsers)
             progressBar.visibility = View.GONE
 
-            // Show/hide requests section
-            if (requestsWithUsers.isNotEmpty()) {
-                requestsLabel.visibility = View.VISIBLE
-                requestsRecyclerView.visibility = View.VISIBLE
-                requestsAdapter.updateData(requestsWithUsers)
-            } else {
-                requestsLabel.visibility = View.GONE
-                requestsRecyclerView.visibility = View.GONE
-            }
+            displayRequests(requestsWithUsers)
+            displayFriends(friends)
+        }
+    }
 
-            // Show friends or empty state
-            friendsAdapter.updateData(friends)
-
-            if (friends.isEmpty()) {
-                emptyText.visibility = View.VISIBLE
-            } else {
-                emptyText.visibility = View.GONE
+    // Fetches pending requests and pairs each with the sender's profile
+    private suspend fun loadRequestsWithUsers(userId: String): List<Pair<FriendRequest, User>> {
+        val requests = friendsRepository.getPendingRequests(userId)
+        return requests.mapNotNull { request ->
+            authRepository.getUserProfile(request.senderId)?.let { user ->
+                Pair(request, user)
             }
         }
+    }
+
+    // Updates the friend requests section visibility and data
+    private fun displayRequests(requestsWithUsers: List<Pair<FriendRequest, User>>) {
+        if (requestsWithUsers.isNotEmpty()) {
+            requestsLabel.visibility = View.VISIBLE
+            requestsRecyclerView.visibility = View.VISIBLE
+            requestsAdapter.updateData(requestsWithUsers)
+        } else {
+            requestsLabel.visibility = View.GONE
+            requestsRecyclerView.visibility = View.GONE
+        }
+    }
+
+    // Updates the friends list and empty state
+    private fun displayFriends(friends: List<User>) {
+        friendsAdapter.updateData(friends)
+        emptyText.visibility = if (friends.isEmpty()) View.VISIBLE else View.GONE
     }
 
     private fun acceptRequest(request: FriendRequest) {
@@ -127,6 +151,8 @@ class FriendsFragment : Fragment(), Refresh {
             val result = friendsRepository.acceptFriendRequest(request)
             result.fold(
                 onSuccess = {
+                    // Clear stale cache after accepting
+                    friendsRepository.invalidateCache()
                     Toast.makeText(requireContext(), getString(R.string.toast_friend_added), Toast.LENGTH_SHORT).show()
                     loadData()
                 },
@@ -141,7 +167,11 @@ class FriendsFragment : Fragment(), Refresh {
         lifecycleScope.launch {
             val result = friendsRepository.declineFriendRequest(request)
             result.fold(
-                onSuccess = { loadData() },
+                onSuccess = {
+                    // Clear stale cache after declining
+                    friendsRepository.invalidateCache()
+                    loadData()
+                },
                 onFailure = {
                     Toast.makeText(requireContext(), getString(R.string.toast_decline_failed), Toast.LENGTH_SHORT).show()
                 }
@@ -156,6 +186,8 @@ class FriendsFragment : Fragment(), Refresh {
             val result = friendsRepository.removeFriend(currentUserId, friend.id)
             result.fold(
                 onSuccess = {
+                    // Clear stale cache after removing
+                    friendsRepository.invalidateCache()
                     Toast.makeText(requireContext(), getString(R.string.toast_friend_removed), Toast.LENGTH_SHORT).show()
                     loadData()
                 },

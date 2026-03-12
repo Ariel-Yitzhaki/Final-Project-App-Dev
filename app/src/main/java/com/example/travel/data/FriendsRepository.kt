@@ -12,6 +12,10 @@ class FriendsRepository {
         val instance = FriendsRepository()
     }
 
+    // Cached friend list per user ID
+    private val cachedFriends = mutableMapOf<String, List<User>>()
+    // Cached pending requests per user ID
+    private val cachedRequests = mutableMapOf<String, List<Pair<FriendRequest, User>>>()
     private val authRepository: AuthRepository = AuthRepository.instance
     private val firestore = FirebaseFirestore.getInstance()
     private val usersCollection = firestore.collection("users")
@@ -98,7 +102,9 @@ class FriendsRepository {
     // Gets all friends as User objects
     suspend fun getFriends(userId: String): List<User> {
         val friendIds = getFriendIds(userId)
-        return friendIds.mapNotNull { authRepository.getUserProfile(it) }
+        val friends = friendIds.mapNotNull { authRepository.getUserProfile(it) }
+        cachedFriends[userId] = friends
+        return friends
     }
 
     // Remove a friend
@@ -159,5 +165,24 @@ class FriendsRepository {
         } catch (_: Exception) {
             null
         }
+    }
+
+    fun getCachedFriends(userId: String): List<User>? {
+        return cachedFriends[userId]
+    }
+
+    fun getCachedRequests(userId: String): List<Pair<FriendRequest, User>>? {
+        return cachedRequests[userId]
+    }
+
+    // Clears all cached data - call after any friend list mutation
+    fun invalidateCache() {
+        cachedFriends.clear()
+        cachedRequests.clear()
+    }
+
+    // Stores fetched requests for instant display on next visit
+    fun cacheRequests(userId: String, requests: List<Pair<FriendRequest, User>>) {
+        cachedRequests[userId] = requests
     }
 }
