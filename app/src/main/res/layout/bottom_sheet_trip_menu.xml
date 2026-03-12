@@ -28,7 +28,6 @@
         android:maxLines="1"
         android:ellipsize="end"
         android:letterSpacing="0"
-        android:lineHeight="32dp"
         android:fontFamily="@font/mont_heavy"
         app:layout_constraintTop_toBottomOf="@id/grabHandle"
         app:layout_constraintStart_toStartOf="parent"
