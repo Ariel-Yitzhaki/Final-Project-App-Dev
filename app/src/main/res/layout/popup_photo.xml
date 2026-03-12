@@ -1,48 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white"
-    android:padding="8dp">
+    android:layout_height="wrap_content"
+    android:background="@color/white">
 
-    <ImageView
-        android:id="@+id/dialogPhotoImage"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:contentDescription="@string/cd_trip_photo"
-        android:scaleType="centerCrop"
-        app:layout_constraintDimensionRatio="4:5"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/dialogPhotoDate"/>
-
-    <TextView
-        android:id="@+id/dialogPhotoDate"
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:maxLines="1"
-        android:ellipsize="end"
-        android:textSize="14sp"
-        android:textColor="@color/text_primary"
-        android:fontFamily="@font/mont_semibold"
-        app:layout_constraintTop_toBottomOf="@id/dialogPhotoImage"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:padding="8dp">
 
-    <TextView
-        android:id="@+id/dialogPhotoLocation"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:textSize="12sp"
-        android:textColor="@color/text_secondary"
-        android:maxLines="1"
-        android:ellipsize="end"
-        android:fontFamily="@font/mont_semibold"
-        app:layout_constraintTop_toBottomOf="@id/dialogPhotoDate"
-        app:layout_constraintStart_toStartOf="parent" />
+        <ImageView
+            android:id="@+id/dialogPhotoImage"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintDimensionRatio="4:5"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:contentDescription="@string/cd_trip_photo"/>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/dialogPhotoDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:textSize="14sp"
+            android:textColor="@color/text_primary"
+            android:fontFamily="@font/mont_semibold"
+            app:layout_constraintTop_toBottomOf="@id/dialogPhotoImage"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/dialogPhotoLocation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textSize="12sp"
+            android:textColor="@color/text_secondary"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:fontFamily="@font/mont_semibold"
+            app:layout_constraintTop_toBottomOf="@id/dialogPhotoDate"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>
