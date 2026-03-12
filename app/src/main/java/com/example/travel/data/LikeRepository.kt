@@ -85,4 +85,13 @@ class LikeRepository {
             likesCollection.document(doc.id).delete().await()
         }
     }
+
+    // Clears all cached data
+    fun invalidateCache(tripId: String? = null) {
+        if (tripId != null) {
+            cachedTripLikes.remove(tripId)
+        } else {
+            cachedTripLikes.clear()
+        }
+    }
 }

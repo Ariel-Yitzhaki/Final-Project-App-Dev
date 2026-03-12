@@ -57,6 +57,9 @@ class PhotoPreviewViewModel : ViewModel() {
                 photoRepository.savePhoto(photo, photoPath)
                 if (tripId.isNotEmpty()) {
                     tripRepository.incrementPhotoCount(tripId)
+                    // New photos added, clear cached data for this trip
+                    photoRepository.invalidateCache(tripId)
+                    tripRepository.invalidateCache()
                 }
                 _uploadState.value = UploadState.Success
             } catch (e: Exception) {

@@ -135,6 +135,8 @@ class TripManager(
                 dialog.dismiss()
                 activity.lifecycleScope.launch {
                     tripRepository.deleteTrip(emptyTrip.id)
+                    // Clear stale cache after discarding empty trip
+                    tripRepository.invalidateCache()
                     activeTrip = null
                     applyTripSelection(selectedTrip, null)
                 }
@@ -153,6 +155,8 @@ class TripManager(
         if (selectedTrip == null) {
             if (currentActive != null) {
                 deactivateWithEndDate(currentActive)
+                // Trip state changed, clear stale cache
+                tripRepository.invalidateCache()
                 activeTrip = null
                 onTripStateChanged?.invoke(null)
             }
@@ -160,6 +164,8 @@ class TripManager(
         } else if (selectedTrip.id.isEmpty()) {
             if (currentActive != null) {
                 deactivateWithEndDate(currentActive)
+                // Trip state changed, clear stale cache
+                tripRepository.invalidateCache()
             }
             showTripNameDialog(openCameraAfter = false)
         } else {
@@ -168,6 +174,8 @@ class TripManager(
             }
             if (currentActive?.id != selectedTrip.id) {
                 tripRepository.reactivateTrip(selectedTrip.id)
+                // Trip state changed, clear stale cache
+                tripRepository.invalidateCache()
                 activeTrip = selectedTrip.copy(active = true, endDate = "")
                 onTripStateChanged?.invoke(activeTrip)
             }
@@ -231,6 +239,8 @@ class TripManager(
         )
 
         tripRepository.saveTrip(trip)
+        // New trip created, clear stale cache
+        tripRepository.invalidateCache()
         activeTrip = trip
         onTripStateChanged?.invoke(activeTrip)
         onRefreshMap?.invoke()

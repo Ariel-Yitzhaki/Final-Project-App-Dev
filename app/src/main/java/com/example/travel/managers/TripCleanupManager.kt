@@ -22,6 +22,10 @@ class TripCleanupManager(
             photoRepository.deletePhoto(photo.id)
         }
         tripRepository.deleteTrip(tripId)
+        // Clear stale cached data after deletion
+        tripRepository.invalidateCache()
+        photoRepository.invalidateCache(tripId)
+        likeRepository.invalidateCache(tripId)
     }
 
     private suspend fun deleteLikesForPhoto(photoId: String) {
@@ -31,7 +35,8 @@ class TripCleanupManager(
     private suspend fun deleteStorageFile(photoId: String) {
         try {
             storageRef.child("photos/${photoId}.jpg").delete().await()
-        } catch (_: Exception) {}
+        } catch (_: Exception) {
+        }
     }
 
     // Deletes a single photo and all associated data (likes, storage, Firestore)
@@ -40,6 +45,9 @@ class TripCleanupManager(
         deleteStorageFile(photoId)
         photoRepository.deletePhoto(photoId)
         decrementPhotoCount(tripId)
+        // Clear stale photo cache for this trip
+        photoRepository.invalidateCache(tripId)
+        likeRepository.invalidateCache(tripId)
     }
 
     // Decrements trip's photo count after a photo deletion
