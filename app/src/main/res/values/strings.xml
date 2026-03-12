@@ -1,3 +1,76 @@
 <resources>
     <string name="app_name">Travel</string>
+
+    <!-- Shared / Reused -->
+    <string name="label_travel">T R A V E L</string>
+    <string name="label_trips">Trips</string>
+    <string name="label_friends">Friends</string>
+    <string name="label_search">Search</string>
+    <string name="label_add">Add</string>
+    <string name="label_cancel">Cancel</string>
+    <string name="label_back">Back</string>
+
+    <!-- Login -->
+    <string name="login_title">Login</string>
+    <string name="login_register_prompt">Don\'t have an account? Register</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_username">Username (what others will use to find you)</string>
+    <string name="hint_display_name">Display Name (what others will see)</string>
+    <string name="hint_password">Password</string>
+
+    <!-- Main / Navigation -->
+    <string name="nav_travel">Travel</string>
+    <string name="nav_home_feed">Home Feed</string>
+    <string name="nav_map">Map</string>
+    <string name="nav_profile">Profile</string>
+
+    <!-- Photo Preview -->
+    <string name="photo_preview_title">Preview</string>
+    <string name="photo_loading_location">Loading location...</string>
+    <string name="photo_upload">Upload Photo</string>
+    <string name="photo_retake">Retake</string>
+    <string name="cd_discard_photo">discard photo</string>
+
+    <!-- Trip -->
+    <string name="trip_select">Select Trip</string>
+    <string name="trip_name_dialog_title">Name Your Trip</string>
+    <string name="trip_name_hint">Enter trip name</string>
+    <string name="trip_start">Start</string>
+    <string name="trip_end">End Trip</string>
+    <string name="trip_active">ACTIVE</string>
+    <string name="trip_no_photos">No photos in this trip</string>
+    <string name="my_trips">My Trips</string>
+
+    <!-- Profile -->
+    <string name="profile_logout">Logout</string>
+    <string name="profile_no_trips">No trips yet. Start traveling!</string>
+
+    <!-- Friend Profile -->
+    <string name="friend_profile_no_trips">No trips yet</string>
+
+    <!-- Friends -->
+    <string name="friends_pending_requests">Pending Requests</string>
+    <string name="friends_my_friends">My Friends</string>
+    <string name="friends_empty">No friends yet. Tap search to find people!</string>
+
+    <!-- Feed -->
+    <string name="feed_empty">No trips from friends yet</string>
+
+    <!-- User Search -->
+    <string name="hint_search_username">Search by username</string>
+    <string name="search_no_users">No users found</string>
+
+    <!-- Friend Actions -->
+    <string name="action_remove">Remove</string>
+    <string name="action_accept">Accept</string>
+    <string name="action_decline">Decline</string>
+
+    <!-- Content Descriptions -->
+    <string name="cd_search_users">Search users</string>
+    <string name="cd_view_on_map">View on map</string>
+    <string name="cd_options">Options</string>
+    <string name="cd_like">Like</string>
+    <string name="cd_menu">Menu</string>
+    <string name="cd_trip_photo">Trip photo</string>
+    <string name="cd_user_profile_picture">User profile picture</string>
 </resources>

@@ -33,7 +33,8 @@
             app:layout_constraintDimensionRatio="4:5"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/topDivider" />
+            app:layout_constraintTop_toBottomOf="@id/topDivider"
+            android:contentDescription="@string/cd_trip_photo"/>
 
         <View
             android:id="@+id/divider"
@@ -62,7 +63,7 @@
                 android:src="@drawable/ic_heart"
                 android:scaleType="centerInside"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="Like"
+                android:contentDescription="@string/cd_like"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent" />
@@ -87,7 +88,7 @@
                 android:src="@drawable/ic_menu"
                 android:scaleType="centerInside"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="Menu"
+                android:contentDescription="@string/cd_menu"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent" />

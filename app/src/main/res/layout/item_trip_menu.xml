@@ -31,7 +31,7 @@
             android:id="@+id/tripMenuActive"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="ACTIVE"
+            android:text="@string/trip_active"
             android:fontFamily="@font/mont_regular"
             android:textSize="12sp"
             android:textColor="@color/text_secondary"

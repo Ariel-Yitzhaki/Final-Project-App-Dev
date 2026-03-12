@@ -91,15 +91,14 @@
             android:id="@+id/mapButton"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:tint="@color/Azur"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="View on map"
+            android:contentDescription="@string/cd_view_on_map"
             android:scaleType="centerInside"
             android:src="@drawable/ic_location"
-
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/tripDate"
-            app:layout_constraintTop_toBottomOf="@+id/tripName" />
+            app:layout_constraintTop_toBottomOf="@+id/tripName"
+            app:tint="@color/Azur" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

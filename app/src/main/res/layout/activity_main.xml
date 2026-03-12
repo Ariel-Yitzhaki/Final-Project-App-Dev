@@ -25,7 +25,7 @@
             android:id="@+id/tripButton"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
-            android:text="Trips"
+            android:text="@string/label_trips"
             android:backgroundTint="@color/button_primary"
             android:textSize="12sp"
             android:textColor="@color/button_primary_text"
@@ -44,7 +44,7 @@
             android:id="@+id/hero_location"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Travel"
+            android:text="@string/nav_travel"
             android:textColor="@color/text_white"
             android:textSize="20sp"
             android:fontFamily="@font/mont_heavy"
@@ -104,7 +104,7 @@
             android:src="@drawable/ic_home"
             android:scaleType="centerInside"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Home Feed" />
+            android:contentDescription="@string/nav_home_feed" />
 
         <ImageButton
             android:id="@+id/nav_friends"
@@ -115,7 +115,7 @@
             android:src="@drawable/ic_friends"
             android:scaleType="centerInside"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Friends" />
+            android:contentDescription="@string/label_friends" />
 
         <View
             android:id="@+id/nav_placeholder"
@@ -132,7 +132,7 @@
             android:src="@drawable/ic_globe"
             android:scaleType="centerInside"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Map" />
+            android:contentDescription="@string/nav_map" />
 
         <ImageButton
             android:id="@+id/nav_profile"
@@ -143,7 +143,7 @@
             android:src="@drawable/ic_profile"
             android:scaleType="centerInside"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Profile" />
+            android:contentDescription="@string/nav_profile" />
 
     </LinearLayout>
 
@@ -151,7 +151,7 @@
         android:id="@+id/fab_add_picture"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:contentDescription="Add"
+        android:contentDescription="@string/label_add"
         android:src="@drawable/ic_plus"
         app:backgroundTint="@color/white"
         app:tint="@color/black"

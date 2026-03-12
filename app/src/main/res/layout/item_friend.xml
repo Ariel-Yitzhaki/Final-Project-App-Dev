@@ -66,7 +66,7 @@
             android:id="@+id/actionButton"
             android:layout_width="80dp"
             android:layout_height="40dp"
-            android:text="Remove"
+            android:text="@string/action_remove"
             android:textSize="12sp"
             android:textAllCaps="false"
             android:backgroundTint="@color/button_primary"

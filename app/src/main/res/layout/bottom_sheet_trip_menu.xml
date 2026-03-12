@@ -22,7 +22,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:text="Select Trip"
+        android:text="@string/trip_select"
         android:textSize="24sp"
         android:textColor="@color/text_primary"
         android:maxLines="1"

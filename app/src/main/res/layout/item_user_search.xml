@@ -27,7 +27,8 @@
             android:padding="1dp"
             app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Circle"
             app:strokeColor="@color/black"
-            app:strokeWidth="1dp"/>
+            app:strokeWidth="1dp"
+            android:contentDescription="@string/cd_user_profile_picture"/>
 
         <TextView
             android:id="@+id/displayNameText"
@@ -63,7 +64,7 @@
             android:id="@+id/actionButton"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
-            android:text="Add"
+            android:text="@string/label_add"
             android:textSize="12sp"
             android:textAllCaps="false"
             android:backgroundTint="@color/button_primary"
