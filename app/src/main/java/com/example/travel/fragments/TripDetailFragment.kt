@@ -24,12 +24,14 @@ import com.example.travel.utils.GeocodingUtils
 import kotlinx.coroutines.launch
 import com.example.travel.utils.loadProfilePicture
 import com.google.android.material.imageview.ShapeableImageView
+import kotlinx.coroutines.async
 
 // Displays photos from a single trip in a vertical scrollable list
 class TripDetailFragment : Fragment() {
 
     private lateinit var photoRepository: PhotoRepository
     private lateinit var tripRepository: TripRepository
+    private lateinit var authRepository: AuthRepository
     private lateinit var tripNameText: TextView
     private lateinit var photosRecyclerView: RecyclerView
     private lateinit var emptyText: TextView
@@ -73,6 +75,8 @@ class TripDetailFragment : Fragment() {
 
         photoRepository = PhotoRepository.instance
         tripRepository = TripRepository.instance
+        authRepository = AuthRepository.instance
+
         // Handles cleanup of photos and their associated data
         tripCleanupManager = TripCleanupManager(tripRepository, photoRepository, LikeRepository.instance)
 
@@ -111,10 +115,30 @@ class TripDetailFragment : Fragment() {
     private fun loadTripDetails() {
         if (tripId.isEmpty()) return
 
-        progressBar.visibility = View.VISIBLE
+        // Show cached data immediately if available
+        val cachedTrip = tripRepository.getCachedTripById(tripId)
+        val cachedPhotos = photoRepository.getCachedPhotosForTrip(tripId)
 
+        if (cachedTrip != null && cachedPhotos != null) {
+            tripNameText.text = cachedTrip.name
+            val cachedOwner = authRepository.getCachedUserProfile(cachedTrip.userId)
+            cachedOwner?.let { profileImage.loadProfilePicture(it.profilePictureUrl) }
+            isOwner = cachedTrip.userId == authRepository.getCurrentUser()?.uid
+            photoAdapter?.setOwner(isOwner)
+            if (cachedPhotos.isNotEmpty()) {
+                emptyText.visibility = View.GONE
+                displayPhotos(cachedPhotos.sortedByDescending { it.timestamp })
+            }
+        } else {
+            progressBar.visibility = View.VISIBLE
+        }
+
+        // Fetch fresh data from Firestore in the background
         lifecycleScope.launch {
-            val trip = tripRepository.getTripById(tripId)
+            val tripDeferred = async { tripRepository.getTripById(tripId) }
+            val photosDeferred = async { photoRepository.getPhotosForTrip(tripId) }
+
+            val trip = tripDeferred.await()
 
             if (trip == null) {
                 progressBar.visibility = View.GONE
@@ -125,15 +149,15 @@ class TripDetailFragment : Fragment() {
             }
 
             tripNameText.text = trip.name
+
             // Load trip owner's profile picture
-            val owner = AuthRepository.instance.getUserProfile(trip.userId)
+            val owner = authRepository.getUserProfile(trip.userId)
             owner?.let { profileImage.loadProfilePicture(it.profilePictureUrl) }
 
-            // Set owner flag
-            isOwner = trip.userId == AuthRepository.instance.getCurrentUser()?.uid
+            isOwner = trip.userId == authRepository.getCurrentUser()?.uid
             photoAdapter?.setOwner(isOwner)
 
-            val photos = photoRepository.getPhotosForTrip(tripId).sortedByDescending { it.timestamp }
+            val photos = photosDeferred.await().sortedByDescending { it.timestamp }
 
             progressBar.visibility = View.GONE
             swipeRefresh.isRefreshing = false

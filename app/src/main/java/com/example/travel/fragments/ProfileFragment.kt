@@ -107,6 +107,12 @@ class ProfileFragment : Fragment(), Refresh {
         }
         profileImage = view.findViewById(R.id.profileImage)
 
+        // Hide profile content until data is ready (hiding default profile icon on first load)
+        profileImage.visibility = View.INVISIBLE
+        displayNameText.visibility = View.INVISIBLE
+        usernameText.visibility = View.INVISIBLE
+        tripsRecyclerView.visibility = View.INVISIBLE
+
         // Opens gallery to pick a profile picture
         profileImage.setDebouncedClickListener {
             pickImageLauncher.launch("image/*")
@@ -193,6 +199,12 @@ class ProfileFragment : Fragment(), Refresh {
         completedTrips: List<Trip>,
         tripLikes: Map<String, Int>,
     ) {
+        // Make sure profile content is visible - made for first
+        profileImage.visibility = View.VISIBLE
+        displayNameText.visibility = View.VISIBLE
+        usernameText.visibility = View.VISIBLE
+        tripsRecyclerView.visibility = View.VISIBLE
+
         displayNameText.text = user.displayName
         usernameText.text = getString(R.string.format_username, user.username)
         profileImage.loadProfilePicture(user.profilePictureUrl)
