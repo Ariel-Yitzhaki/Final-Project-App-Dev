@@ -24,6 +24,8 @@ import com.example.travel.models.User
 import com.example.travel.utils.openTripDetail
 import kotlinx.coroutines.launch
 import com.example.travel.utils.openTripMap
+import kotlinx.coroutines.async
+import kotlin.math.PI
 
 // Displays friends' completed trips in a feed
 class HomeFeedFragment : Fragment(), Refresh {
@@ -81,9 +83,22 @@ class HomeFeedFragment : Fragment(), Refresh {
     private fun loadFeed() {
         val currentUserId = authRepository.getCurrentUser()?.uid ?: return
 
-        progressBar.visibility = View.VISIBLE
-        emptyText.visibility = View.GONE
+        // Show cached feed instantly if available
+        val cachedTrips = tripRepository.getCachedFeedTrips()
+        val cachedLikes = likeRepository.getCachedLikesForTrips()
 
+        if (cachedTrips != null && cachedTrips.isNotEmpty()) {
+            lifecycleScope.launch {
+                val tripsWithUsers =
+                    getTripsWithUsers(cachedTrips.sortedByDescending { it.endDate })
+                displayFeed(tripsWithUsers, cachedLikes)
+            }
+        } else {
+            progressBar.visibility = View.VISIBLE
+            emptyText.visibility = View.GONE
+        }
+
+        // Fetch fresh data from Firestore in the background
         lifecycleScope.launch {
             val friendIds = friendsRepository.getFriendIds(currentUserId)
 
@@ -92,18 +107,22 @@ class HomeFeedFragment : Fragment(), Refresh {
                 emptyText.visibility = View.VISIBLE
                 return@launch
             }
-
             val trips = tripRepository.getTripsWithPhotosForUsers(friendIds)
                 .sortedByDescending { it.endDate }
 
-            val tripsWithUsers = getTripsWithUsers(trips)
-            val tripLikes = likeRepository.getLikesForTrips(trips, photoRepository)
+            val tripsWithUsersDeferred = async { getTripsWithUsers(trips) }
+            val tripLikesDeferred = async { likeRepository.getLikesForTrips(trips, photoRepository) }
+
+            val tripsWithUsers = tripsWithUsersDeferred.await()
+            val tripLikes = tripLikesDeferred.await()
 
             progressBar.visibility = View.GONE
             displayFeed(tripsWithUsers, tripLikes)
             swipeRefresh.isRefreshing = false
-        }
     }
+}
+
+
 
     // Maps trips to their owner's username
     private suspend fun getTripsWithUsers(trips: List<Trip>): List<Pair<Trip, User>> {

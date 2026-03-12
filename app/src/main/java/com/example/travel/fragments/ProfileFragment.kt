@@ -34,9 +34,11 @@ import com.example.travel.utils.setDebouncedClickListener
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
 import com.example.travel.managers.TripCleanupManager
+import com.example.travel.models.User
 import com.example.travel.utils.loadProfilePicture
 import com.example.travel.utils.openTripDetail
 import com.example.travel.utils.openTripMap
+import kotlinx.coroutines.async
 
 class ProfileFragment : Fragment(), Refresh {
 
@@ -133,46 +135,83 @@ class ProfileFragment : Fragment(), Refresh {
 
     private fun loadProfile(excludeTripId: String? = null) {
         val userId = authRepository.getCurrentUser()?.uid ?: return
-        progressBar.visibility = View.VISIBLE
 
+        // Show cached data immediately so the screen isn't empty while fetching
+        val cachedUser = authRepository.getCachedUserProfile(userId)
+        val cachedActive = tripRepository.getCachedActiveTrip(userId)
+            ?.takeIf { it.id != excludeTripId }
+        val cachedCompleted = tripRepository.getCachedCompletedTrips(userId)
+            ?.filter { it.id != excludeTripId }
+        val cachedLikes = likeRepository.getCachedLikesForTrips()
+
+        if (cachedUser != null && cachedCompleted != null) {
+            displayProfile(cachedUser, cachedActive, cachedCompleted, cachedLikes, excludeTripId)
+        } else {
+            progressBar.visibility = View.VISIBLE
+        }
+
+        // Fetch fresh data from Firestore in the background
         lifecycleScope.launch {
+
+            val userDeferred = async { authRepository.getUserProfile(userId) }
+            val activeDeferred = async { tripRepository.getActiveTrip(userId) }
+            val completedDeferred = async { tripRepository.getCompletedTrips(userId) }
+
             // Load user info
-            val user = authRepository.getUserProfile(userId)
-            user?.let {
-                displayNameText.text = it.displayName
-                usernameText.text = getString(R.string.format_username, it.username)
-                profileImage.loadProfilePicture(it.profilePictureUrl)
-            }
-
-            // Load completed trips
-            val activeTrip = tripRepository.getActiveTrip(userId)
+            val user = userDeferred.await()
+            val activeTrip = activeDeferred.await()
                 ?.takeIf { it.id != excludeTripId }
-            val completedTrips = tripRepository.getCompletedTrips(userId)
-                .filter {it.id != excludeTripId}
+            val completedTrips = completedDeferred.await()
+                .filter { it.id != excludeTripId }
 
-            // Active trip first, then completed trips sorted by date (newest first)
+            // Build full trip list to fetch likes for
             val allTrips = mutableListOf<Trip>()
             activeTrip?.let {allTrips.add(it)}
-            val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
-            allTrips.addAll(completedTrips.sortedByDescending {
-                try {
-                    dateFormat.parse(it.startDate)?.time ?: 0L
-                } catch (_: Exception) { 0L }
-            })
+            allTrips.addAll(completedTrips)
 
-            // Load cover photos for each trip
+            val tripLikes = if (allTrips.isNotempty()) {
+                likeRepository.getLikesForTrips(allTrips, photoRepository)
+            } else {
+                emptyMap()
+            }
+
             progressBar.visibility = View.GONE
+            swipeRefresh.isRefreshing = false
 
-            if (allTrips.isNotEmpty()) {
-                emptyText.visibility = View.GONE
-
-                val tripLikes = likeRepository.getLikesForTrips(allTrips, photoRepository)
-
-                tripAdapter.updateData(allTrips, tripLikes)
+            if (user != null) {
+                displayProfile(user, activeTrip, completedTrips, tripLikes, excludeTripId)
             } else {
                 emptyText.visibility = View.VISIBLE
             }
-            swipeRefresh.isRefreshing = false
+        }
+    }
+
+    // Populates the profile UI with user info and sorted trips
+    private fun displayProfile(
+        user: User,
+        activeTrip: Trip?,
+        completedTrips: List<Trip>,
+        tripLikes: Map<String, Int>,
+        excludeTripId: String?
+    ) {
+        displayNameText.text = user.displayName
+        usernameText.text = getString(R.string.format_username, user.username)
+        profileImage.loadProfilePicture(user.profilePictureUrl)
+
+        val allTrips = mutableListOf<Trip>()
+        activeTrip?.let { allTrips.add(it) }
+        val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
+        allTrips.addAll(completedTrips.sortedByDescending {
+            try {
+                dateFormat.parse(it.startDate)?.time ?: 0L
+            } catch (_: Exception) { 0L }
+        })
+
+        if (allTrips.isNotEmpty()) {
+            emptyText.visibility = View.GONE
+            tripAdapter.updateData(allTrips, tripLikes)
+        } else {
+            emptyText.visibility = View.VISIBLE
         }
     }
 

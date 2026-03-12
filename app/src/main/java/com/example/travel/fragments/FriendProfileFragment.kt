@@ -18,10 +18,12 @@ import com.example.travel.data.LikeRepository
 import com.example.travel.data.PhotoRepository
 import com.example.travel.data.TripRepository
 import com.example.travel.models.Trip
+import com.example.travel.models.User
 import com.example.travel.utils.loadProfilePicture
 import com.example.travel.utils.openTripDetail
 import com.example.travel.utils.openTripMap
 import com.google.android.material.imageview.ShapeableImageView
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -97,41 +99,73 @@ class FriendProfileFragment : Fragment() {
     }
 
     private fun loadFriendProfile() {
-        progressBar.visibility = View.VISIBLE
+        // Show cached data immediately if available
+        val cachedUser = authRepository.getCachedUserProfile(friendId)
+        val cachedActive = tripRepository.getCachedActiveTrip(friendId)
+        val cachedCompleted = tripRepository.getCachedCompletedTrips(friendId)
+        val cachedLikes = likeRepository.getCachedLikesForTrips()
 
+        if (cachedUser != null && cachedCompleted != null) {
+            displayFriendProfile(cachedUser, cachedActive, cachedCompleted, cachedLikes)
+        } else {
+            progressBar.visibility = View.VISIBLE
+        }
+
+        // Fetch fresh data from Firestore in the background
         lifecycleScope.launch {
-            // Load friend's info
-            val user = authRepository.getUserProfile(friendId)
-            user?.let {
-                profileImage.loadProfilePicture(it.profilePictureUrl)
-                displayNameText.text = it.displayName
-                usernameText.text = "@${it.username}"
-            }
+            val userDeferred = async { authRepository.getUserProfile(friendId) }
+            val activeDeferred = async { tripRepository.getActiveTrip(friendId) }
+            val completedDeferred = async { tripRepository.getCompletedTrips(friendId) }
 
-            // Load friend's trips (active + completed)
-            val activeTrip = tripRepository.getActiveTrip(friendId)
-            val completedTrips = tripRepository.getCompletedTrips(friendId)
+            val user = userDeferred.await()
+            val activeTrip = activeDeferred.await()
+            val completedTrips = completedDeferred.await()
 
             val allTrips = mutableListOf<Trip>()
-            activeTrip?.let {allTrips.add(it)}
-            val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
-            allTrips.addAll(completedTrips.sortedByDescending {
-                try {
-                    dateFormat.parse(it.startDate)?.time ?: 0L
-                } catch (_: Exception) { 0L }
-            })
+            activeTrip?.let { allTrips.add(it) }
+            allTrips.addAll(completedTrips)
+
+            val tripLikes = if (allTrips.isNotEmpty()) {
+                likeRepository.getLikesForTrips(allTrips, photoRepository)
+            } else {
+                emptyMap()
+            }
 
             progressBar.visibility = View.GONE
 
-            if (allTrips.isNotEmpty()) {
-                emptyText.visibility = View.GONE
-
-                val tripLikes = likeRepository.getLikesForTrips(allTrips, photoRepository)
-
-                tripAdapter.updateData(allTrips, tripLikes)
+            if (user != null) {
+                displayFriendProfile(user, activeTrip, completedTrips, tripLikes)
             } else {
                 emptyText.visibility = View.VISIBLE
             }
+        }
+    }
+
+    // Populates the friend profile UI with user info and sorted trips
+    private fun displayFriendProfile(
+        user: User,
+        activeTrip: Trip?,
+        completedTrips: List<Trip>,
+        tripLikes: Map<String, Int>
+    ) {
+        profileImage.loadProfilePicture(user.profilePictureUrl)
+        displayNameText.text = user.displayName
+        usernameText.text = "@${user.username}"
+
+        val allTrips = mutableListOf<Trip>()
+        activeTrip?.let { allTrips.add(it) }
+        val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
+        allTrips.addAll(completedTrips.sortedByDescending {
+            try {
+                dateFormat.parse(it.startDate)?.time ?: 0L
+            } catch (_: Exception) { 0L }
+        })
+
+        if (allTrips.isNotEmpty()) {
+            emptyText.visibility = View.GONE
+            tripAdapter.updateData(allTrips, tripLikes)
+        } else {
+            emptyText.visibility = View.VISIBLE
         }
     }
 }
