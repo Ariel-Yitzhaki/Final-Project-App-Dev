@@ -145,7 +145,7 @@ class ProfileFragment : Fragment(), Refresh {
         val cachedLikes = likeRepository.getCachedLikesForTrips()
 
         if (cachedUser != null && cachedCompleted != null) {
-            displayProfile(cachedUser, cachedActive, cachedCompleted, cachedLikes, excludeTripId)
+            displayProfile(cachedUser, cachedActive, cachedCompleted, cachedLikes)
         } else {
             progressBar.visibility = View.VISIBLE
         }
@@ -169,7 +169,7 @@ class ProfileFragment : Fragment(), Refresh {
             activeTrip?.let {allTrips.add(it)}
             allTrips.addAll(completedTrips)
 
-            val tripLikes = if (allTrips.isNotempty()) {
+            val tripLikes = if (allTrips.isNotEmpty()) {
                 likeRepository.getLikesForTrips(allTrips, photoRepository)
             } else {
                 emptyMap()
@@ -179,7 +179,7 @@ class ProfileFragment : Fragment(), Refresh {
             swipeRefresh.isRefreshing = false
 
             if (user != null) {
-                displayProfile(user, activeTrip, completedTrips, tripLikes, excludeTripId)
+                displayProfile(user, activeTrip, completedTrips, tripLikes)
             } else {
                 emptyText.visibility = View.VISIBLE
             }
@@ -192,7 +192,6 @@ class ProfileFragment : Fragment(), Refresh {
         activeTrip: Trip?,
         completedTrips: List<Trip>,
         tripLikes: Map<String, Int>,
-        excludeTripId: String?
     ) {
         displayNameText.text = user.displayName
         usernameText.text = getString(R.string.format_username, user.username)

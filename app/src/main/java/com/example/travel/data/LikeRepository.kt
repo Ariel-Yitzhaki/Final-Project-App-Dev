@@ -3,6 +3,7 @@ package com.example.travel.data
 import com.example.travel.models.Like
 import com.example.travel.models.Trip
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.async
 import kotlinx.coroutines.tasks.await
 
 class LikeRepository {
@@ -61,13 +62,23 @@ class LikeRepository {
     // Gets like counts for multiple trips
     suspend fun getLikesForTrips(trips: List<Trip>, photoRepository: PhotoRepository): Map<String, Int> {
         val tripLikes = mutableMapOf<String, Int>()
-        for (trip in trips) {
-            val photos = photoRepository.getPhotosForTrip(trip.id)
-            val photoIds = photos.map { it.id }
-            val likes = getTotalLikesForTrip(photoIds)
-            tripLikes[trip.id] = likes
-            cachedTripLikes[trip.id] = likes
+
+        // Run all trip-like fetches concurrently instead of one by one
+        kotlinx.coroutines.coroutineScope {
+            val deferredResults = trips.map { trip ->
+                async {
+                    val photos = photoRepository.getPhotosForTrip(trip.id)
+                    val photoIds = photos.map { it.id }
+                    trip.id to getTotalLikesForTrip(photoIds)
+                }
+            }
+            for (deferred in deferredResults) {
+                val (tripId, likes) = deferred.await()
+                tripLikes[tripId] = likes
+                cachedTripLikes[tripId] = likes
+            }
         }
+
         return tripLikes
     }
 
