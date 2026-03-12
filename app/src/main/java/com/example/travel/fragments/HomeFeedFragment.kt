@@ -50,11 +50,11 @@ class HomeFeedFragment : Fragment(), Refresh {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        authRepository = AuthRepository()
-        friendsRepository = FriendsRepository()
-        tripRepository = TripRepository()
-        photoRepository = PhotoRepository()
-        likeRepository = LikeRepository()
+        authRepository = AuthRepository.instance
+        friendsRepository = FriendsRepository.instance
+        tripRepository = TripRepository.instance
+        photoRepository = PhotoRepository.instance
+        likeRepository = LikeRepository.instance
 
         feedRecyclerView = view.findViewById(R.id.feedRecyclerView)
         emptyText = view.findViewById(R.id.emptyText)

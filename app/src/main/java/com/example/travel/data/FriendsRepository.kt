@@ -7,7 +7,12 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
 class FriendsRepository {
-    private val authRepository: AuthRepository = AuthRepository()
+
+    companion object {
+        val instance = FriendsRepository()
+    }
+
+    private val authRepository: AuthRepository = AuthRepository.instance
     private val firestore = FirebaseFirestore.getInstance()
     private val usersCollection = firestore.collection("users")
     private val friendsCollection = firestore.collection("friends")

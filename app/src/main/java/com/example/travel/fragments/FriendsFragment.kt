@@ -45,8 +45,8 @@ class FriendsFragment : Fragment(), Refresh {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        authRepository = AuthRepository()
-        friendsRepository = FriendsRepository()
+        authRepository = AuthRepository.instance
+        friendsRepository = FriendsRepository.instance
 
         // Bind views
         requestsLabel = view.findViewById(R.id.requestsLabel)

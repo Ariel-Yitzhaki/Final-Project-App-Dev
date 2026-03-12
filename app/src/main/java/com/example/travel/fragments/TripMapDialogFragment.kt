@@ -52,7 +52,7 @@ class TripMapDialogFragment : DialogFragment(), OnMapReadyCallback {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        photoRepository = PhotoRepository()
+        photoRepository = PhotoRepository.instance
         val mapFragment = childFragmentManager.findFragmentById(R.id.dialogMap) as SupportMapFragment
         mapFragment.getMapAsync(this)
     }

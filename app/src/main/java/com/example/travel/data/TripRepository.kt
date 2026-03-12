@@ -6,7 +6,22 @@ import kotlinx.coroutines.tasks.await
 
 class TripRepository {
 
+    companion object {
+        val instance = TripRepository()
+    }
     private val tripsCollection = FirebaseFirestore.getInstance().collection("trips")
+
+    // Cached trips per use ID, so navigating back shows data instantly
+    private val cachedUserTrips = mutableMapOf<String, List<Trip>>()
+
+    // Caches single trips by trip ID
+    private val cachedTripsById = mutableMapOf<String, Trip>()
+
+    // Cached active trip per user ID
+    private var cachedActiveTrip = mutableMapOf<String, Trip?>()
+
+    // Cache for friend feed trips (keyed by sorted friend IDs to detect changes)
+    private var cachedFeedTrips: List<Trip>? = null
 
     // Save a new trip
     suspend fun saveTrip(trip: Trip) {
@@ -20,13 +35,31 @@ class TripRepository {
             .whereEqualTo("active", true)
             .get()
             .await()
-        return snapshot.toObjects(Trip::class.java).firstOrNull()
+        val trip = snapshot.toObjects(Trip::class.java).firstOrNull()
+        cachedActiveTrip[userId] = trip
+        return trip
+    }
+
+    // Returns cached active trip if available
+    fun getCachedActiveTrip(userId: String): Trip? {
+        return cachedActiveTrip[userId]
+    }
+
+    // If we have cached data for this user (even if it's null)
+    fun hasCachedActiveTrip(userId: String): Boolean {
+        return cachedActiveTrip.containsKey(userId)
     }
 
     // Get a single trip by its ID
     suspend fun getTripById(tripId: String): Trip? {
         val snapshot = tripsCollection.document(tripId).get().await()
-        return snapshot.toObject(Trip::class.java)
+        val trip = snapshot.toObject(Trip::class.java)
+        if (trip != null) cachedTripsById[tripId] = trip
+        return trip
+    }
+
+    fun getCachedTripById(tripId: String): Trip? {
+        return cachedTripsById[tripId]
     }
 
     // Get all completed trips for user (with photos)
@@ -36,7 +69,14 @@ class TripRepository {
             .whereEqualTo("active", false)
             .get()
             .await()
-        return snapshot.toObjects(Trip::class.java).filter { it.photoCount > 0 }
+        val trips = snapshot.toObjects(Trip::class.java).filter { it.photoCount > 0 }
+        cachedUserTrips[userId] = trips
+        return trips
+    }
+
+    // Returns cached completed trips if available, null if no cache exists
+    fun getCachedCompletedTrips(userId: String): List<Trip>? {
+        return cachedUserTrips[userId]
     }
 
     // Increment photo count for a trip
@@ -76,8 +116,14 @@ class TripRepository {
             allTrips.addAll(snapshot.toObjects(Trip::class.java))
         }
 
+        cachedFeedTrips = allTrips
         return allTrips
     }
+
+    fun getCachedFeedTrips(): List<Trip>? {
+        return cachedFeedTrips
+    }
+
 
     // Reactivates a trip (sets active = true, clears endDate)
     suspend fun reactivateTrip(tripId: String): Boolean {
@@ -111,5 +157,13 @@ class TripRepository {
     // Updates photo count for a trip
     suspend fun updatePhotoCount(tripId: String, count: Int) {
         tripsCollection.document(tripId).update("photoCount", count).await()
+    }
+
+    // Clears all cached data - call after mutations that affect trip state
+    fun invalidateCache() {
+        cachedUserTrips.clear()
+        cachedTripsById.clear()
+        cachedActiveTrip.clear()
+        cachedFeedTrips = null
     }
 }

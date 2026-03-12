@@ -62,7 +62,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, Refresh {
 
         // Initialize Google's location service
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
-        photoRepository = PhotoRepository()
+        photoRepository = PhotoRepository.instance
 
         // Find the map fragment and request the GoogleMap object asynchronously
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment

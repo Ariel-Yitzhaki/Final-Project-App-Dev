@@ -65,10 +65,10 @@ class FriendProfileFragment : Fragment() {
 
         friendId = arguments?.getString("friendId") ?: return
 
-        authRepository = AuthRepository()
-        tripRepository = TripRepository()
-        photoRepository = PhotoRepository()
-        likeRepository = LikeRepository()
+        authRepository = AuthRepository.instance
+        tripRepository = TripRepository.instance
+        photoRepository = PhotoRepository.instance
+        likeRepository = LikeRepository.instance
 
         displayNameText = view.findViewById(R.id.displayNameText)
         usernameText = view.findViewById(R.id.usernameText)

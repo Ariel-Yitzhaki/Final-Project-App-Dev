@@ -7,6 +7,12 @@ import kotlinx.coroutines.tasks.await
 
 class LikeRepository {
 
+    companion object {
+        val instance = LikeRepository()
+    }
+
+    // Cached total likes per trip ID
+    private val cachedTripLikes = mutableMapOf<String, Int>()
     private val likesCollection = FirebaseFirestore.getInstance().collection("likes")
 
     // Toggles like status - returns true if now liked, false if unliked
@@ -58,9 +64,15 @@ class LikeRepository {
         for (trip in trips) {
             val photos = photoRepository.getPhotosForTrip(trip.id)
             val photoIds = photos.map { it.id }
-            tripLikes[trip.id] = getTotalLikesForTrip(photoIds)
+            val likes = getTotalLikesForTrip(photoIds)
+            tripLikes[trip.id] = likes
+            cachedTripLikes[trip.id] = likes
         }
         return tripLikes
+    }
+
+    fun getCachedLikesForTrips(): Map<String, Int> {
+        return cachedTripLikes.toMap()
     }
 
     suspend fun deleteLikesForPhoto(photoId: String) {

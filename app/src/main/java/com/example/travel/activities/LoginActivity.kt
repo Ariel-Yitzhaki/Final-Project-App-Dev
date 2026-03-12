@@ -29,7 +29,7 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        authRepository = AuthRepository()
+        authRepository = AuthRepository.instance
 
         // If already logged in, skip to MainActivity
         if (authRepository.getCurrentUser() != null) {

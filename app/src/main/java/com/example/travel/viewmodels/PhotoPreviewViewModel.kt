@@ -26,9 +26,9 @@ sealed class UploadState {
 
 class PhotoPreviewViewModel : ViewModel() {
 
-    private val authRepository = AuthRepository()
-    private val photoRepository = PhotoRepository()
-    private val tripRepository = TripRepository()
+    private val authRepository = AuthRepository.instance
+    private val photoRepository = PhotoRepository.instance
+    private val tripRepository = TripRepository.instance
 
     private val _uploadState = MutableLiveData<UploadState>(UploadState.Idle)
     val uploadState: LiveData<UploadState> = _uploadState

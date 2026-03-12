@@ -71,10 +71,10 @@ class TripDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        photoRepository = PhotoRepository()
-        tripRepository = TripRepository()
+        photoRepository = PhotoRepository.instance
+        tripRepository = TripRepository.instance
         // Handles cleanup of photos and their associated data
-        tripCleanupManager = TripCleanupManager(tripRepository, photoRepository, LikeRepository())
+        tripCleanupManager = TripCleanupManager(tripRepository, photoRepository, LikeRepository.instance)
 
         // Bind views
         tripNameText = view.findViewById(R.id.tripNameText)
@@ -92,9 +92,9 @@ class TripDetailFragment : Fragment() {
         photoAdapter = TripPhotoAdapter(
             mutableListOf(),
             mutableMapOf(),
-            AuthRepository().getCurrentUser()?.uid ?: "",
+            AuthRepository.instance.getCurrentUser()?.uid ?: "",
             lifecycleScope,
-            LikeRepository(),
+            LikeRepository.instance,
             isOwner
         ) { photo -> showDeletePhotoDialog(photo) }
         photosRecyclerView.adapter = photoAdapter
@@ -126,11 +126,11 @@ class TripDetailFragment : Fragment() {
 
             tripNameText.text = trip.name
             // Load trip owner's profile picture
-            val owner = AuthRepository().getUserProfile(trip.userId)
+            val owner = AuthRepository.instance.getUserProfile(trip.userId)
             owner?.let { profileImage.loadProfilePicture(it.profilePictureUrl) }
 
             // Set owner flag
-            isOwner = trip.userId == AuthRepository().getCurrentUser()?.uid
+            isOwner = trip.userId == AuthRepository.instance.getCurrentUser()?.uid
             photoAdapter?.setOwner(isOwner)
 
             val photos = photoRepository.getPhotosForTrip(tripId).sortedByDescending { it.timestamp }

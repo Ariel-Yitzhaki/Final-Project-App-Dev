@@ -94,9 +94,9 @@ class MainActivity : AppCompatActivity(), TripEndListener {
 
     // Initializes TripManager and CameraManager with callbacks
     private fun initializeManagers() {
-        val authRepository = AuthRepository()
-        val tripRepository = TripRepository()
-        val photoRepository = PhotoRepository()
+        val authRepository = AuthRepository.instance
+        val tripRepository = TripRepository.instance
+        val photoRepository = PhotoRepository.instance
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         tripManager = TripManager(this, authRepository, tripRepository, photoRepository)
@@ -166,7 +166,7 @@ class MainActivity : AppCompatActivity(), TripEndListener {
                 return true
             }
 
-            val photos = PhotoRepository().getPhotosForTrip(tripId)
+            val photos = PhotoRepository.instance.getPhotosForTrip(tripId)
 
             for (photo in photos) {
                 val results = FloatArray(1)

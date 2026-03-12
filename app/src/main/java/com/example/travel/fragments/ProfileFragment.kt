@@ -87,10 +87,10 @@ class ProfileFragment : Fragment(), Refresh {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        authRepository = AuthRepository()
-        tripRepository = TripRepository()
-        photoRepository = PhotoRepository()
-        likeRepository = LikeRepository()
+        authRepository = AuthRepository.instance
+        tripRepository = TripRepository.instance
+        photoRepository = PhotoRepository.instance
+        likeRepository = LikeRepository.instance
         tripCleanupManager = TripCleanupManager(tripRepository, photoRepository, likeRepository)
 
         // Bind views

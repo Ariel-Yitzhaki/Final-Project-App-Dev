@@ -8,6 +8,12 @@ import kotlinx.coroutines.tasks.await
 
 class AuthRepository {
 
+    companion object {
+        val instance = AuthRepository()
+    }
+
+    // Cached user profiles by user ID, avoids re-fetching on every screen
+    private val cachedProfiles = mutableMapOf<String, User>()
     private val auth = FirebaseAuth.getInstance()
     private val usersCollection = FirebaseFirestore.getInstance().collection("users")
 
@@ -56,14 +62,24 @@ class AuthRepository {
     // Get user profile from Firestore by ID
     suspend fun getUserProfile(uid: String): User? {
         return try {
-            usersCollection.document(uid).get().await().toObject(User::class.java)
+            val user = usersCollection.document(uid).get().await().toObject(User::class.java)
+            if (user != null) cachedProfiles[uid] = user
+            user
         } catch (_: Exception) {
             null
         }
     }
 
+    fun getCachedUserProfile(uid: String): User? {
+        return cachedProfiles[uid]
+    }
+
     // Updates user's profile picture URL in Firestore
     suspend fun updateProfilePicture(uid: String, url: String) {
         usersCollection.document(uid).update("profilePictureUrl", url).await()
+        // Keep cache in sync with the new picture URL
+        cachedProfiles[uid]?.let {
+            cachedProfiles[uid] = it.copy(profilePictureUrl = url)
+        }
     }
 }

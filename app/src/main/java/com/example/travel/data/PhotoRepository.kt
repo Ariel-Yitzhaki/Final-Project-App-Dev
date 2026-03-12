@@ -10,6 +10,12 @@ import java.io.File
 
 class PhotoRepository {
 
+    companion object {
+        val instance = PhotoRepository()
+    }
+
+    // Cached photos per trip ID
+    private val cachedTripPhotos = mutableMapOf<String, List<Photo>>()
     private val photosCollection = FirebaseFirestore.getInstance().collection("photos")
     private val storageRef = FirebaseStorage.getInstance().reference
 
@@ -39,7 +45,13 @@ class PhotoRepository {
             .whereEqualTo("tripId", tripId)
             .get()
             .await()
-        return snapshot.toObjects(Photo::class.java)
+        val photos = snapshot.toObjects(Photo::class.java)
+        cachedTripPhotos[tripId] = photos
+        return photos
+    }
+
+    fun getCachedPhotosForTrip(tripId: String): List<Photo>? {
+        return cachedTripPhotos[tripId]
     }
 
     // Returns the most recent photo for a trip (by timestamp), or null if no photos
@@ -59,5 +71,14 @@ class PhotoRepository {
 
     suspend fun deletePhoto(photoId: String) {
         photosCollection.document(photoId).delete().await()
+    }
+
+    // Clears cached photos for a specific trip, or all if no ID given
+    fun invalidateCache(tripId: String? = null) {
+        if (tripId != null) {
+            cachedTripPhotos.remove(tripId)
+        } else {
+            cachedTripPhotos.clear()
+        }
     }
 }
