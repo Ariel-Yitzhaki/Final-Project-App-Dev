@@ -115,7 +115,7 @@ class UserSearchFragment : Fragment() {
             val result = friendsRepository.sendFriendRequest(currentUserId, user.id)
             result.fold(
                 onSuccess = {
-                    Toast.makeText(requireContext(), "Request sent!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), getString(R.string.toast_request_sent), Toast.LENGTH_SHORT).show()
                     // Refresh search results to update button state
                     val query = searchInput.text.toString().trim()
                     if (query.isNotEmpty()) {
@@ -123,7 +123,7 @@ class UserSearchFragment : Fragment() {
                     }
                 },
                 onFailure = {
-                    Toast.makeText(requireContext(), "Failed to send request", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), getString(R.string.toast_request_failed), Toast.LENGTH_SHORT).show()
                 }
             )
         }

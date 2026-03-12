@@ -227,8 +227,10 @@ class ProfileFragment : Fragment(), Refresh {
     // Confirms before deleting a trip
     private fun confirmDeleteTrip(trip: Trip) {
         val dialogView = layoutInflater.inflate(R.layout.dialog_confirm, null)
-        dialogView.findViewById<TextView>(R.id.dialogTitle).text = getString(R.string.dialog_delete_trip_title)
-        dialogView.findViewById<TextView>(R.id.dialogMessage).text = "Are you sure you want to delete '${trip.name}'? This cannot be undone."
+        dialogView.findViewById<TextView>(R.id.dialogTitle)
+            .text = getString(R.string.dialog_delete_trip_title)
+        dialogView.findViewById<TextView>(R.id.dialogMessage)
+            .text = getString(R.string.dialog_delete_trip_confirm, trip.name)
 
         val dialog = android.app.AlertDialog.Builder(requireContext())
             .setView(dialogView)
@@ -244,7 +246,7 @@ class ProfileFragment : Fragment(), Refresh {
             }
         }
         dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.dialogNegativeButton).apply {
-            text = "Cancel"
+            text = getString(R.string.label_cancel)
             setOnClickListener { dialog.dismiss() }
         }
 
@@ -284,7 +286,7 @@ class ProfileFragment : Fragment(), Refresh {
                 // Display the new profile picture
                 profileImage.loadProfilePicture(downloadUrl)
             } catch (_: Exception) {
-                Toast.makeText(requireContext(), "Failed to upload picture", Toast.LENGTH_SHORT)
+                Toast.makeText(requireContext(), getString(R.string.toast_upload_picture_failed), Toast.LENGTH_SHORT)
                     .show()
             } finally {
                 progressBar.visibility = View.GONE

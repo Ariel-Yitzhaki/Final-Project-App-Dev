@@ -119,9 +119,10 @@ class TripManager(
     // Shows dialog warning user that empty trip will be discarded
     private fun showDiscardEmptyTripDialog(selectedTrip: Trip?, emptyTrip: Trip) {
         val dialogView = activity.layoutInflater.inflate(R.layout.dialog_confirm, null)
-        dialogView.findViewById<android.widget.TextView>(R.id.dialogTitle).text = "Discard Empty Trip?"
-        dialogView.findViewById<android.widget.TextView>(R.id.dialogMessage).text = "'${emptyTrip.name}' has no photos and will be discarded."
-
+        dialogView.findViewById<android.widget.TextView>(R.id.dialogTitle).text =
+            activity.getString(R.string.dialog_discard_trip_title)
+        dialogView.findViewById<android.widget.TextView>(R.id.dialogMessage).text =
+            activity.getString(R.string.dialog_discard_trip_message, emptyTrip.name)
         val dialog = AlertDialog.Builder(activity)
             .setView(dialogView)
             .create()
@@ -129,7 +130,7 @@ class TripManager(
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
         dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.dialogPositiveButton).apply {
-            text = "Discard"
+            text = activity.getString(R.string.action_discard)
             setOnClickListener {
                 dialog.dismiss()
                 activity.lifecycleScope.launch {
@@ -140,7 +141,7 @@ class TripManager(
             }
         }
         dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.dialogNegativeButton).apply {
-            text = "Cancel"
+            text = activity.getString(R.string.label_cancel)
             setOnClickListener { dialog.dismiss() }
         }
 
@@ -203,7 +204,7 @@ class TripManager(
                     }
                 }
             } else {
-                Toast.makeText(activity, "Please enter trip name",
+                Toast.makeText(activity, activity.getString(R.string.toast_enter_trip_name),
                     Toast.LENGTH_SHORT).show()
             }
         }

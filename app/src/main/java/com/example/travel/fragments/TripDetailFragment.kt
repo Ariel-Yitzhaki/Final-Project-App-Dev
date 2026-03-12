@@ -118,8 +118,8 @@ class TripDetailFragment : Fragment() {
 
             if (trip == null) {
                 progressBar.visibility = View.GONE
-                tripNameText.text = "Trip unavailable"
-                emptyText.text = "This trip is no longer available"
+                tripNameText.text = getString(R.string.trip_unavailable)
+                emptyText.text = getString(R.string.trip_no_longer_available)
                 emptyText.visibility = View.VISIBLE
                 return@launch
             }
@@ -171,9 +171,10 @@ class TripDetailFragment : Fragment() {
     // Shows confirmation dialog before deleting a photo
     private fun showDeletePhotoDialog(photo: Photo) {
         val dialogView = layoutInflater.inflate(R.layout.dialog_confirm, null)
-        dialogView.findViewById<TextView>(R.id.dialogTitle).text = "Delete Photo"
+        dialogView.findViewById<TextView>(R.id.dialogTitle).text =
+            getString(R.string.dialog_delete_photo_title)
         dialogView.findViewById<TextView>(R.id.dialogMessage).text =
-            "Are you sure you want to delete this photo from the trip?"
+            getString(R.string.dialog_delete_photo_message)
 
         val dialog = android.app.AlertDialog.Builder(requireContext())
             .setView(dialogView)
@@ -183,7 +184,7 @@ class TripDetailFragment : Fragment() {
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
         dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.dialogPositiveButton).apply {
-            text = "Delete"
+            text = getString(R.string.action_delete)
             backgroundTintList = android.content.res.ColorStateList.valueOf(
                 resources.getColor(R.color.button_destructive, null)
             )
@@ -197,7 +198,7 @@ class TripDetailFragment : Fragment() {
         }
 
         dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.dialogNegativeButton).apply {
-            text = "Cancel"
+            text = getString(R.string.label_cancel)
             setOnClickListener { dialog.dismiss() }
         }
 
