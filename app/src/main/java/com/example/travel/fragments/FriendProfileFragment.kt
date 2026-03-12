@@ -79,6 +79,12 @@ class FriendProfileFragment : Fragment() {
         progressBar = view.findViewById(R.id.progressBar)
         profileImage = view.findViewById(R.id.profilePicture)
 
+        // Hide profile content until data is ready to avoid showing default placeholders
+        profileImage.visibility = View.INVISIBLE
+        displayNameText.visibility = View.INVISIBLE
+        usernameText.visibility = View.INVISIBLE
+        tripsRecyclerView.visibility = View.INVISIBLE
+
         tripsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         tripAdapter = TripAdapter(
             onEndTripClick = {},
@@ -148,6 +154,12 @@ class FriendProfileFragment : Fragment() {
         completedTrips: List<Trip>,
         tripLikes: Map<String, Int>
     ) {
+        // Content is ready, make everything visible
+        profileImage.visibility = View.VISIBLE
+        displayNameText.visibility = View.VISIBLE
+        usernameText.visibility = View.VISIBLE
+        tripsRecyclerView.visibility = View.VISIBLE
+
         profileImage.loadProfilePicture(user.profilePictureUrl)
         displayNameText.text = user.displayName
         usernameText.text = "@${user.username}"

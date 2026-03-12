@@ -3,6 +3,7 @@ package com.example.travel.utils
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.example.travel.R
 import com.example.travel.fragments.TripDetailFragment
 import com.example.travel.fragments.TripMapDialogFragment
@@ -28,6 +29,8 @@ fun ImageView.loadProfilePicture(url: String) {
             .load(url)
             .circleCrop()
             .placeholder(R.drawable.ic_profile)
+            // Smooth transition so the image fades in instead of popping
+            .transition(DrawableTransitionOptions.withCrossFade(200))
             .into(this)
     } else {
         this.setImageResource(R.drawable.ic_profile)
