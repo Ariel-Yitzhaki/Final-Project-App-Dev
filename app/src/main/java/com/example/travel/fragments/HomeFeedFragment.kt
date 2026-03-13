@@ -25,7 +25,6 @@ import com.example.travel.utils.openTripDetail
 import kotlinx.coroutines.launch
 import com.example.travel.utils.openTripMap
 import kotlinx.coroutines.async
-import kotlin.math.PI
 
 // Displays friends' completed trips in a feed
 class HomeFeedFragment : Fragment(), Refresh {
@@ -79,7 +78,7 @@ class HomeFeedFragment : Fragment(), Refresh {
         loadFeed()
     }
 
-    // Loads friends' completed trips sorted by end date
+    // Loads friend's trips sorted by end date
     private fun loadFeed() {
         val currentUserId = authRepository.getCurrentUser()?.uid ?: return
 
@@ -122,8 +121,6 @@ class HomeFeedFragment : Fragment(), Refresh {
     }
 }
 
-
-
     // Maps trips to their owner's username
     private suspend fun getTripsWithUsers(trips: List<Trip>): List<Pair<Trip, User>> {
         return trips.mapNotNull { trip ->
@@ -144,8 +141,6 @@ class HomeFeedFragment : Fragment(), Refresh {
             emptyText.visibility = View.VISIBLE
         }
     }
-
-    // Opens the trip map
 
     override fun refresh() {
         loadFeed()

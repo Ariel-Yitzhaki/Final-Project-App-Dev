@@ -1,6 +1,7 @@
 package com.example.travel.adapters
 
 import android.content.Context
+import android.graphics.Typeface
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,7 +11,8 @@ import com.example.travel.R
 import com.example.travel.models.Trip
 import android.text.SpannableString
 import android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-import android.text.style.TypefaceSpan
+import android.text.TextPaint
+import android.text.style.MetricAffectingSpan
 import android.widget.ImageView
 import com.example.travel.models.User
 import android.widget.ImageButton
@@ -68,18 +70,28 @@ class FeedTripAdapter(
 
     // Creates "username started a new trip!" with bold username font
     private fun createActivityText(context: Context, username: String): SpannableString {
-        val text = "$username started a new trip!"
+        val text = context.getString(R.string.format_activity_new_trip, username)
         val spannable = SpannableString(text)
         val typeface = ResourcesCompat.getFont(context, R.font.mont_bold)
         typeface?.let {
             spannable.setSpan(
-                TypefaceSpan(it),
+                CustomTypefaceSpan(it),
                 0,
                 username.length,
                 SPAN_EXCLUSIVE_EXCLUSIVE
             )
         }
         return spannable
+    }
+
+    // Made because the regular library for TypefaceSpan didn't support my min version
+    class CustomTypefaceSpan(private val typeface: Typeface) : MetricAffectingSpan() {
+        override fun updateDrawState(ds: TextPaint) {
+            ds.typeface = typeface
+        }
+        override fun updateMeasureState(paint: TextPaint) {
+            paint.typeface = typeface
+        }
     }
 
     // Updates adapter data and refreshes the list

@@ -45,11 +45,6 @@ class TripRepository {
         return cachedActiveTrip[userId]
     }
 
-    // If we have cached data for this user (even if it's null)
-    fun hasCachedActiveTrip(userId: String): Boolean {
-        return cachedActiveTrip.containsKey(userId)
-    }
-
     // Get a single trip by its ID
     suspend fun getTripById(tripId: String): Trip? {
         val snapshot = tripsCollection.document(tripId).get().await()
