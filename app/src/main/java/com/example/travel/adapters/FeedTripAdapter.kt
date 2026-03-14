@@ -1,5 +1,6 @@
 package com.example.travel.adapters
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Typeface
 import android.view.LayoutInflater
@@ -46,7 +47,7 @@ class FeedTripAdapter(
     override fun onBindViewHolder(holder: FeedTripViewHolder, position: Int) {
         val (trip, user) = trips[position]
 
-        holder.activityText.text = createActivityText(holder.itemView.context, user.username)
+        holder.activityText.text = createActivityText(holder.itemView.context, user.displayName)
         holder.profilePicture.loadProfilePicture(user.profilePictureUrl)
         holder.tripName.text = trip.name
         holder.tripDate.text = trip.startDate
@@ -69,15 +70,15 @@ class FeedTripAdapter(
     }
 
     // Creates "username started a new trip!" with bold username font
-    private fun createActivityText(context: Context, username: String): SpannableString {
-        val text = context.getString(R.string.format_activity_new_trip, username)
+    private fun createActivityText(context: Context, displayName: String): SpannableString {
+        val text = context.getString(R.string.format_activity_new_trip, displayName)
         val spannable = SpannableString(text)
         val typeface = ResourcesCompat.getFont(context, R.font.mont_bold)
         typeface?.let {
             spannable.setSpan(
                 CustomTypefaceSpan(it),
                 0,
-                username.length,
+                displayName.length,
                 SPAN_EXCLUSIVE_EXCLUSIVE
             )
         }
@@ -95,6 +96,7 @@ class FeedTripAdapter(
     }
 
     // Updates adapter data and refreshes the list
+    @SuppressLint("NotifyDataSetChanged")
     fun updateData(newTrips: List<Pair<Trip, User>>, newTripLikes: Map<String, Int>) {
         trips = newTrips
         tripLikes = newTripLikes
