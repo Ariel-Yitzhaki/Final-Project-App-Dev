@@ -26,18 +26,22 @@ class LikeRepository {
         if (existingLike.exists()) {
             // Unlike - remove the document
             likesCollection.document(likeId).delete().await()
-            photosCollection.document(photoId)
-                .update("likeCount", com.google.firebase.firestore.FieldValue.increment(-1))
-                .await()
+            try {
+                photosCollection.document(photoId)
+                    .update("likeCount", com.google.firebase.firestore.FieldValue.increment(-1))
+                    .await()
+            } catch (_: Exception) {}
             cachedTripLikes.clear()
             return false
         } else {
             // Like - create a new document
             val like = Like(id = likeId, photoId = photoId, userId = userId)
             likesCollection.document(likeId).set(like).await()
-            photosCollection.document(photoId)
-                .update("likeCount", com.google.firebase.firestore.FieldValue.increment(1))
-                .await()
+            try {
+                photosCollection.document(photoId)
+                    .update("likeCount", com.google.firebase.firestore.FieldValue.increment(1))
+                    .await()
+            } catch (_: Exception) {}
             cachedTripLikes.clear()
             return true
         }
