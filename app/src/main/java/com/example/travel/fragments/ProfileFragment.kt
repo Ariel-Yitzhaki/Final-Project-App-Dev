@@ -176,7 +176,7 @@ class ProfileFragment : Fragment(), Refresh {
             allTrips.addAll(completedTrips)
 
             val tripLikes = if (allTrips.isNotEmpty()) {
-                likeRepository.getLikesForTrips(allTrips, photoRepository)
+                likeRepository.fetchTripLikesFromPhotos(allTrips, photoRepository)
             } else {
                 emptyMap()
             }

@@ -4,7 +4,6 @@ import com.example.travel.models.Like
 import com.example.travel.models.Photo
 import com.example.travel.models.Trip
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.async
 import kotlinx.coroutines.tasks.await
 import kotlin.collections.emptyList
 
@@ -95,5 +94,16 @@ class LikeRepository {
         } else {
             cachedTripLikes.clear()
         }
+    }
+
+    suspend fun fetchTripLikesFromPhotos(
+        trips: List<Trip>,
+        photoRepository: PhotoRepository
+    ): Map<String, Int> {
+        val photosMap = mutableMapOf<String, List<Photo>>()
+        for (trip in trips) {
+            photosMap[trip.id] = photoRepository.getPhotosForTrip(trip.id)
+        }
+        return getTotalLikesForTrips(trips, photosMap)
     }
 }

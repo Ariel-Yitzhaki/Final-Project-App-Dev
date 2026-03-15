@@ -110,10 +110,8 @@ class HomeFeedFragment : Fragment(), Refresh {
                 .sortedByDescending { it.endDate }
 
             val tripsWithUsersDeferred = async { getTripsWithUsers(trips) }
-            val tripLikesDeferred = async { likeRepository.getLikesForTrips(trips, photoRepository) }
-
+            val tripLikes = likeRepository.fetchTripLikesFromPhotos(trips, photoRepository)
             val tripsWithUsers = tripsWithUsersDeferred.await()
-            val tripLikes = tripLikesDeferred.await()
 
             progressBar.visibility = View.GONE
             displayFeed(tripsWithUsers, tripLikes)
