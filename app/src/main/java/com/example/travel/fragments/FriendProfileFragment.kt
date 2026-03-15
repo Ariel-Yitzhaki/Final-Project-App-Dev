@@ -22,6 +22,7 @@ import com.example.travel.models.User
 import com.example.travel.utils.loadProfilePicture
 import com.example.travel.utils.openTripDetail
 import com.example.travel.utils.openTripMap
+import com.example.travel.utils.parsedStartTime
 import com.google.android.material.imageview.ShapeableImageView
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -166,12 +167,7 @@ class FriendProfileFragment : Fragment() {
 
         val allTrips = mutableListOf<Trip>()
         activeTrip?.let { allTrips.add(it) }
-        val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
-        allTrips.addAll(completedTrips.sortedByDescending {
-            try {
-                dateFormat.parse(it.startDate)?.time ?: 0L
-            } catch (_: Exception) { 0L }
-        })
+        allTrips.addAll(completedTrips.sortedByDescending { it.parsedStartTime() })
 
         if (allTrips.isNotEmpty()) {
             emptyText.visibility = View.GONE

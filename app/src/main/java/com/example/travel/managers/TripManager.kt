@@ -13,6 +13,7 @@ import com.example.travel.data.AuthRepository
 import com.example.travel.data.PhotoRepository
 import com.example.travel.data.TripRepository
 import com.example.travel.models.Trip
+import com.example.travel.utils.parsedStartTime
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -65,15 +66,10 @@ class TripManager(
             menuItems.add(Trip()) // Empty trip = "New Trip" option
 
             // Add existing trips, sorted: active first, then by startDate descending
-            val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
             val sortedTrips = allTrips
                 .filter { it.active || it.photoCount > 0 }
                 .sortedWith(
-                    compareByDescending<Trip> { it.active }.thenByDescending {
-                        try {
-                            dateFormat.parse(it.startDate)?.time ?: 0L
-                        } catch (_: Exception) { 0L }
-                    }
+                    compareByDescending<Trip> { it.active }.thenByDescending { it.parsedStartTime() }
                 )
 
             menuItems.addAll(sortedTrips)

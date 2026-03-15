@@ -25,6 +25,7 @@ import com.example.travel.utils.openTripDetail
 import kotlinx.coroutines.launch
 import com.example.travel.utils.openTripMap
 import kotlinx.coroutines.async
+import com.example.travel.utils.parsedStartTime
 
 // Displays friends' completed trips in a feed
 class HomeFeedFragment : Fragment(), Refresh {
@@ -89,7 +90,7 @@ class HomeFeedFragment : Fragment(), Refresh {
         if (cachedTrips != null && cachedTrips.isNotEmpty()) {
             lifecycleScope.launch {
                 val tripsWithUsers =
-                    getTripsWithUsers(cachedTrips.sortedByDescending { it.endDate })
+                    getTripsWithUsers(cachedTrips.sortedByDescending { it.parsedStartTime() })
                 displayFeed(tripsWithUsers, cachedLikes)
             }
         } else {
@@ -107,7 +108,7 @@ class HomeFeedFragment : Fragment(), Refresh {
                 return@launch
             }
             val trips = tripRepository.getTripsWithPhotosForUsers(friendIds)
-                .sortedByDescending { it.endDate }
+                .sortedByDescending { it.parsedStartTime() }
 
             val tripsWithUsersDeferred = async { getTripsWithUsers(trips) }
             val tripLikes = likeRepository.fetchTripLikesFromPhotos(trips, photoRepository)

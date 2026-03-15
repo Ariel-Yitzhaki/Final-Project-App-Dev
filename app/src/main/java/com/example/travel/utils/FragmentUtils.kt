@@ -7,6 +7,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.example.travel.R
 import com.example.travel.fragments.TripDetailFragment
 import com.example.travel.fragments.TripMapDialogFragment
+import com.example.travel.models.Trip
 
 // Opens the trip detail view from any fragment
 fun Fragment.openTripDetail(tripId: String) {
@@ -36,3 +37,14 @@ fun ImageView.loadProfilePicture(url: String) {
         this.setImageResource(R.drawable.ic_profile)
     }
 }
+
+// Parses a date string into a long for sorting (Months don't sort well based on ABC
+fun Trip.parsedStartTime(): Long {
+    return try {
+        java.text.SimpleDateFormat("MMM dd, yyyy", java.util.Locale.getDefault())
+            .parse(startDate)?.time ?: 0L
+    } catch (_: Exception) {
+        0L
+    }
+}
+
