@@ -8,5 +8,6 @@ data class Photo(
     val longitude: Double = 0.0,
     val date: String = "",
     val timestamp: Long = 0L,
-    val tripId: String = ""
+    val tripId: String = "",
+    val likeCount: Int = 0
 )

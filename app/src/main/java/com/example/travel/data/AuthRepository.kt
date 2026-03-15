@@ -57,6 +57,11 @@ class AuthRepository {
     // Log out
     fun logOut() {
         auth.signOut()
+        invalidateCache()
+        TripRepository.instance.invalidateCache()
+        PhotoRepository.instance.invalidateCache()
+        LikeRepository.instance.invalidateCache()
+        FriendsRepository.instance.invalidateCache()
     }
 
     // Get user profile from Firestore by ID
@@ -81,5 +86,9 @@ class AuthRepository {
         cachedProfiles[uid]?.let {
             cachedProfiles[uid] = it.copy(profilePictureUrl = url)
         }
+    }
+
+    fun invalidateCache() {
+        cachedProfiles.clear()
     }
 }
