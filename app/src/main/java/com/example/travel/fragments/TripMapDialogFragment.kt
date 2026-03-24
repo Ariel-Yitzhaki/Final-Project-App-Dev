@@ -1,5 +1,6 @@
 package com.example.travel.fragments
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -58,8 +59,10 @@ class TripMapDialogFragment : DialogFragment(), OnMapReadyCallback {
     }
 
     // Callback triggered when GoogleMap is ready to use
+    @SuppressLint("PotentialBehaviorOverride")
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
+        map.uiSettings.isCompassEnabled = false
 
         // Show photo popup when marker is clicked
         map.setOnMarkerClickListener { marker ->

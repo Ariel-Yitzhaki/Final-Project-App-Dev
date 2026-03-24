@@ -26,8 +26,6 @@ import com.example.travel.utils.parsedStartTime
 import com.google.android.material.imageview.ShapeableImageView
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 // Displays a friend's profile (read-only)
 class FriendProfileFragment : Fragment() {
@@ -163,7 +161,7 @@ class FriendProfileFragment : Fragment() {
 
         profileImage.loadProfilePicture(user.profilePictureUrl)
         displayNameText.text = user.displayName
-        usernameText.text = "@${user.username}"
+        usernameText.text = getString(R.string.format_username, user.username)
 
         val allTrips = mutableListOf<Trip>()
         activeTrip?.let { allTrips.add(it) }

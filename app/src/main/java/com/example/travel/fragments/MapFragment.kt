@@ -1,6 +1,7 @@
 package com.example.travel.fragments
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -70,8 +71,10 @@ class MapFragment : Fragment(), OnMapReadyCallback, Refresh {
     }
 
     // Callback triggered when GoogleMap is ready to use - check permissions and enable location
+    @SuppressLint("PotentialBehaviorOverride", "ResourceType")
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
+        map.uiSettings.isCompassEnabled = false
 
         // Move My Location button to bottom-right
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
