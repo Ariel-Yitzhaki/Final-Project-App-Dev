@@ -15,15 +15,15 @@ Built with Kotlin, Firebase, and Google Maps SDK.
 
 ## Features
 
-- **Trip Management** — Create, name, activate, and reactivate trips with automatic lifecycle handling and a bottom sheet selector
+- **Trip Management** - Create, name, activate, and reactivate trips with automatic lifecycle handling and a bottom sheet selector
   
-- **Geotagged Photos** — Capture photos with the in-app camera, preview with reverse-geocoded address, and upload with a 200m minimum distance between shots
+- **Geotagged Photos** - Capture photos with the in-app camera, preview with reverse-geocoded address, and upload with a 200m minimum distance between shots
   
-- **Interactive Map** — Live location on Google Maps with custom photo pin markers, a dashed travel path with direction arrows, and tap-to-view photo popups
+- **Interactive Map** - Live location on Google Maps with custom photo pin markers, a dashed travel path with direction arrows, and tap-to-view photo popups
   
-- **Social** — Add friends, explore their trips and routes in a home feed, like their photos, and view their profiles
+- **Social** - Add friends, explore their trips and routes in a home feed, like their photos, and view their profiles
   
-- **Profile** — Custom profile picture, trip history with like counts, and full trip/photo deletion with cascading cleanup
+- **Profile** - Custom profile picture, trip history with like counts, and full trip/photo deletion with cascading cleanup
   
 
 ---
@@ -37,7 +37,7 @@ Built with Kotlin, Firebase, and Google Maps SDK.
 | **Min SDK** | 24 (Android 7.0) |
 | **Target SDK** | 36 |
 
-### Backend — Firebase (serverless)
+### Backend - Firebase (serverless)
 | Service | Usage |
 |---|---|
 | **Firebase Auth** | Email/password authentication |
@@ -87,7 +87,7 @@ com.example.travel/
   
 - **Fragments** own screen logic - they fetch data from repositories and update their own views
   
-- **Callbacks and interfaces** for communication — managers use lambdas to notify activities, fragments use interfaces (`TripEndListener`, `Refresh`) to talk to their host activity
+- **Callbacks and interfaces** for communication - managers use lambdas to notify activities, fragments use interfaces (`TripEndListener`, `Refresh`) to talk to their host activity
 
 ### Firestore Data Model
 
@@ -161,7 +161,7 @@ friendRequests/{senderId_receiverId}
 ## Design
 
 - **Theme:** Material3 NoActionBar with a white-dominant color scheme
-- **Typography:** Mont font family (6 weights) — Heavy for screen titles and trip names, Bold for labels and buttons, SemiBold for metadata, Regular for secondary text
+- **Typography:** Mont font family (6 weights) - Heavy for screen titles and trip names, Bold for labels and buttons, SemiBold for metadata, Regular for secondary text
 - **Navigation:** Bottom bar with 4 tabs (Home, Friends, Map, Profile) with Azure/black icon tinting for selected state, and a centered FAB overlapping the bar on the map tab
 - **Colors:** White backgrounds, dark (`#18181B`) primary text and buttons, Azure (`#0066FF`) for accents and interactive elements, light gray (`#F4F4F5`) card surfaces, dark surface for the photo preview screen
 - **Components:** Rounded MaterialCardView cards (16dp corners) for feed, trips, friends, and search results. Bottom sheet trip selector with grab handle.
