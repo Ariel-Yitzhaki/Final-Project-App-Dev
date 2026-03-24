@@ -40,6 +40,7 @@ class MainActivity : AppCompatActivity(), TripEndListener {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var heroSection: View
 
+    @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

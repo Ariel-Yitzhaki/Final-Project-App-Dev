@@ -219,7 +219,7 @@ object MapRenderingUtils {
 
     // Creates a pin-shaped bitmap with a photo inside a white border and a pointer triangle
     private fun createPinWithPhoto(photo: Bitmap, borderWidth: Int, borderColor: Int): Bitmap {
-        val pointerHeight = 50
+        val pointerHeight = 30
 
         val totalWidth = photo.width + borderWidth * 2
         val totalHeight = photo.height + borderWidth * 2 + pointerHeight
