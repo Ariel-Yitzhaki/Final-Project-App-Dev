@@ -17,7 +17,7 @@ Built with Kotlin, Firebase, and Google Maps SDK.
 
 ## Features
 
-### Trip Management <img align="right" width="200" src="https://github.com/user-attachments/assets/b0e3e9ba-eb1c-47ae-bed8-cb88151d4cc7">  <img align="right" width="200" src="https://github.com/user-attachments/assets/59c9325b-1dad-4048-bf9b-631200eb66a8">  
+### Trip Management <img align="right" width="200" src="https://github.com/user-attachments/assets/280225dd-9415-4607-b8ec-c8dbeccaa9ab">  <img align="right" width="200" src="https://github.com/user-attachments/assets/59c9325b-1dad-4048-bf9b-631200eb66a8">  
 - Create, name, activate, and reactivate trips with automatic lifecycle handling
 - Bottom sheet trip selector for quick switching between trips
 - Full trip deletion with cascading cleanup of photos, likes, and storage
@@ -54,15 +54,12 @@ Built with Kotlin, Firebase, and Google Maps SDK.
 - Home feed of friends' completed trips with like counts
 - View friend profiles, explore their trips and routes
 - Like photos across the app
-
+<br>
 <img width="130" alt="image" src="https://github.com/user-attachments/assets/ac6e4f38-a8f8-47ae-9b84-6ca6bb07ada5" >
 <img width="130" alt="image" src="https://github.com/user-attachments/assets/446de0db-c357-479c-b42b-f717c9a7aec1" />
 <img width="130" alt="image" src="https://github.com/user-attachments/assets/76cb8156-ce23-4eda-9405-481eebb1bbfb" />
 
-
-
 <br clear="right">
-
 <br><br>
 
 
