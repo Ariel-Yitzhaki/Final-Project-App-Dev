@@ -150,9 +150,3 @@ MAPS_API_KEY=your_api_key_here
 **4. Build and run** on a physical device (camera and GPS required).
 
 ---
-
-
-## Author
-
-Ariel Yitzhaki
-
